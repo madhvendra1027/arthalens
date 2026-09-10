@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
@@ -9,11 +9,11 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthalens-production.up.railway.app"),
   title: {
-    default: "India GDP & Macroeconomic Accounts 2024 | Official MoSPI & RBI Statistics â€” ArthaLens",
+    default: "India GDP & Macroeconomic Accounts 2024 | Official MoSPI & RBI Statistics — ArthaLens",
     template: "%s | ArthaLens Macroeconomic Intelligence",
   },
   description:
-    "Official repository of India's National Accounts Statistics (NAS). Track Real GDP growth (+8.2% FY24), Nominal GDP (â‚¹295.36 Lakh Crore), GVA by sector, Implicit GDP Deflator, CPI, WPI, and sovereign credit ratings with verified MoSPI & RBI provenance.",
+    "Official repository of India's National Accounts Statistics (NAS). Track Real GDP growth (+8.2% FY24), Nominal GDP (₹295.36 Lakh Crore), GVA by sector, Implicit GDP Deflator, CPI, WPI, and sovereign credit ratings with verified MoSPI & RBI provenance.",
   keywords: [
     "India GDP",
     "India GDP growth rate",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://arthalens-production.up.railway.app",
-    siteName: "ArthaLens â€” India Macroeconomic Intelligence",
+    siteName: "ArthaLens — India Macroeconomic Intelligence",
     title: "India GDP & Macroeconomic Indicators 2024 | Official MoSPI & RBI Data",
     description:
       "Authoritative economic portal for India's National Accounts Statistics. Real GDP (+8.2%), Nominal GDP, Sectoral GVA, Deflator, and Sovereign Credit Ratings.",
@@ -66,9 +66,6 @@ export const metadata: Metadata = {
     title: "India GDP & Macroeconomic Intelligence | ArthaLens",
     description:
       "Official macroeconomic data repository published by MoSPI and RBI. Real GDP (+8.2%), Nominal GDP, and Sectoral GVA.",
-  },
-  verification: {
-    google: 'google5aa6cb3286881c9f',
   },
   robots: {
     index: true,
@@ -140,7 +137,7 @@ export default function RootLayout({
             "name": "What is India's Nominal GDP size in FY 2023-24?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "India's Nominal GDP (at Current Prices) for FY 2023-24 is estimated at â‚¹295.36 Lakh Crore (approximately $3.55 Trillion USD), recording a growth rate of 9.6% over FY 2022-23."
+              "text": "India's Nominal GDP (at Current Prices) for FY 2023-24 is estimated at ₹295.36 Lakh Crore (approximately $3.55 Trillion USD), recording a growth rate of 9.6% over FY 2022-23."
             }
           },
           {
@@ -186,10 +183,10 @@ export default function RootLayout({
           <main className="min-h-screen">{children}</main>
           <footer className="border-t border-surface px-6 py-8 text-center text-sm text-[--color-text-muted]">
             <p>
-              ArthaLens â€” Official statistics reproduced with provenance from MoSPI, RBI, and Government of India.
+              ArthaLens — Official statistics reproduced with provenance from MoSPI, RBI, and Government of India.
               Derived analytics, forecasts, and AI interpretations are not official government estimates.
             </p>
-            <p className="mt-1 font-mono text-xs">Open Government Data Framework Compliant â€¢ Not investment advice.</p>
+            <p className="mt-1 font-mono text-xs">Open Government Data Framework Compliant • Not investment advice.</p>
           </footer>
         </Providers>
       </body>
