@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+  --color-brand-800: #1e3a8a;
+  --color-brand-900: #0f2942;
+
+  --color-surface-white: #ffffff;
+  --color-surface-bg: #f8fafc;
+  --color-surface-50: #f1f5f9;
+  --color-surface-100: #e2e8f0;
+  --color-surface-200: #cbd5e1;
+  --color-surface-600: #475569;
+  --color-surface-700: #334155;
+  --color-surface-800: #1e293b;
+  --color-surface-900: #0f172a;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  
+  --color-official: #059669;
+  --color-official-bg: #ecfdf5;
+  --color-official-border: #a7f3d0;
+  
+  --color-provisional: #d97706;
+  --color-provisional-bg: #fffbeb;
+  --color-provisional-border: #fde68a;
+  
+  --color-forecast: #7c3aed;
+  --color-forecast-bg: #f5f3ff;
+  --color-forecast-border: #ddd6fe;
+
+  --color-derived: #0284c7;
+  --color-derived-bg: #f0f9ff;
+  --color-derived-border: #bae6fd;
+  
+  --color-danger: #dc2626;
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+
+  select {
+    color-scheme: light !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+  }
+  
+  select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  input, textarea {
+    color-scheme: light !important;
+    background-color: #ffffff;
+    color: #0f172a;
+    border-color: #cbd5e1;
+  }
+}
+
+@layer utilities {
+  .text-official { color: #059669; }
+  .text-provisional { color: #d97706; }
+  .text-forecast { color: #7c3aed; }
+  .text-derived { color: #0284c7; }
+
+  .bg-surface-white { background-color: #ffffff; }
+  .bg-surface-bg { background-color: #f8fafc; }
+  .bg-surface-50 { background-color: #f1f5f9; }
+  
+  .border-surface { border-color: #e2e8f0; }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .card:hover {
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
+    border-color: #cbd5e1;
+  }
+}
