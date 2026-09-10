@@ -1,0 +1,96 @@
+version: "3.9"
+
+# ArthaLens — Docker Compose for local development
+# Requires: .env file (copy from .env.example)
+
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: arthalens_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-arthalens}
+      POSTGRES_USER: ${POSTGRES_USER:-arthalens}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - arthalens_postgres_data:/var/lib/postgresql/data
+      - ./services/database/docker/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-arthalens}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: arthalens_api
+    env_file: .env
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ai:
+    build:
+      context: ./services/ai
+      dockerfile: Dockerfile
+    container_name: arthalens_ai
+    env_file: .env
+    ports:
+      - "${AI_SERVICE_PORT:-8001}:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ml:
+    build:
+      context: ./services/ml
+      dockerfile: Dockerfile
+    container_name: arthalens_ml
+    env_file: .env
+    ports:
+      - "${ML_SERVICE_PORT:-8002}:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: arthalens_web
+    env_file: .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  arthalens_postgres_data:
+    driver: local

@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arthalens-ingestion"
+version = "0.1.0"
+description = "ArthaLens data ingestion service for Indian macroeconomic data"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx[http2]>=0.27",
+    "pandas>=2.2",
+    "openpyxl>=3.1",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "psycopg2-binary>=2.9",
+    "sqlalchemy>=2.0",
+    "tenacity>=8.3",
+    "apscheduler>=3.10",
+    "structlog>=24.1",
+    "python-dotenv>=1.0",
+    "hashlib2>=1.0; python_version < '3.9'",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "pytest-httpx>=0.30",
+    "respx>=0.21",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "types-PyYAML",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+

@@ -1,0 +1,117 @@
+name: ArthaLens CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  POSTGRES_DB: arthalens_test
+  POSTGRES_USER: arthalens
+  POSTGRES_PASSWORD: testpassword
+  JAVA_VERSION: "21"
+  PYTHON_VERSION: "3.13"
+  NODE_VERSION: "24"
+
+jobs:
+
+  backend:
+    name: Backend (Java / Spring Boot)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: arthalens_test
+          POSTGRES_USER: arthalens
+          POSTGRES_PASSWORD: testpassword
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+      - name: Build & Test
+        working-directory: services/api
+        run: ./mvnw -B verify
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_PASSWORD: testpassword
+
+  ingestion:
+    name: Ingestion Service (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install & Test
+        working-directory: services/ingestion
+        run: |
+          pip install -e ".[dev]"
+          ruff check .
+          mypy ingestion --ignore-missing-imports
+          pytest --cov=ingestion --cov-report=term-missing
+
+  ml:
+    name: ML Service (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install & Test
+        working-directory: services/ml
+        run: |
+          pip install -e ".[dev]"
+          ruff check .
+          pytest --cov=ml --cov-report=term-missing
+
+  ai:
+    name: AI Service (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install & Test
+        working-directory: services/ai
+        run: |
+          pip install -e ".[dev]"
+          ruff check .
+          pytest --cov=rag --cov-report=term-missing
+
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+      - name: Type check
+        working-directory: apps/web
+        run: npx tsc --noEmit
+      - name: Lint
+        working-directory: apps/web
+        run: npm run lint
+      - name: Build
+        working-directory: apps/web
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api/v1
+          NEXT_PUBLIC_AI_BASE_URL: http://localhost:8001/ai/v1
+          NEXT_PUBLIC_APP_ENV: test

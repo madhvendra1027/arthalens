@@ -1,0 +1,41 @@
+# ArthaLens Source Registry
+# DO NOT invent URLs. Only confirmed official sources are listed here.
+# Parser version increments when parsing logic changes.
+
+sources:
+
+  mospi_nas:
+    name: "MoSPI National Accounts Statistics"
+    authority: "Ministry of Statistics and Programme Implementation"
+    canonical_url: "https://mospi.gov.in/national-accounts-statistics"
+    data_types: [gdp, gva, deflators, sector, methodology]
+    update_frequency: "quarterly"
+    access_method: download
+    file_formats: [xlsx, pdf]
+    parser_version: "1.0"
+    schedule_cron: "0 10 * * 1"   # weekly Monday check; actual release dates vary
+    terms: "Government of India open data"
+
+  rbi_dbie:
+    name: "RBI Database on Indian Economy (DBIE)"
+    authority: "Reserve Bank of India"
+    canonical_url: "https://dbie.rbi.org.in/DBIE/dbie.rbi"
+    data_types: [cpi, wpi, monetary, banking, trade, fiscal]
+    update_frequency: "monthly"
+    access_method: api
+    file_formats: [json, csv]
+    parser_version: "1.0"
+    schedule_cron: "0 9 15 * *"   # 15th of each month
+    terms: "RBI data usage policy — see dbie.rbi.org.in"
+
+  pib_releases:
+    name: "Government of India Press Information Bureau"
+    authority: "Press Information Bureau, GoI"
+    canonical_url: "https://pib.gov.in/allRel.aspx"
+    data_types: [press_release, fiscal, ratings_commentary]
+    update_frequency: "as_released"
+    access_method: download
+    file_formats: [pdf, html]
+    parser_version: "1.0"
+    schedule_cron: "0 8 * * *"    # daily
+    terms: "Government of India press release policy"

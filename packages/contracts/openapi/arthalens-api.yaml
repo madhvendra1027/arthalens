@@ -1,0 +1,781 @@
+openapi: "3.1.0"
+info:
+  title: ArthaLens API
+  version: "1.0.0"
+  description: |
+    ArthaLens REST API — India macroeconomic intelligence platform.
+
+    **Data policy**: Official statistics are reproduced with full provenance metadata.
+    Derived analytics, ML forecasts, and AI-generated interpretations are clearly
+    distinguished from official government estimates and are never presented as such.
+
+    All monetary values in INR Crore unless stated otherwise.
+    All timestamps are UTC ISO-8601.
+    All periods follow the format defined in the period_type/period_label schema.
+  contact:
+    name: ArthaLens
+  license:
+    name: See LICENSE
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development
+
+tags:
+  - name: health
+  - name: dashboard
+  - name: gdp
+  - name: gva
+  - name: deflators
+  - name: indicators
+  - name: methodology
+  - name: revisions
+  - name: ratings
+  - name: sources
+  - name: ai
+
+paths:
+
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /dashboard/india:
+    get:
+      tags: [dashboard]
+      operationId: getIndiaDashboard
+      summary: Economic snapshot for India
+      description: Returns the latest headline indicators for the India economic snapshot dashboard.
+      parameters:
+        - $ref: "#/components/parameters/BaseYearParam"
+      responses:
+        "200":
+          description: Dashboard snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /gdp/latest:
+    get:
+      tags: [gdp]
+      operationId: getLatestGdp
+      summary: Latest GDP observation
+      parameters:
+        - $ref: "#/components/parameters/BaseYearParam"
+        - $ref: "#/components/parameters/PriceTypeParam"
+      responses:
+        "200":
+          description: Latest GDP observation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GdpObservation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /gdp/series:
+    get:
+      tags: [gdp]
+      operationId: getGdpSeries
+      summary: GDP time series
+      parameters:
+        - $ref: "#/components/parameters/BaseYearParam"
+        - $ref: "#/components/parameters/PriceTypeParam"
+        - $ref: "#/components/parameters/PeriodTypeParam"
+        - $ref: "#/components/parameters/FromPeriodParam"
+        - $ref: "#/components/parameters/ToPeriodParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+        - name: allow_mixed_series
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: |
+            If true, allows mixing 2011-12 and 2022-23 series in response.
+            Response will include a prominentWarning field. Use with caution.
+      responses:
+        "200":
+          description: GDP time series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GdpSeriesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /gdp/sectors:
+    get:
+      tags: [gdp]
+      operationId: getGdpSectors
+      summary: Sectoral GDP / GVA breakdown
+      parameters:
+        - $ref: "#/components/parameters/BaseYearParam"
+        - $ref: "#/components/parameters/PriceTypeParam"
+        - $ref: "#/components/parameters/PeriodParam"
+      responses:
+        "200":
+          description: Sectoral breakdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SectorBreakdownResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /gdp/revisions:
+    get:
+      tags: [gdp, revisions]
+      operationId: getGdpRevisions
+      summary: GDP revision history
+      parameters:
+        - $ref: "#/components/parameters/BaseYearParam"
+        - $ref: "#/components/parameters/PeriodParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: Revision history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevisionsResponse"
+
+  /methodology/series-comparison:
+    get:
+      tags: [methodology]
+      operationId: getSeriesComparison
+      summary: Compare 2011-12 and 2022-23 base-year series
+      responses:
+        "200":
+          description: Series comparison metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesComparisonResponse"
+
+  /deflators:
+    get:
+      tags: [deflators]
+      operationId: getDeflators
+      summary: GDP deflator and price index observations
+      parameters:
+        - $ref: "#/components/parameters/BaseYearParam"
+        - $ref: "#/components/parameters/PeriodTypeParam"
+        - $ref: "#/components/parameters/FromPeriodParam"
+        - $ref: "#/components/parameters/ToPeriodParam"
+      responses:
+        "200":
+          description: Deflator observations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeflatorsResponse"
+
+  /indicators:
+    get:
+      tags: [indicators]
+      operationId: getIndicators
+      summary: High-frequency economic indicators
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/SizeParam"
+      responses:
+        "200":
+          description: Indicators list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndicatorsResponse"
+
+  /ratings:
+    get:
+      tags: [ratings]
+      operationId: getRatings
+      summary: Sovereign credit ratings for India
+      parameters:
+        - name: agency
+          in: query
+          schema:
+            type: string
+            enum: [moodys, sp, fitch, all]
+            default: all
+      responses:
+        "200":
+          description: Ratings list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RatingsResponse"
+
+  /sources/{id}:
+    get:
+      tags: [sources]
+      operationId: getSource
+      summary: Source document metadata
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Source metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /ai/query:
+    post:
+      tags: [ai]
+      operationId: aiQuery
+      summary: AI research assistant query
+      description: |
+        Orchestrates retrieval and generation for an economic research query.
+        Delegates to the AI service. Responses include citations with source metadata.
+        Model-generated interpretations are clearly labeled.
+        This endpoint does NOT provide investment advice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiQueryRequest"
+      responses:
+        "200":
+          description: AI research response with citations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiQueryResponse"
+            text/event-stream:
+              schema:
+                type: string
+                description: SSE stream of AiQueryChunk objects (if streaming supported)
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+components:
+
+  parameters:
+    BaseYearParam:
+      name: base_year
+      in: query
+      schema:
+        type: string
+        enum: ["2011-12", "2022-23"]
+        default: "2022-23"
+      description: GDP base year series to use
+    PriceTypeParam:
+      name: price_type
+      in: query
+      schema:
+        type: string
+        enum: [current, constant]
+        default: constant
+    PeriodTypeParam:
+      name: period_type
+      in: query
+      schema:
+        type: string
+        enum: [FY, Q, CY, M]
+        default: FY
+    PeriodParam:
+      name: period
+      in: query
+      schema:
+        type: string
+        example: "2023-24"
+    FromPeriodParam:
+      name: from_period
+      in: query
+      schema:
+        type: string
+        example: "2014-15"
+    ToPeriodParam:
+      name: to_period
+      in: query
+      schema:
+        type: string
+        example: "2023-24"
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    SizeParam:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+
+  responses:
+    BadRequest:
+      description: Bad request — invalid parameter combination
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    ServiceUnavailable:
+      description: Downstream service unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+
+  schemas:
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [UP, DOWN, DEGRADED]
+        timestamp:
+          type: string
+          format: date-time
+        services:
+          type: object
+          additionalProperties:
+            type: string
+
+    ProblemDetail:
+      type: object
+      description: RFC 7807 Problem Detail
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        requestId:
+          type: string
+
+    Provenance:
+      type: object
+      description: Source and methodology provenance attached to every observation
+      properties:
+        sourceId:
+          type: string
+          format: uuid
+        sourceName:
+          type: string
+        sourceUrl:
+          type: string
+          format: uri
+        publicationDate:
+          type: string
+          format: date
+        retrievalTimestamp:
+          type: string
+          format: date-time
+        baseYear:
+          type: string
+          example: "2022-23"
+        methodologyVersion:
+          type: string
+        observationStatus:
+          type: string
+          enum: [official, provisional, revised, estimated, derived, forecast]
+
+    GdpObservation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        period:
+          type: string
+          example: "2023-24"
+        periodType:
+          type: string
+          enum: [FY, Q, CY, M]
+        value:
+          type: number
+          description: GDP value in INR Crore
+        unit:
+          type: string
+          example: "INR Crore"
+        priceType:
+          type: string
+          enum: [current, constant]
+        growthRate:
+          type: number
+          nullable: true
+          description: YoY growth rate (%) — derived, not official
+        provenance:
+          $ref: "#/components/schemas/Provenance"
+
+    GdpSeriesResponse:
+      type: object
+      properties:
+        baseYear:
+          type: string
+        priceType:
+          type: string
+        periodType:
+          type: string
+        prominentWarning:
+          type: string
+          nullable: true
+          description: Set when allow_mixed_series=true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/GdpObservation"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    SectorBreakdownResponse:
+      type: object
+      properties:
+        period:
+          type: string
+        baseYear:
+          type: string
+        priceType:
+          type: string
+        sectors:
+          type: array
+          items:
+            type: object
+            properties:
+              sectorCode:
+                type: string
+              sectorName:
+                type: string
+              value:
+                type: number
+              shareOfGdp:
+                type: number
+              growthRate:
+                type: number
+                nullable: true
+              provenance:
+                $ref: "#/components/schemas/Provenance"
+
+    DashboardResponse:
+      type: object
+      properties:
+        asOf:
+          type: string
+          format: date-time
+        baseYear:
+          type: string
+        realGdpGrowth:
+          $ref: "#/components/schemas/MetricCard"
+        nominalGdpGrowth:
+          $ref: "#/components/schemas/MetricCard"
+        gdpAbsolute:
+          $ref: "#/components/schemas/MetricCard"
+        gvaGrowth:
+          $ref: "#/components/schemas/MetricCard"
+        gdpDeflator:
+          $ref: "#/components/schemas/MetricCard"
+        cpi:
+          $ref: "#/components/schemas/MetricCard"
+        wpi:
+          $ref: "#/components/schemas/MetricCard"
+        topSectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricCard"
+
+    MetricCard:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: number
+          nullable: true
+        unit:
+          type: string
+        period:
+          type: string
+        status:
+          type: string
+          enum: [official, provisional, revised, derived, forecast, unavailable]
+        provenance:
+          $ref: "#/components/schemas/Provenance"
+
+    RevisionsResponse:
+      type: object
+      properties:
+        period:
+          type: string
+        baseYear:
+          type: string
+        revisions:
+          type: array
+          items:
+            type: object
+            properties:
+              revisionDate:
+                type: string
+                format: date
+              fromValue:
+                type: number
+              toValue:
+                type: number
+              fromStatus:
+                type: string
+              toStatus:
+                type: string
+              releaseLabel:
+                type: string
+              provenance:
+                $ref: "#/components/schemas/Provenance"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    SeriesComparisonResponse:
+      type: object
+      properties:
+        series:
+          type: array
+          items:
+            type: object
+            properties:
+              baseYear:
+                type: string
+              methodologyVersion:
+                type: string
+              baseYearDescription:
+                type: string
+              deflationMethod:
+                type: string
+                enum: [single, double]
+              primaryDataSources:
+                type: array
+                items:
+                  type: string
+              coveragePeriodFrom:
+                type: string
+              coveragePeriodTo:
+                type: string
+              keyChanges:
+                type: array
+                items:
+                  type: string
+
+    DeflatorsResponse:
+      type: object
+      properties:
+        baseYear:
+          type: string
+        periodType:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              gdpDeflator:
+                type: number
+                nullable: true
+              cpi:
+                type: number
+                nullable: true
+              wpi:
+                type: number
+                nullable: true
+              provenance:
+                $ref: "#/components/schemas/Provenance"
+
+    IndicatorsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              indicatorCode:
+                type: string
+              indicatorName:
+                type: string
+              latestValue:
+                type: number
+              unit:
+                type: string
+              period:
+                type: string
+              provenance:
+                $ref: "#/components/schemas/Provenance"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    RatingsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              agency:
+                type: string
+              rating:
+                type: string
+              outlook:
+                type: string
+                enum: [Positive, Stable, Negative, Watch]
+              ratingDate:
+                type: string
+                format: date
+              previousRating:
+                type: string
+                nullable: true
+              actionType:
+                type: string
+                enum: [Upgrade, Downgrade, Affirm, Outlook_Change]
+              provenance:
+                $ref: "#/components/schemas/Provenance"
+
+    SourceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        authority:
+          type: string
+        canonicalUrl:
+          type: string
+          format: uri
+        dataTypes:
+          type: array
+          items:
+            type: string
+        updateFrequency:
+          type: string
+        lastSuccessfulRetrieval:
+          type: string
+          format: date-time
+        lastObservedPublicationDate:
+          type: string
+          format: date
+
+    AiQueryRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          maxLength: 2000
+          description: User research query
+        conversationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For multi-turn conversations
+        stream:
+          type: boolean
+          default: false
+          description: Request SSE streaming if supported
+
+    AiQueryResponse:
+      type: object
+      properties:
+        conversationId:
+          type: string
+          format: uuid
+        answer:
+          type: string
+          description: Generated answer text
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Citation"
+        groundednessScore:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of factual claims with source support
+        disclaimer:
+          type: string
+          description: Always present; clarifies AI interpretation vs official stats
+
+    Citation:
+      type: object
+      properties:
+        citationId:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        publisher:
+          type: string
+        publicationDate:
+          type: string
+          format: date
+        section:
+          type: string
+          nullable: true
+        page:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          nullable: true
+        excerpt:
+          type: string
+          nullable: true
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer

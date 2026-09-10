@@ -1,0 +1,75 @@
+# ArthaLens .gitignore
+
+# Secrets
+.env
+.env.local
+.env.*.local
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+dist/
+build/
+*.egg-info/
+.eggs/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Java/Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+.mvn/wrapper/maven-wrapper.jar
+
+# Node/Next.js
+node_modules/
+.next/
+out/
+.npm/
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+coverage/
+test-results/
+playwright-report/
+
+# ML model artifacts
+*.onnx
+*.pkl
+*.joblib
+*.h5
+models/
+
+# Raw ingested data (never commit official government data)
+services/ingestion/raw_archive/
+services/ingestion/quarantine/
+
+# Docker local volumes
+infra/volumes/

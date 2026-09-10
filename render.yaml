@@ -1,0 +1,38 @@
+services:
+  # Next.js 16 Web Application Frontend
+  - type: web
+    name: arthalens-web
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: apps/web
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NEXT_PUBLIC_API_URL
+        value: http://localhost:8080
+
+  # Spring Boot Java 21 REST API
+  - type: web
+    name: arthalens-api
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: services/api
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: arthalens-db
+          property: connectionString
+
+databases:
+  - name: arthalens-db
+    plan: free
+    region: oregon
+    databaseName: arthalens
+    user: arthalens

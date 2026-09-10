@@ -1,0 +1,13 @@
+[
+  {
+    "base_year": "2022-23",
+    "period_type": "FY",
+    "period_label": "2023-24",
+    "value": 295355000.0,
+    "unit": "INR Crore",
+    "price_type": "constant",
+    "source_id": "00000000-0000-0000-0000-000000000001",
+    "status": "official",
+    "_note": "Synthetic test fixture. Not an official GDP value."
+  }
+]
