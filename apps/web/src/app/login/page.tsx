@@ -10,18 +10,41 @@ import {
   User,
   Building,
   ArrowRight,
-  Zap,
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
+  Globe2,
 } from "lucide-react";
+
+function GoogleIcon() {
+  return (
+    <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
+      <path
+        fill="#4285F4"
+        d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+      />
+    </svg>
+  );
+}
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/";
 
-  const { login, signup } = useAuth();
+  const { login, loginWithGoogle, continueAsGuest, signup } = useAuth();
   const [tab, setTab] = useState<"signin" | "signup">("signin");
 
   // Form states
@@ -29,6 +52,8 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [organization, setOrganization] = useState("");
+  const [showGmailPrompt, setShowGmailPrompt] = useState(false);
+  const [gmailInput, setGmailInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -43,14 +68,47 @@ function LoginForm() {
     setLoading(false);
 
     if (res.success) {
-      setSuccessMsg("Authorization verified. Redirecting to workspace...");
+      setSuccessMsg("Signed in successfully. Redirecting...");
       setTimeout(() => router.push(from), 400);
     } else {
-      setErrorMsg(res.error || "Authentication failed. Please verify credentials.");
+      setErrorMsg(res.error || "Authentication failed. Please verify email and password.");
     }
   };
 
-  const handleDemoSignIn = async () => {
+  const handleGoogleAuth = async (customGmail?: string) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setLoading(true);
+
+    const targetEmail = customGmail || (gmailInput.trim() ? gmailInput.trim() : "citizen.explorer@gmail.com");
+    const res = await loginWithGoogle(targetEmail);
+    setLoading(false);
+
+    if (res.success) {
+      setSuccessMsg(`Signed in with Google (${targetEmail}). Redirecting...`);
+      setTimeout(() => router.push(from), 400);
+    } else {
+      setErrorMsg(res.error || "Google sign in error.");
+    }
+  };
+
+  const handleGuestExplorer = async () => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setLoading(true);
+
+    const res = await continueAsGuest();
+    setLoading(false);
+
+    if (res.success) {
+      setSuccessMsg("Public Explorer access granted. Loading data...");
+      setTimeout(() => router.push(from), 400);
+    } else {
+      setErrorMsg(res.error || "Explorer access error.");
+    }
+  };
+
+  const handleDemoAnalyst = async () => {
     setErrorMsg(null);
     setSuccessMsg(null);
     setLoading(true);
@@ -59,7 +117,7 @@ function LoginForm() {
     setLoading(false);
 
     if (res.success) {
-      setSuccessMsg("Demo Analyst Authorized. Redirecting to dashboard...");
+      setSuccessMsg("MoSPI Analyst Authorized. Redirecting...");
       setTimeout(() => router.push(from), 400);
     } else {
       setErrorMsg(res.error || "Demo access error.");
@@ -76,7 +134,7 @@ function LoginForm() {
     setLoading(false);
 
     if (res.success) {
-      setSuccessMsg("Account registered successfully. Redirecting...");
+      setSuccessMsg("Account created successfully. Redirecting...");
       setTimeout(() => router.push(from), 500);
     } else {
       setErrorMsg(res.error || "Registration failed. Please check your information.");
@@ -85,51 +143,104 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-md rounded-md border border-slate-200 bg-white p-7 shadow-xs">
-      {/* Official Government / National Accounts Crest Header */}
+      {/* Official Crest Header */}
       <div className="flex flex-col items-center text-center pb-5 border-b border-slate-100">
         <ArthaLensLogo size="lg" />
         <div className="mt-3 flex items-center gap-1.5">
           <span className="rounded-md bg-blue-50 text-blue-900 border border-blue-200 px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider">
-            Official Data Gateway
+            Public & Institutional Portal
           </span>
           <span className="rounded-md bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 text-[10px] font-mono font-medium">
-            MoSPI &#x2022; RBI OGD
+            Open Access
           </span>
         </div>
         <h1 className="mt-2 text-xl font-extrabold tracking-tight text-slate-900">
           Sign In to ArthaLens
         </h1>
         <p className="mt-1 text-xs text-slate-500 leading-relaxed max-w-xs">
-          National Accounts Statistics & Macroeconomic Intelligence Portal
+          Explore India&apos;s National Macroeconomic Accounts, GDP series, and Global Economic Benchmarks.
         </p>
       </div>
 
-      {/* Instant Demo Quick Access */}
-      <div className="mt-5">
+      {/* Primary 1-Click Access for Normal People: Google (Gmail) & Guest Explorer */}
+      <div className="mt-5 space-y-2.5">
+        {/* Google / Gmail Sign-In Button */}
         <button
           type="button"
-          onClick={handleDemoSignIn}
+          onClick={() => {
+            if (!showGmailPrompt) {
+              setShowGmailPrompt(true);
+            } else {
+              handleGoogleAuth();
+            }
+          }}
           disabled={loading}
-          className="flex w-full items-center justify-between rounded-md bg-blue-50/70 p-3 text-left border border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition-all group cursor-pointer"
+          className="flex w-full items-center justify-center gap-2.5 rounded-md border border-slate-300 bg-white py-2.5 px-4 text-xs font-semibold text-slate-800 hover:bg-slate-50 hover:border-slate-400 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-900 text-white">
-              <Zap className="h-3.5 w-3.5 fill-white" />
+          <GoogleIcon />
+          <span>Continue with Google (Gmail)</span>
+        </button>
+
+        {/* Optional Custom Gmail Input */}
+        {showGmailPrompt && (
+          <div className="rounded-md bg-slate-50 p-3 border border-slate-200 space-y-2 text-xs animate-in fade-in duration-200">
+            <label className="block text-[11px] font-semibold text-slate-700">
+              Enter your Gmail address:
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="yourname@gmail.com"
+                value={gmailInput}
+                onChange={(e) => setGmailInput(e.target.value)}
+                className="flex-1 rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => handleGoogleAuth(gmailInput)}
+                disabled={loading}
+                className="rounded-md bg-blue-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800 shrink-0"
+              >
+                Sign In
+              </button>
             </div>
+            <p className="text-[10px] text-slate-500">
+              Or click Sign In to continue with your default Google profile.
+            </p>
+          </div>
+        )}
+
+        {/* Citizen / Public Explorer Quick Access */}
+        <button
+          type="button"
+          onClick={handleGuestExplorer}
+          disabled={loading}
+          className="flex w-full items-center justify-between rounded-md bg-slate-50 border border-slate-200 p-2.5 text-left hover:bg-slate-100/80 transition-colors group cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <Globe2 className="h-4 w-4 text-blue-700" />
             <div>
-              <div className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
-                Instant Demo Analyst Access
-                <span className="rounded-md bg-blue-200 text-blue-900 font-mono text-[9px] px-1.5 py-0.2 font-bold">1-CLICK</span>
-              </div>
-              <div className="text-[11px] text-slate-600">Dr. Vikram Sengupta &#x2022; MoSPI NAS Division</div>
+              <span className="text-xs font-bold text-slate-800 block leading-tight">
+                Explore as Public Citizen / Guest
+              </span>
+              <span className="text-[10px] text-slate-500">Instant access to read macroeconomic accounts</span>
             </div>
           </div>
-          <ArrowRight className="h-4 w-4 text-blue-800 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-blue-700 transition-colors" />
         </button>
       </div>
 
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-slate-200" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-white px-2 text-slate-500 font-mono text-[11px]">or email and password</span>
+        </div>
+      </div>
+
       {/* Segmented Tab Switcher */}
-      <div className="mt-4 grid grid-cols-2 rounded-md bg-slate-100 p-1 border border-slate-200 text-xs">
+      <div className="grid grid-cols-2 rounded-md bg-slate-100 p-1 border border-slate-200 text-xs">
         <button
           type="button"
           onClick={() => {
@@ -162,14 +273,14 @@ function LoginForm() {
 
       {/* Status Messages */}
       {errorMsg && (
-        <div className="mt-4 flex items-center gap-2 rounded-md bg-red-50 p-3 text-xs text-red-700 border border-red-200">
+        <div className="mt-3 flex items-center gap-2 rounded-md bg-red-50 p-2.5 text-xs text-red-700 border border-red-200">
           <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="mt-4 flex items-center gap-2 rounded-md bg-emerald-50 p-3 text-xs text-emerald-800 border border-emerald-200">
+        <div className="mt-3 flex items-center gap-2 rounded-md bg-emerald-50 p-2.5 text-xs text-emerald-800 border border-emerald-200">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
           <span>{successMsg}</span>
         </div>
@@ -177,10 +288,10 @@ function LoginForm() {
 
       {/* Sign In Form */}
       {tab === "signin" && (
-        <form onSubmit={handleSignIn} className="mt-4 space-y-3.5">
+        <form onSubmit={handleSignIn} className="mt-4 space-y-3">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              Official / Research Email
+              Email Address (Gmail, personal, or institutional)
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -189,7 +300,7 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="analyst@arthalens.gov.in"
+                placeholder="name@gmail.com"
                 className="w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
               />
             </div>
@@ -218,9 +329,9 @@ function LoginForm() {
             className="w-full rounded-md bg-blue-900 py-2.5 text-xs font-bold text-white shadow-2xs hover:bg-blue-800 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
-              <span className="text-xs">Authenticating...</span>
+              <span className="text-xs">Signing in...</span>
             ) : (
-              <span>Authorize & Enter Platform</span>
+              <span>Sign In & Explore</span>
             )}
           </button>
         </form>
@@ -231,7 +342,7 @@ function LoginForm() {
         <form onSubmit={handleSignUp} className="mt-4 space-y-3">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              Full Professional Name
+              Your Name
             </label>
             <div className="relative">
               <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -240,7 +351,7 @@ function LoginForm() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Radhika Sundaram"
+                placeholder="e.g. Radhika Sharma"
                 className="w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
               />
             </div>
@@ -248,7 +359,7 @@ function LoginForm() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              Institutional Email
+              Email Address
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -257,7 +368,7 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@institute.ac.in or research@domain.com"
+                placeholder="name@gmail.com"
                 className="w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
               />
             </div>
@@ -265,7 +376,7 @@ function LoginForm() {
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-              Organization / Department
+              Profession or Interest <span className="text-slate-400 font-normal lowercase">(optional)</span>
             </label>
             <div className="relative">
               <Building className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -273,7 +384,7 @@ function LoginForm() {
                 type="text"
                 value={organization}
                 onChange={(e) => setOrganization(e.target.value)}
-                placeholder="e.g. NITI Aayog / RBI / University Research"
+                placeholder="e.g. Student, Citizen, Researcher, Business"
                 className="w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
               />
             </div>
@@ -305,18 +416,23 @@ function LoginForm() {
             {loading ? (
               <span className="text-xs">Creating account...</span>
             ) : (
-              <span>Create Account & Register</span>
+              <span>Create Account & Explore</span>
             )}
           </button>
         </form>
       )}
 
-      {/* Institutional Security Notice */}
-      <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-        <span className="flex items-center gap-1">
-          <ShieldCheck className="h-3.5 w-3.5 text-blue-700" /> Authorized Institutional Access
-        </span>
-        <span className="text-slate-500">OGD Compliant</span>
+      {/* Institutional Analyst Access Link */}
+      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <button
+          type="button"
+          onClick={handleDemoAnalyst}
+          disabled={loading}
+          className="text-blue-900 font-semibold hover:underline cursor-pointer"
+        >
+          Test as MoSPI Official Analyst (1-Click)
+        </button>
+        <span className="text-slate-400 text-[11px] font-mono">Open Data Portal</span>
       </div>
     </div>
   );

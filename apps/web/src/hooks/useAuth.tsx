@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,8 @@ interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
   login: (email?: string, password?: string, isDemo?: boolean) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (email?: string, name?: string) => Promise<{ success: boolean; error?: string }>;
+  continueAsGuest: () => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password: string, organization?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -69,6 +71,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async (email?: string, name?: string) => {
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, error: data.error || "Google sign-in failed" };
+      }
+      setUser(data.user);
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error" };
+    }
+  };
+
+  const continueAsGuest = async () => {
+    return loginWithGoogle("guest.explorer@gmail.com", "Guest Citizen Explorer");
+  };
+
   const signup = async (name: string, email: string, password: string, organization?: string) => {
     try {
       const res = await fetch("/api/auth/signup", {
@@ -97,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, continueAsGuest, signup, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
