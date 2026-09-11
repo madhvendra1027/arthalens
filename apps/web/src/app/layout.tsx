@@ -173,6 +173,34 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
       <head>
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function isExt(e) {
+                  var file = e && e.filename ? String(e.filename) : '';
+                  var msg = e && e.message ? String(e.message) : '';
+                  var stack = e && e.error && e.error.stack ? String(e.error.stack) : '';
+                  return file.indexOf('chrome-extension:') !== -1 || file.indexOf('embed_script.js') !== -1 || msg.indexOf('299') !== -1 || stack.indexOf('chrome-extension:') !== -1 || stack.indexOf('embed_script.js') !== -1;
+                }
+                window.addEventListener('error', function(e) {
+                  if (isExt(e)) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    return true;
+                  }
+                }, true);
+                window.addEventListener('unhandledrejection', function(e) {
+                  var reason = e && e.reason ? String(e.reason.stack || e.reason) : '';
+                  if (reason.indexOf('chrome-extension:') !== -1 || reason.indexOf('embed_script.js') !== -1) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                  }
+                }, true);
+              })();
+            `,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
