@@ -25,11 +25,11 @@ const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 
 // Preserve singleton Redis across Next.js Turbopack / HMR reloads
 declare global {
-  // eslint-disable-next-line no-var
+  
   var _redisInstance: Redis | undefined;
-  // eslint-disable-next-line no-var
+  
   var _inMemoryFallbackSessions: Map<string, { data: SessionData; exp: number }> | undefined;
-  // eslint-disable-next-line no-var
+  
   var _inMemoryFallbackUsers: Map<string, UserRecord> | undefined;
 }
 

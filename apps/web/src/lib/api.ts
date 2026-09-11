@@ -4,7 +4,7 @@
  * so the application remains fully functional and testable offline or during local development.
  */
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
-const AI_BASE = process.env.NEXT_PUBLIC_AI_BASE_URL ?? "http://localhost:8001/ai/v1";
+
 
 // --- Mock / Default Datasets ---
 const MOCK_DASHBOARD: DashboardResponse = {

@@ -6,10 +6,10 @@ interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
   showText?: boolean;
-  variant?: "light" | "dark";
+
 }
 
-export function ArthaLensLogo({ size = "md", className = "", showText = false, variant = "dark" }: LogoProps) {
+export function ArthaLensLogo({ size = "md", className = "", showText = false }: LogoProps) {
   const dimensions = {
     sm: { box: 28, text: "text-base", sub: "text-[9px]" },
     md: { box: 40, text: "text-lg", sub: "text-[10px]" },

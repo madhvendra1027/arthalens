@@ -1,6 +1,6 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { getUserByEmail, saveUser, setSession, SessionData, UserRecord } from "@/lib/redis";
+import { getUserByEmail, saveUser, setSession, SessionData } from "@/lib/redis";
 import { generateSessionToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {

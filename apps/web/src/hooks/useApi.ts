@@ -3,8 +3,8 @@
  * All values come from the backend; nothing is hardcoded.
  */
 "use client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { api, AiQueryRequest } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 // ─── Query Keys ────────────────────────────────────────────────────────────
 export const queryKeys = {

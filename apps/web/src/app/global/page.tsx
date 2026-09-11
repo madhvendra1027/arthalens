@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { GLOBAL_ECONOMIES, CountryEconomy } from "@/data/globalEconomies";
+import { GLOBAL_ECONOMIES } from "@/data/globalEconomies";
 import {
   Search,
   ArrowUpDown,

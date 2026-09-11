@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,7 +12,7 @@ import {
   ArrowRight,
   CheckCircle2,
   AlertCircle,
-  ShieldCheck,
+  
   Globe2,
 } from "lucide-react";
 

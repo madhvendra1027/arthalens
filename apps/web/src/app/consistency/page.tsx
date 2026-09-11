@@ -61,7 +61,7 @@ const SUB_FACTORS: SubFactor[] = [
 ];
 
 export default function ConsistencyPage() {
-  const [factors, setFactors] = useState<SubFactor[]>(SUB_FACTORS);
+  const [factors] = useState<SubFactor[]>(SUB_FACTORS);
 
   // Compute composite score
   const totalScore = Math.round(
