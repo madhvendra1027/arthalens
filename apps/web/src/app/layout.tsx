@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
@@ -170,7 +170,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"
