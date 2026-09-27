@@ -86,6 +86,14 @@ const ALL_MODULES: NavModule[] = [
     category: "methodology",
     icon: CheckCircle2,
   },
+  {
+    href: "/sources",
+    label: "Official Data Sources",
+    description: "Institutional registry for MoSPI, RBI, DPIIT, World Bank, and PIB",
+    category: "methodology",
+    icon: ShieldCheck,
+    badge: "Verified Registry",
+  },
 
   // 3. Global & Intelligence
   {
@@ -275,12 +283,12 @@ export function NavBar() {
               onClick={() => setMenuOpen(true)}
               className="btn-realistic btn-solid-navy px-3.5 py-1.5 text-xs font-bold gap-2 group shadow-sm"
               aria-label="Open all modules menu"
-              title="Explore all 10 macroeconomic modules"
+              title={`Explore all ${ALL_MODULES.length} macroeconomic modules`}
             >
               <Menu className="h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform" />
               <span className="font-extrabold tracking-wide">All Modules</span>
               <span className="rounded bg-blue-600 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 shadow-inner border border-blue-400/40">
-                10
+                {ALL_MODULES.length}
               </span>
             </button>
 
@@ -339,7 +347,7 @@ export function NavBar() {
                 </div>
                 <div>
                   <h2 className="text-sm font-extrabold text-slate-900">Platform Navigation</h2>
-                  <p className="text-[11px] text-slate-500 font-medium">10 Core Macroeconomic Intelligence Modules</p>
+                  <p className="text-[11px] text-slate-500 font-medium">{ALL_MODULES.length} Core Macroeconomic Intelligence Modules</p>
                 </div>
               </div>
 
