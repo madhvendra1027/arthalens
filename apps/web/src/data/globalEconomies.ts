@@ -19,9 +19,20 @@ export interface CountryEconomy {
   keyDrivers: string[];
   economicGlance: string;
   indiaComparison: string;
+  provenance?: {
+    authority: string;
+    dataset: string;
+    canonicalUrl: string;
+    lastObservedYear: string;
+    retrievedAt: string;
+    nominalGdpSource?: string;
+    growthSource?: string;
+    perCapitaSource?: string;
+    inflationSource?: string;
+  };
 }
 
-export const GLOBAL_ECONOMIES: CountryEconomy[] = [
+export const GLOBAL_ECONOMIES_BASELINE: CountryEconomy[] = [
   {
     id: "usa",
     name: "United States",
@@ -287,3 +298,6 @@ export const GLOBAL_ECONOMIES: CountryEconomy[] = [
     indiaComparison: "Korean conglomerates have deep manufacturing footprints in India (Hyundai is India's 2nd largest automaker; Samsung operates one of the world's largest mobile factories in Noida).",
   },
 ];
+
+export const GLOBAL_ECONOMIES: CountryEconomy[] = GLOBAL_ECONOMIES_BASELINE;
+

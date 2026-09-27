@@ -1,7 +1,10 @@
 package com.arthalens.api.domain.gdp.controller;
 
+import com.arthalens.api.common.exception.ResourceNotFoundException;
 import com.arthalens.api.domain.gdp.dto.*;
 import com.arthalens.api.domain.gdp.service.GdpService;
+import com.arthalens.api.domain.methodology.entity.BaseYear;
+import com.arthalens.api.domain.methodology.repository.BaseYearRepository;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
@@ -16,9 +19,11 @@ import java.util.UUID;
 public class GdpController {
 
     private final GdpService service;
+    private final BaseYearRepository baseYearRepository;
 
-    public GdpController(GdpService service) {
+    public GdpController(GdpService service, BaseYearRepository baseYearRepository) {
         this.service = service;
+        this.baseYearRepository = baseYearRepository;
     }
 
     @GetMapping("/latest")
@@ -26,8 +31,6 @@ public class GdpController {
     public GdpObservationDto getLatest(
             @RequestParam(defaultValue = "2022-23") String baseYear,
             @RequestParam(defaultValue = "constant") String priceType) {
-        // In production: resolve baseYear string to UUID from methodology service
-        // Using placeholder UUID here — replaced once DB is seeded
         UUID baseYearId = resolveBaseYearId(baseYear);
         return service.getLatest(baseYearId, priceType);
     }
@@ -46,10 +49,9 @@ public class GdpController {
     }
 
     private UUID resolveBaseYearId(String baseYear) {
-        return switch (baseYear) {
-            case "2022-23" -> UUID.fromString("00000000-0000-0000-0000-000000000002");
-            case "2011-12" -> UUID.fromString("00000000-0000-0000-0000-000000000001");
-            default -> throw new IllegalArgumentException("Invalid base year: " + baseYear + ". Must be 2011-12 or 2022-23.");
-        };
+        String effective = (baseYear != null && !baseYear.isBlank()) ? baseYear : "2022-23";
+        return baseYearRepository.findByYearLabel(effective)
+                .map(BaseYear::getId)
+                .orElseThrow(() -> new ResourceNotFoundException("BaseYear", "yearLabel", effective));
     }
 }

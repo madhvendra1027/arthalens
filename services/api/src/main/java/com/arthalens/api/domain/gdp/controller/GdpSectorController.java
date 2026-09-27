@@ -18,6 +18,12 @@ import java.util.List;
 @Tag(name = "gdp-sectors", description = "GDP/GVA breakdown by sector (MoSPI NAS)")
 public class GdpSectorController {
 
+    private final com.arthalens.api.domain.gdp.service.GdpSectorService sectorService;
+
+    public GdpSectorController(com.arthalens.api.domain.gdp.service.GdpSectorService sectorService) {
+        this.sectorService = sectorService;
+    }
+
     @GetMapping
     @Operation(
         summary = "Get GDP/GVA sector breakdown",
@@ -39,11 +45,6 @@ public class GdpSectorController {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok(new SectorBreakdownResponse(
-                period != null ? period : "latest",
-                baseYear,
-                priceType,
-                List.of()  // Populated after ingestion
-        ));
+        return ResponseEntity.ok(sectorService.getSectors(baseYear, priceType, period));
     }
 }

@@ -64,7 +64,7 @@ class RatingsServiceTest {
         assertThat(response.current()).hasSize(1);
         assertThat(response.current().get(0).agency()).isEqualTo("Moody's");
         assertThat(response.history()).hasSize(1);
-        assertThat(response.disclaimer()).isNotBlank();
+        assertThat(response.note()).isNotBlank();
     }
 
     @Test

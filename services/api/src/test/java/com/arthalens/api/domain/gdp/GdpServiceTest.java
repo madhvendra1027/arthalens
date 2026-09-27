@@ -68,7 +68,7 @@ class GdpServiceTest {
         GdpObservationDto result = service.getLatest(baseYearId, "constant");
 
         assertThat(result).isNotNull();
-        assertThat(result.periodLabel()).isEqualTo("2023-24");
+        assertThat(result.period()).isEqualTo("2023-24");
         assertThat(result.valueCrore()).isEqualByComparingTo("17382000.00");
         assertThat(result.provenance()).isNotNull();
     }
@@ -92,8 +92,8 @@ class GdpServiceTest {
         GdpSeriesResponse response = service.getSeries(baseYearId, "constant", "FY", true, 0, 10);
 
         assertThat(response).isNotNull();
-        assertThat(response.warning()).isNotNull();
-        assertThat(response.warning()).contains("WARNING: mixed base-year");
+        assertThat(response.prominentWarning()).isNotNull();
+        assertThat(response.prominentWarning()).contains("WARNING: mixed base-year");
         assertThat(response.data()).hasSize(1);
     }
 }

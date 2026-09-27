@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useGdpSeries, useGdpSectors } from "@/hooks/useApi";
 import { GdpLineChart } from "@/components/charts/GdpLineChart";
 import { SectorDonutChart } from "@/components/charts/SectorDonutChart";
+import { StateGvaSection } from "@/components/gdp/StateGvaSection";
 import { ErrorState, LoadingGrid, EmptyState } from "@/components/ui/StateComponents";
 
 function GdpExplorerInner() {
@@ -148,6 +149,9 @@ function GdpExplorerInner() {
           ) : <EmptyState />
         )}
       </section>
+
+      {/* State-Level Gross Value Added Section */}
+      <StateGvaSection baseYear={baseYear} />
 
       <div className="rounded border border-slate-200 bg-white p-3.5 text-xs text-slate-500 font-mono">
         Primary Source: MoSPI National Accounts Statistics (NAS). Figures denominated in INR Crore.

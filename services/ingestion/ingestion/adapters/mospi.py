@@ -68,15 +68,74 @@ class MoSPIAdapter(SourceAdapter):
     def _parse_sheet(
         self, df: pd.DataFrame, sheet_name: str, provenance: Provenance
     ) -> Iterator[dict[str, Any]]:
-        """Parse a single NAS sheet. Override / extend for specific sheet formats."""
-        # Placeholder: real implementation maps known MoSPI sheet layouts to observation rows.
-        # This yields a structural marker row for test validation.
-        yield {
-            "_adapter": self.adapter_id,
-            "_sheet": sheet_name,
-            "_provenance": provenance.to_dict(),
-            "_parse_note": "Sheet structure mapping required for this release format.",
-        }
+        """Parse a single NAS sheet. Extracts tabular macro and sector observations."""
+        if df.empty:
+            return
+
+        import re
+        sheet_lower = sheet_name.lower()
+        default_price_type = "constant" if "constant" in sheet_lower else ("current" if "current" in sheet_lower else "constant")
+        default_base_year = "2022-23" if ("2022-23" in sheet_lower or "2022_23" in sheet_lower) else "2011-12"
+
+        period_col_indices = {}
+        for col_idx, col in enumerate(df.columns):
+            col_str = str(col).strip()
+            if re.search(r'\b(20\d\d[-/]\d\d|Q[1-4]\s*20\d\d[-/]\d\d)\b', col_str):
+                period_col_indices[col_idx] = col_str
+
+        header_row_offset = 0
+        if not period_col_indices:
+            for r_idx in range(min(10, len(df))):
+                row_vals = [str(x).strip() for x in df.iloc[r_idx].values]
+                matches = {c_idx: val for c_idx, val in enumerate(row_vals) if re.search(r'\b(20\d\d[-/]\d\d|Q[1-4]\s*20\d\d[-/]\d\d)\b', val)}
+                if len(matches) >= 2:
+                    period_col_indices = matches
+                    header_row_offset = r_idx + 1
+                    break
+
+        if not period_col_indices:
+            yield {
+                "_adapter": self.adapter_id,
+                "_sheet": sheet_name,
+                "base_year": default_base_year,
+                "price_type": default_price_type,
+                "unit": "INR Crore",
+                "_provenance": provenance.to_dict(),
+                "_parse_note": "Sheet indexed without time-series column matrix.",
+            }
+            return
+
+        for r_idx in range(header_row_offset, len(df)):
+            row = df.iloc[r_idx]
+            series_name = str(row.iloc[0]).strip() if len(row) > 0 else ""
+            if not series_name or series_name.lower() in {"nan", "total", "source:", "note:"}:
+                continue
+
+            for c_idx, period_label in period_col_indices.items():
+                if c_idx >= len(row):
+                    continue
+                raw_val = row.iloc[c_idx]
+                try:
+                    cleaned_val = re.sub(r'[^\d.-]', '', str(raw_val))
+                    if not cleaned_val or cleaned_val == '-':
+                        continue
+                    val_float = float(cleaned_val)
+                    period_type = "Q" if period_label.strip().startswith("Q") else "FY"
+                    yield {
+                        "series_name": series_name,
+                        "period_type": period_type,
+                        "period_label": period_label.strip(),
+                        "value": val_float,
+                        "price_type": default_price_type,
+                        "base_year": default_base_year,
+                        "unit": "INR Crore",
+                        "status": "official",
+                        "_adapter": self.adapter_id,
+                        "_sheet": sheet_name,
+                        "_provenance": provenance.to_dict(),
+                    }
+                except (ValueError, TypeError):
+                    continue
 
     def normalize(self, row: dict[str, Any], provenance: Provenance) -> dict[str, Any]:
         """Normalize a parsed row to the canonical observation schema."""

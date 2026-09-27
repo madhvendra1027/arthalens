@@ -18,6 +18,12 @@ import java.util.List;
 @Tag(name = "gdp-revisions", description = "GDP revision history across MoSPI releases")
 public class GdpRevisionController {
 
+    private final com.arthalens.api.domain.gdp.service.GdpRevisionService revisionService;
+
+    public GdpRevisionController(com.arthalens.api.domain.gdp.service.GdpRevisionService revisionService) {
+        this.revisionService = revisionService;
+    }
+
     @GetMapping
     @Operation(
         summary = "Get GDP revision history",
@@ -37,14 +43,6 @@ public class GdpRevisionController {
             return ResponseEntity.badRequest().build();
         }
 
-        // When DB is connected, query gdp_revisions table joined to observations.
-        // Currently returns empty list with warning — data populates after ingestion.
-        return ResponseEntity.ok(new RevisionHistoryResponse(
-                period != null ? period : "all",
-                baseYear,
-                "Revision history populates after ingestion pipeline runs. " +
-                "Comparing values across base-year series is a methodology change, not a revision.",
-                List.of()
-        ));
+        return ResponseEntity.ok(revisionService.getRevisions(baseYear, period));
     }
 }

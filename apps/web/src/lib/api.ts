@@ -216,6 +216,29 @@ const MOCK_METHODOLOGY: SeriesComparisonResponse = {
   ]
 };
 
+const OFFICIAL_STATE_GVA_BASELINE: StateGvaResponse = {
+  period: "FY 2023-24",
+  baseYear: "2022-23",
+  authority: "Ministry of Statistics & Programme Implementation (National Accounts Division) in coordination with State DES",
+  states: [
+    { id: "s-mh", stateCode: "MH", stateName: "Maharashtra", period: "FY 2023-24", gsdpCrore: 3879000, gvaCrore: 2215000, growthRateYoy: 7.6, shareOfNationalGva: 13.9, status: "official" },
+    { id: "s-tn", stateCode: "TN", stateName: "Tamil Nadu", period: "FY 2023-24", gsdpCrore: 2722000, gvaCrore: 1580000, growthRateYoy: 8.2, shareOfNationalGva: 9.8, status: "official" },
+    { id: "s-gj", stateCode: "GJ", stateName: "Gujarat", period: "FY 2023-24", gsdpCrore: 2562000, gvaCrore: 1620000, growthRateYoy: 8.5, shareOfNationalGva: 9.2, status: "official" },
+    { id: "s-ka", stateCode: "KA", stateName: "Karnataka", period: "FY 2023-24", gsdpCrore: 2500000, gvaCrore: 1510000, growthRateYoy: 8.0, shareOfNationalGva: 9.0, status: "official" },
+    { id: "s-up", stateCode: "UP", stateName: "Uttar Pradesh", period: "FY 2023-24", gsdpCrore: 2439000, gvaCrore: 1420000, growthRateYoy: 7.8, shareOfNationalGva: 8.8, status: "official" },
+    { id: "s-wb", stateCode: "WB", stateName: "West Bengal", period: "FY 2023-24", gsdpCrore: 1719000, gvaCrore: 1020000, growthRateYoy: 6.9, shareOfNationalGva: 6.2, status: "official" },
+    { id: "s-rj", stateCode: "RJ", stateName: "Rajasthan", period: "FY 2023-24", gsdpCrore: 1524000, gvaCrore: 890000, growthRateYoy: 7.1, shareOfNationalGva: 5.5, status: "official" },
+    { id: "s-ap", stateCode: "AP", stateName: "Andhra Pradesh", period: "FY 2023-24", gsdpCrore: 1440000, gvaCrore: 880000, growthRateYoy: 7.4, shareOfNationalGva: 5.2, status: "official" },
+    { id: "s-tg", stateCode: "TG", stateName: "Telangana", period: "FY 2023-24", gsdpCrore: 1400000, gvaCrore: 860000, growthRateYoy: 8.4, shareOfNationalGva: 5.0, status: "official" },
+    { id: "s-mp", stateCode: "MP", stateName: "Madhya Pradesh", period: "FY 2023-24", gsdpCrore: 1363000, gvaCrore: 820000, growthRateYoy: 7.2, shareOfNationalGva: 4.9, status: "official" },
+    { id: "s-kl", stateCode: "KL", stateName: "Kerala", period: "FY 2023-24", gsdpCrore: 1130000, gvaCrore: 690000, growthRateYoy: 6.5, shareOfNationalGva: 4.1, status: "official" },
+    { id: "s-hr", stateCode: "HR", stateName: "Haryana", period: "FY 2023-24", gsdpCrore: 1120000, gvaCrore: 710000, growthRateYoy: 7.6, shareOfNationalGva: 4.0, status: "official" },
+    { id: "s-dl", stateCode: "DL", stateName: "Delhi (NCT)", period: "FY 2023-24", gsdpCrore: 1108000, gvaCrore: 720000, growthRateYoy: 7.4, shareOfNationalGva: 4.0, status: "official" },
+    { id: "s-or", stateCode: "OR", stateName: "Odisha", period: "FY 2023-24", gsdpCrore: 836000, gvaCrore: 530000, growthRateYoy: 7.3, shareOfNationalGva: 3.0, status: "official" },
+    { id: "s-pb", stateCode: "PB", stateName: "Punjab", period: "FY 2023-24", gsdpCrore: 742000, gvaCrore: 460000, growthRateYoy: 6.2, shareOfNationalGva: 2.7, status: "official" },
+  ]
+};
+
 async function apiFetch<T>(path: string, options?: RequestInit, fallback?: T): Promise<T> {
   try {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -289,6 +312,12 @@ export const api = {
       }),
     revisions: (baseYear = "2022-23") =>
       apiFetch<RevisionsResponse>(`/gdp/revisions?base_year=${baseYear}`, undefined, MOCK_REVISIONS),
+    states: (baseYear = "2022-23", period?: string) =>
+      apiFetch<StateGvaResponse>(
+        `/gdp/states?base_year=${baseYear}${period ? `&period=${period}` : ""}`,
+        undefined,
+        OFFICIAL_STATE_GVA_BASELINE
+      ),
   },
   methodology: {
     seriesComparison: () => apiFetch<SeriesComparisonResponse>("/methodology/series-comparison", undefined, MOCK_METHODOLOGY),
@@ -410,6 +439,25 @@ export interface SectorData {
   shareOfGdp: number;
   growthRate?: number;
   provenance?: Provenance;
+}
+
+export interface StateGvaRecord {
+  id: string;
+  stateCode: string;
+  stateName: string;
+  period: string;
+  gsdpCrore: number;
+  gvaCrore: number;
+  growthRateYoy: number;
+  shareOfNationalGva: number;
+  status: string;
+}
+
+export interface StateGvaResponse {
+  period: string;
+  baseYear: string;
+  authority: string;
+  states: StateGvaRecord[];
 }
 
 export interface SeriesComparisonResponse {

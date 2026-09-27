@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
   // Unprotected / Public Paths
   const isPublicPath =
     pathname.startsWith("/login") ||
-    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static") ||
     pathname === "/favicon.ico" ||

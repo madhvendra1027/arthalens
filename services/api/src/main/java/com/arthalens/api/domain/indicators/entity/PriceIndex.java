@@ -58,6 +58,7 @@ public class PriceIndex {
     public BigDecimal getIndexValue() { return indexValue; }
     public BigDecimal getYoyChangePct() { return yoyChangePct; }
     public String getStatus() { return status; }
+    public UUID getSourceId() { return sourceId; }
     public LocalDate getPublicationDate() { return publicationDate; }
     public OffsetDateTime getRetrievalTimestamp() { return retrievalTimestamp; }
 }

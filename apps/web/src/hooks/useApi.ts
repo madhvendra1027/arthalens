@@ -16,6 +16,8 @@ export const queryKeys = {
   gdpSectors: (baseYear: string, priceType: string, period?: string) =>
     ["gdp", "sectors", baseYear, priceType, period] as const,
   gdpRevisions: (baseYear: string) => ["gdp", "revisions", baseYear] as const,
+  gdpStates: (baseYear: string, period?: string) =>
+    ["gdp", "states", baseYear, period] as const,
   methodology: () => ["methodology", "series-comparison"] as const,
   deflators: (baseYear: string) => ["deflators", baseYear] as const,
   indicators: () => ["indicators"] as const,
@@ -75,6 +77,14 @@ export function useGdpRevisions(baseYear = "2022-23") {
   return useQuery({
     queryKey: queryKeys.gdpRevisions(baseYear),
     queryFn: () => api.gdp.revisions(baseYear),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useGdpStates(baseYear = "2022-23", period?: string) {
+  return useQuery({
+    queryKey: queryKeys.gdpStates(baseYear, period),
+    queryFn: () => api.gdp.states(baseYear, period),
     staleTime: 5 * 60 * 1000,
   });
 }

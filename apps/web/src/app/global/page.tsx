@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { GLOBAL_ECONOMIES } from "@/data/globalEconomies";
+import { GLOBAL_ECONOMIES, CountryEconomy } from "@/data/globalEconomies";
 import {
   Search,
   ArrowUpDown,
@@ -17,30 +17,49 @@ import {
 } from "lucide-react";
 
 export default function GlobalEconomiesPage() {
+  const [economies, setEconomies] = useState<CountryEconomy[]>(GLOBAL_ECONOMIES);
+  const [sourceAttribution, setSourceAttribution] = useState("World Bank Open Data (World Development Indicators) & Official Accounts");
+  const [isLiveFromApi, setIsLiveFromApi] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<"rank" | "growth" | "perCapita" | "debt" | "inflation">("rank");
   const [expandedCountry, setExpandedCountry] = useState<string | null>("india");
-  const [lastRefreshed, setLastRefreshed] = useState<string>("Just now");
+  const [lastRefreshed, setLastRefreshed] = useState<string>("Loading official sources...");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const refreshData = () => {
+  const loadData = async (force = false) => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setLastRefreshed(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+    try {
+      const res = await fetch(`/api/global-economies${force ? "?refresh=true" : ""}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && json.data.length > 0) {
+          setEconomies(json.data);
+          setSourceAttribution(json.source || "World Bank Open Data");
+          setIsLiveFromApi(!json.cached);
+          setLastRefreshed(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+        }
+      }
+    } catch {
+      // Retain fallback safely
+    } finally {
       setIsRefreshing(false);
-    }, 400);
+    }
   };
 
   useEffect(() => {
-    // 30-second automated continuous refresh interval
+    loadData();
     const interval = setInterval(() => {
-      setLastRefreshed(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
-    }, 30000);
+      loadData();
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
+  const refreshData = () => {
+    loadData(true);
+  };
+
   const sortedEconomies = useMemo(() => {
-    let list = [...GLOBAL_ECONOMIES];
+    let list = [...economies];
 
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
@@ -66,9 +85,9 @@ export default function GlobalEconomiesPage() {
       default:
         return list.sort((a, b) => a.rank - b.rank);
     }
-  }, [searchTerm, sortBy]);
+  }, [economies, searchTerm, sortBy]);
 
-  const maxGdp = Math.max(...GLOBAL_ECONOMIES.map((c) => c.nominalGdpTrillion));
+  const maxGdp = Math.max(...economies.map((c) => c.nominalGdpTrillion), 1);
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
@@ -83,8 +102,8 @@ export default function GlobalEconomiesPage() {
               Comparative National Accounts Statistics
             </span>
             <span className="text-slate-300 hidden sm:inline">&#x2022;</span>
-            <span className="text-xs text-slate-500">
-              Sources: IMF World Economic Outlook (WEO) & World Bank ICP (2024)
+            <span className="text-xs text-slate-600 font-medium">
+              {sourceAttribution}
             </span>
           </div>
 
@@ -93,7 +112,7 @@ export default function GlobalEconomiesPage() {
               Global GDP & Comparative World Economies
             </h1>
             <p className="mt-1 max-w-3xl text-xs sm:text-sm text-slate-600 leading-relaxed">
-              Official macroeconomic data comparing the world&apos;s top 12 economies against India&apos;s National Accounts Statistics. Track nominal scale, real growth trajectories, inflation dynamics, debt-to-GDP ratios, and sovereign credit ratings.
+              Official macroeconomic data comparing the world&apos;s top economies against India&apos;s National Accounts Statistics. Live indicators sourced from the World Bank Open Data API (WDI indicators NY.GDP.MKTP.CD, NY.GDP.MKTP.KD.ZG, FP.CPI.TOTL.ZG) and official government accounts.
             </p>
           </div>
         </div>
@@ -106,18 +125,18 @@ export default function GlobalEconomiesPage() {
             </div>
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-slate-900">
-                Top 12 World Economies Output
+                Top World Economies Output
               </div>
               <div className="text-xs text-slate-500 font-mono">
-                Combined Nominal Output: $75.3 Trillion USD (&#x2248; 72% of Global GDP)
+                Combined Nominal Output: ${(economies.reduce((acc, c) => acc + c.nominalGdpTrillion, 0)).toFixed(1)} Trillion USD (&#x2248; 72% of Global GDP)
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-xs text-slate-600 font-mono">
-              <span className="h-2 w-2 rounded-xs bg-emerald-500 inline-block animate-pulse" />
-              <span>Live Sync: 30s (Updated: {lastRefreshed})</span>
+              <span className={`h-2 w-2 rounded-xs ${isLiveFromApi ? "bg-emerald-500 animate-pulse" : "bg-blue-500"} inline-block`} />
+              <span>World Bank Sync: {lastRefreshed}</span>
             </div>
 
             <button
@@ -127,7 +146,7 @@ export default function GlobalEconomiesPage() {
               className="flex items-center gap-1.5 rounded-md bg-white border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-2xs cursor-pointer"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-blue-700" : "text-slate-500"}`} />
-              <span>{isRefreshing ? "Refreshing..." : "Refresh Data"}</span>
+              <span>{isRefreshing ? "Fetching World Bank..." : "Live Sync API"}</span>
             </button>
           </div>
         </div>
@@ -459,6 +478,27 @@ export default function GlobalEconomiesPage() {
                                 </p>
                               </div>
                             </div>
+
+                            {country.provenance && (
+                              <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-500 gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="font-bold text-slate-700">Data Source:</span>
+                                  <span>{country.provenance.authority}</span>
+                                  <span className="text-slate-300 hidden sm:inline">&#x2022;</span>
+                                  <a
+                                    href={country.provenance.canonicalUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-700 hover:underline font-mono"
+                                  >
+                                    World Bank WDI Portal &#x2197;
+                                  </a>
+                                </div>
+                                <div className="font-mono text-slate-500 text-[10px]">
+                                  Observed: {country.provenance.lastObservedYear} &#x2022; Series: {country.provenance.nominalGdpSource}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </td>
                       </tr>
