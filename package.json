@@ -5,12 +5,11 @@
   "description": "National Macroeconomic Accounts & Global Monetary Intelligence Portal",
   "scripts": {
     "dev": "npm --prefix apps/web run dev",
-    "build": "npm --prefix apps/web run build",
+    "build": "npm --prefix apps/web run build && node -e \"const fs=require('fs'); if(fs.existsSync('apps/web/.next')) fs.cpSync('apps/web/.next', '.next', {recursive:true});\"",
     "start": "npm --prefix apps/web run start",
     "lint": "npm --prefix apps/web run lint"
   },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "dependencies": {
+    "next": "16.3.4"
+  }
 }

@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
-
 const nextConfig: NextConfig = {
-  ...(process.env.VERCEL ? {} : { output: "standalone" }),
+  ...(process.env.DOCKER_BUILD === "1" ? { output: "standalone" } : {}),
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1",
     NEXT_PUBLIC_AI_BASE_URL: process.env.NEXT_PUBLIC_AI_BASE_URL ?? "http://localhost:8001/ai/v1",
