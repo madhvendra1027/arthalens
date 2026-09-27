@@ -143,9 +143,9 @@ export default function GlobalEconomiesPage() {
               type="button"
               onClick={refreshData}
               disabled={isRefreshing}
-              className="flex items-center gap-1.5 rounded-md bg-white border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-2xs cursor-pointer"
+              className="btn-realistic btn-solid-blue px-3.5 py-1.5 text-xs font-bold gap-2 shadow-sm disabled:opacity-50"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-blue-700" : "text-slate-500"}`} />
+              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-white" : "text-blue-100"}`} />
               <span>{isRefreshing ? "Fetching World Bank..." : "Live Sync API"}</span>
             </button>
           </div>

@@ -73,33 +73,33 @@ export default function HomePage() {
           </div>
 
           {/* High-Contrast Official Base Year Buttons */}
-          <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-slate-300 shadow-2xs self-start md:self-auto">
+          <div className="flex items-center gap-2.5 bg-slate-100 p-1.5 rounded-xl border border-slate-300 shadow-inner self-start md:self-auto">
             <button
               onClick={() => setBaseYear("2022-23")}
-              className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-bold transition-all ${
+              className={`btn-realistic gap-2 rounded-lg px-4 py-2 text-xs transition-all ${
                 baseYear === "2022-23"
-                  ? "bg-blue-900 text-white shadow-sm ring-1 ring-blue-950"
-                  : "text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+                  ? "btn-solid-blue font-extrabold"
+                  : "btn-solid-slate font-bold text-slate-700"
               }`}
             >
-              <span className={`h-2 w-2 rounded-full ${baseYear === "2022-23" ? "bg-emerald-400 animate-pulse" : "bg-slate-400"}`} />
+              <span className={`h-2.5 w-2.5 rounded-full ${baseYear === "2022-23" ? "bg-emerald-300 shadow-sm shadow-emerald-400 animate-pulse" : "bg-slate-400"}`} />
               <span>2022-23 Base Year</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${baseYear === "2022-23" ? "bg-blue-800 text-blue-100" : "bg-slate-100 text-slate-600"}`}>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-black ${baseYear === "2022-23" ? "bg-blue-950 text-emerald-300 border border-blue-800" : "bg-slate-200 text-slate-600 border border-slate-300"}`}>
                 ACTIVE
               </span>
             </button>
 
             <button
               onClick={() => setBaseYear("2011-12")}
-              className={`flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-bold transition-all ${
+              className={`btn-realistic gap-2 rounded-lg px-4 py-2 text-xs transition-all ${
                 baseYear === "2011-12"
-                  ? "bg-slate-800 text-white shadow-sm ring-1 ring-slate-900"
-                  : "text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+                  ? "btn-solid-navy font-extrabold"
+                  : "btn-solid-slate font-bold text-slate-700"
               }`}
             >
-              <span className={`h-2 w-2 rounded-full ${baseYear === "2011-12" ? "bg-amber-400" : "bg-slate-400"}`} />
+              <span className={`h-2.5 w-2.5 rounded-full ${baseYear === "2011-12" ? "bg-amber-400 shadow-sm shadow-amber-500" : "bg-slate-400"}`} />
               <span>2011-12 Base Year</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${baseYear === "2011-12" ? "bg-slate-700 text-slate-200" : "bg-slate-100 text-slate-600"}`}>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-black ${baseYear === "2011-12" ? "bg-slate-950 text-amber-300 border border-slate-700" : "bg-slate-200 text-slate-600 border border-slate-300"}`}>
                 HISTORICAL
               </span>
             </button>

@@ -94,27 +94,33 @@ export function StateGvaSection({ baseYear }: Props) {
             className="rounded border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600"
           />
 
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded border border-slate-200 text-xs">
+          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-300 shadow-inner text-xs">
             <button
               onClick={() => setSortBy("gsdp")}
-              className={`px-2 py-1 rounded font-semibold transition-all ${
-                sortBy === "gsdp" ? "bg-white text-blue-950 shadow-2xs font-bold" : "text-slate-600 hover:text-slate-900"
+              className={`btn-realistic px-2.5 py-1 text-xs rounded-md transition-all ${
+                sortBy === "gsdp"
+                  ? "btn-solid-blue font-extrabold"
+                  : "btn-solid-slate font-semibold text-slate-700"
               }`}
             >
               Output Size
             </button>
             <button
               onClick={() => setSortBy("growth")}
-              className={`px-2 py-1 rounded font-semibold transition-all ${
-                sortBy === "growth" ? "bg-white text-blue-950 shadow-2xs font-bold" : "text-slate-600 hover:text-slate-900"
+              className={`btn-realistic px-2.5 py-1 text-xs rounded-md transition-all ${
+                sortBy === "growth"
+                  ? "btn-solid-blue font-extrabold"
+                  : "btn-solid-slate font-semibold text-slate-700"
               }`}
             >
               Growth YoY
             </button>
             <button
               onClick={() => setSortBy("share")}
-              className={`px-2 py-1 rounded font-semibold transition-all ${
-                sortBy === "share" ? "bg-white text-blue-950 shadow-2xs font-bold" : "text-slate-600 hover:text-slate-900"
+              className={`btn-realistic px-2.5 py-1 text-xs rounded-md transition-all ${
+                sortBy === "share"
+                  ? "btn-solid-blue font-extrabold"
+                  : "btn-solid-slate font-semibold text-slate-700"
               }`}
             >
               National Share

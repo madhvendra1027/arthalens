@@ -96,7 +96,7 @@ function GdpExplorerInner() {
         <div className="flex items-end ml-auto pt-4 sm:pt-0">
           <Link
             href="/gdp/why"
-            className="rounded border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-900 hover:bg-blue-100 transition-colors shadow-2xs"
+            className="btn-realistic btn-solid-blue px-4 py-2 text-xs font-bold text-white shadow-sm"
           >
             View Growth Drivers & Breakdown ➔
           </Link>

@@ -173,7 +173,7 @@ export default function AIPage() {
         {messages.length > 0 && (
           <button
             onClick={clearConversation}
-            className="rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs"
+            className="btn-realistic btn-solid-slate px-3.5 py-1.5 text-xs font-bold text-slate-700 shadow-sm"
           >
             Clear Session
           </button>
@@ -272,7 +272,7 @@ export default function AIPage() {
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="rounded bg-blue-900 px-5 py-2 text-xs font-bold text-white shadow-2xs hover:bg-blue-800 disabled:opacity-50 transition-colors"
+            className="btn-realistic btn-solid-blue px-5 py-2 text-xs font-bold text-white shadow-md shadow-blue-900/20 disabled:opacity-50"
           >
             Submit
           </button>

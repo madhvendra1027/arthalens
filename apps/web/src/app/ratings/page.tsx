@@ -41,15 +41,15 @@ export default function RatingsPage() {
         </div>
 
         {/* Agency Filter Tabs */}
-        <div className="flex rounded-md bg-slate-100 p-1 border border-slate-200 gap-1">
+        <div className="flex rounded-lg bg-slate-100 p-1 border border-slate-300 shadow-inner gap-1.5">
           {AGENCIES.map((a) => (
             <button
               key={a.key}
               onClick={() => setAgency(a.key)}
-              className={`rounded px-3 py-1 text-xs font-bold transition-all ${
+              className={`btn-realistic rounded-md px-3.5 py-1 text-xs transition-all ${
                 agency === a.key
-                  ? "bg-white text-blue-900 shadow-xs border border-slate-300"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "btn-solid-blue font-extrabold"
+                  : "btn-solid-slate font-bold text-slate-700"
               }`}
             >
               {a.label}

@@ -21,7 +21,7 @@ export function ErrorState({ message, retry }: ErrorStateProps) {
       {retry && (
         <button
           onClick={retry}
-          className="rounded border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition-colors"
+          className="btn-realistic btn-solid-blue px-4 py-1.5 text-xs font-bold shadow-sm"
         >
           Retry Retrieval
         </button>

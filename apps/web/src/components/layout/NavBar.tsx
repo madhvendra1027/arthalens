@@ -247,17 +247,17 @@ export function NavBar() {
           </Link>
 
           {/* Desktop Primary Nav (Clean, Uncluttered 4 Core Links) */}
-          <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-1 xl:gap-2">
+          <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-1.5 xl:gap-2">
             {PRIMARY_NAV.map((item) => {
               const active = path === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`btn-realistic px-3.5 py-1.5 text-xs whitespace-nowrap transition-all ${
                     active
-                      ? "bg-blue-50 text-blue-900 border border-blue-200 shadow-2xs font-bold"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      ? "btn-solid-blue font-extrabold"
+                      : "btn-solid-slate font-semibold text-slate-700"
                   }`}
                   aria-current={active ? "page" : undefined}
                 >
@@ -269,17 +269,17 @@ export function NavBar() {
 
           {/* Right Action Area: Hamburger Menu Button + User Profile */}
           <div className="flex items-center gap-2.5">
-            {/* Sleek Hamburger / All Modules Button */}
+            {/* Sleek Realistic Solid Hamburger / All Modules Button */}
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="flex items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs transition-all cursor-pointer group"
+              className="btn-realistic btn-solid-navy px-3.5 py-1.5 text-xs font-bold gap-2 group shadow-sm"
               aria-label="Open all modules menu"
               title="Explore all 10 macroeconomic modules"
             >
-              <Menu className="h-4 w-4 text-blue-700 group-hover:scale-110 transition-transform" />
-              <span className="font-bold">All Modules</span>
-              <span className="rounded-full bg-blue-100 text-blue-800 text-[10px] font-mono font-bold px-1.5 py-0.2">
+              <Menu className="h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform" />
+              <span className="font-extrabold tracking-wide">All Modules</span>
+              <span className="rounded bg-blue-600 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 shadow-inner border border-blue-400/40">
                 10
               </span>
             </button>
@@ -289,7 +289,7 @@ export function NavBar() {
               {loading ? (
                 <span className="text-xs text-slate-400 font-mono">...</span>
               ) : user ? (
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 shadow-2xs">
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 shadow-2xs">
                   <div className="flex flex-col text-left leading-tight">
                     <span className="font-bold text-slate-900 truncate max-w-[130px]">{user.name}</span>
                     <span className="text-[10px] text-slate-500 truncate max-w-[130px]">{user.organization || "Analyst"}</span>
@@ -306,7 +306,7 @@ export function NavBar() {
               ) : (
                 <Link
                   href="/login"
-                  className="rounded-lg bg-blue-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-blue-800 shadow-2xs transition-all whitespace-nowrap"
+                  className="btn-realistic btn-solid-blue px-4 py-1.5 text-xs font-bold whitespace-nowrap shadow-sm"
                 >
                   Sign In
                 </Link>
@@ -346,10 +346,10 @@ export function NavBar() {
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors cursor-pointer"
+                className="btn-realistic btn-solid-slate p-1.5 text-slate-700 hover:text-slate-950"
                 aria-label="Close menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
@@ -559,10 +559,10 @@ export function NavBar() {
             <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
               {/* User Identity inside drawer */}
               {user ? (
-                <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-2.5">
+                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-3 shadow-2xs">
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-slate-900">{user.name}</span>
-                    <span className="text-[10px] text-slate-500">{user.organization || "Public Citizen Explorer"}</span>
+                    <span className="text-[10px] text-slate-500 font-medium">{user.organization || "Public Citizen Explorer"}</span>
                   </div>
                   <button
                     type="button"
@@ -570,7 +570,7 @@ export function NavBar() {
                       logout();
                       setMenuOpen(false);
                     }}
-                    className="flex items-center gap-1 text-xs text-red-600 font-semibold hover:underline cursor-pointer"
+                    className="btn-realistic btn-solid-slate px-2.5 py-1 text-xs text-red-700 font-bold border-red-200 hover:bg-red-50 hover:border-red-300 gap-1.5"
                   >
                     <LogOut className="h-3 w-3" />
                     Sign Out
@@ -580,7 +580,7 @@ export function NavBar() {
                 <Link
                   href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="block text-center rounded-lg bg-blue-900 py-2 text-xs font-semibold text-white hover:bg-blue-800 transition-colors"
+                  className="btn-realistic btn-solid-blue w-full py-2.5 text-xs font-bold text-center block shadow-sm"
                 >
                   Sign In to ArthaLens
                 </Link>
