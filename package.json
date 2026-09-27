@@ -1,0 +1,16 @@
+{
+  "name": "arthalens",
+  "version": "1.0.0",
+  "private": true,
+  "description": "National Macroeconomic Accounts & Global Monetary Intelligence Portal",
+  "scripts": {
+    "dev": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "start": "npm --prefix apps/web run start",
+    "lint": "npm --prefix apps/web run lint"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

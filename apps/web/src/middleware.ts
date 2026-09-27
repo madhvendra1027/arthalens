@@ -4,8 +4,18 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionToken = request.cookies.get("arthalens_session")?.value;
 
-  // Unprotected / Public Paths
+  // Unprotected / Public Explorer Paths
   const isPublicPath =
+    pathname === "/" ||
+    pathname.startsWith("/gdp") ||
+    pathname.startsWith("/global") ||
+    pathname.startsWith("/methodology") ||
+    pathname.startsWith("/deflator") ||
+    pathname.startsWith("/revisions") ||
+    pathname.startsWith("/consistency") ||
+    pathname.startsWith("/ratings") ||
+    pathname.startsWith("/about") ||
+    pathname.startsWith("/sources") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next") ||
