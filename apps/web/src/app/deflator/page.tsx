@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useDeflators } from "@/hooks/useApi";
+import Link from "next/link";
+import { BklitDeflatorLineChart } from "@/components/charts/BklitDeflatorLineChart";
 
 export default function DeflatorPage() {
   const { data: deflatorData } = useDeflators("2022-23");
@@ -16,42 +18,42 @@ export default function DeflatorPage() {
   const impliedInflation = impliedInflationNum.toFixed(2);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
-      {/* Official Header Banner */}
-      <div className="mb-6 rounded-md border border-slate-200 bg-white p-5 shadow-xs">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="rounded bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 text-[11px] font-mono font-bold uppercase">
-            National Accounts Statistical Diagnostic
+    <div className="mx-auto max-w-7xl px-6 py-10">
+      {/* Official Antimetal Header Banner */}
+      <div className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="rounded-full bg-[#141416] text-[#ECEBE5] px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider">
+            02 // DEFLATOR LABORATORY
           </span>
-          <span className="text-xs text-slate-500">  Methodology: SNA 2008 Standard Deflation</span>
+          <span className="font-mono text-xs text-[#828387]">• Methodology: UN SNA 2008 Standard Deflation</span>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-[#141416]">
           GDP Deflator & Price Index Arithmetic Simulator
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1">
-          Technical explainer and interactive laboratory measuring the mathematical relationship between Nominal GDP, Implicit Price Deflators, CPI, and WPI.
+        <p className="text-xs sm:text-sm text-[#57585C] mt-2 max-w-3xl leading-relaxed">
+          Technical laboratory measuring the mathematical relationship between Nominal GDP, Implicit Price Deflators, CPI, and WPI with single versus double deflation diagnostics.
         </p>
       </div>
 
       <div
-        className="mb-8 rounded-md border border-blue-200 bg-blue-50/70 p-4 text-xs sm:text-sm text-blue-900"
+        className="mb-8 rounded-lg border border-[rgba(20,21,23,0.15)] bg-[#E3E2DC] p-4 text-xs sm:text-sm text-[#141416] font-mono"
         role="alert"
       >
-        <strong>Note on Statistical Methodology:</strong> The GDP Deflator is an implicit price index reflecting domestic output across all economic sectors. Adjusting simulation inputs below computes mathematical transformations and does not alter official national accounts records.
+        <strong>Note on Statistical Methodology:</strong> The GDP Deflator is an implicit price index reflecting domestic output across all 14 economic sub-sectors. Adjusting simulation inputs below computes mathematical transformations without altering official records.
       </div>
 
       {/* Simulator Section */}
-      <div className="grid gap-6 lg:grid-cols-2 mb-8">
-        <div className="rounded-md border border-slate-200 bg-white p-5 shadow-xs space-y-5">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2">
+      <div className="grid gap-8 lg:grid-cols-2 mb-12">
+        <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs space-y-6">
+          <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#57585C] border-b border-[rgba(20,21,23,0.1)] pb-2">
             Nominal to Real GDP Conversion Tool
           </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+              <div className="flex justify-between text-xs font-semibold text-[#141416] mb-1.5 font-mono">
                 <span>Nominal GDP (Current Prices)</span>
-                <span className="font-mono text-blue-800 font-bold">₹{nominalGdp.toLocaleString()} Crore</span>
+                <span className="font-bold text-[#141416]">₹{nominalGdp.toLocaleString()} Crore</span>
               </div>
               <input
                 type="range"
@@ -60,14 +62,16 @@ export default function DeflatorPage() {
                 step="100000"
                 value={nominalGdp}
                 onChange={(e) => setNominalGdp(Number(e.target.value))}
-                className="w-full h-2 rounded bg-slate-200 accent-blue-700 cursor-pointer"
+                className="w-full h-2 rounded bg-black/10 accent-[#141416] cursor-pointer"
               />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+              <div className="flex justify-between text-xs font-semibold text-[#141416] mb-1.5 font-mono">
                 <span>Implicit GDP Deflator Index (Base 100)</span>
-                <span className="font-mono text-blue-800 font-bold">{deflatorIndex.toFixed(1)} ({impliedInflationNum >= 0 ? "+" : ""}{impliedInflation}% Implied Inflation)</span>
+                <span className="font-bold text-[#D94E34]">
+                  {deflatorIndex.toFixed(1)} ({impliedInflationNum >= 0 ? "+" : ""}{impliedInflation}% Implied Inflation)
+                </span>
               </div>
               <input
                 type="range"
@@ -76,94 +80,72 @@ export default function DeflatorPage() {
                 step="0.1"
                 value={deflatorIndex}
                 onChange={(e) => setDeflatorIndex(Number(e.target.value))}
-                className="w-full h-2 rounded bg-slate-200 accent-blue-700 cursor-pointer"
+                className="w-full h-2 rounded bg-black/10 accent-[#141416] cursor-pointer"
               />
             </div>
           </div>
 
-          <div className="rounded-md border border-emerald-200 bg-emerald-50/60 p-4">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 mb-1">
-              Computed Real GDP (Constant Basic Prices)
+          <div className="rounded-lg border border-[#059669]/30 bg-[#ECEBE5] p-5">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#059669] mb-1">
+              COMPUTED REAL GDP (CONSTANT BASIC PRICES)
             </div>
-            <div className="text-3xl font-extrabold text-emerald-950 font-mono">
-              ₹{realGdp.toLocaleString()} <span className="text-sm font-semibold text-emerald-700">Crore</span>
+            <div className="text-3xl font-black text-[#141416] font-mono">
+              ₹{realGdp.toLocaleString()} <span className="text-sm font-semibold text-[#57585C]">Crore</span>
             </div>
-            <p className="mt-2 text-[11px] text-slate-600 font-mono">
-              Mathematical Formula: Real GDP = (Nominal GDP / Deflator) x 100
+            <p className="mt-2 text-[11px] text-[#828387] font-mono">
+              Formula: Real GDP = (Nominal GDP / Deflator Index) × 100
             </p>
           </div>
         </div>
 
         {/* Price Index Comparison */}
-        <div className="rounded-md border border-slate-200 bg-white p-5 shadow-xs space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-2">
+        <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs space-y-4">
+          <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#57585C] border-b border-[rgba(20,21,23,0.1)] pb-2">
             Price Index Basket Scope & Composition
           </h2>
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-[#57585C]">
             CPI, WPI, and the GDP Deflator represent distinct economic baskets and weighting mechanisms:
           </p>
 
-          <div className="space-y-2.5 text-xs">
-            <div className="rounded border border-slate-200 bg-slate-50 p-3">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="font-bold text-slate-900">Consumer Price Index (CPI Combined)</span>
-                <span className="font-mono font-bold text-blue-800">4.83% YoY</span>
+          <div className="space-y-3 text-xs">
+            <div className="rounded border border-[rgba(20,21,23,0.1)] bg-[#E8E7E1] p-3.5">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-[#141416] font-mono">Consumer Price Index (CPI Combined)</span>
+                <span className="font-mono font-bold text-[#141416]">4.83% YoY</span>
               </div>
-              <p className="text-slate-600 text-[11px]">Retail household basket (food, housing, fuel, health, education). Target anchor for RBI Monetary Policy.</p>
+              <p className="text-[#57585C] text-[11px]">Retail household basket (food, housing, fuel, health, education). Primary anchor for RBI Monetary Policy Committee.</p>
             </div>
 
-            <div className="rounded border border-slate-200 bg-slate-50 p-3">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="font-bold text-slate-900">Wholesale Price Index (WPI)</span>
-                <span className="font-mono font-bold text-blue-800">1.26% YoY</span>
+            <div className="rounded border border-[rgba(20,21,23,0.1)] bg-[#E8E7E1] p-3.5">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-[#141416] font-mono">Wholesale Price Index (WPI Headline)</span>
+                <span className="font-mono font-bold text-[#141416]">1.26% YoY</span>
               </div>
-              <p className="text-slate-600 text-[11px]">Producer and bulk commodity level prices. Heavy weighting on manufactured goods and fuel; excludes services.</p>
+              <p className="text-[#57585C] text-[11px]">Producer and bulk commodity level prices. Heavy weighting on manufactured goods and crude fuel; excludes services.</p>
             </div>
 
-            <div className="rounded border border-slate-200 bg-slate-50 p-3">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="font-bold text-slate-900">Implicit GDP Deflator</span>
-                <span className="font-mono font-bold text-emerald-800">1.40% YoY</span>
+            <div className="rounded border border-[#D94E34]/20 bg-[#E8E7E1] p-3.5">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-[#D94E34] font-mono">Implicit GDP Deflator (Whole Economy)</span>
+                <span className="font-mono font-bold text-[#D94E34]">1.40% YoY</span>
               </div>
-              <p className="text-slate-600 text-[11px]">Comprehensive measure covering entire domestic output. Includes both goods and services produced in India.</p>
+              <p className="text-[#57585C] text-[11px]">Comprehensive measure covering domestic output across agriculture, industry, and tertiary services.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Historical Observations Table */}
-      <section className="rounded-md border border-slate-200 bg-white p-5 shadow-xs">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3 border-b border-slate-200 pb-2">
-          Quarterly Price Index & Deflator Time Series (MoSPI / RBI)
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs gov-table">
-            <thead>
-              <tr className="text-slate-700">
-                <th className="p-2.5">Quarterly Period</th>
-                <th className="p-2.5">GDP Deflator (% YoY)</th>
-                <th className="p-2.5">Headline CPI (% YoY)</th>
-                <th className="p-2.5">WPI (% YoY)</th>
-                <th className="p-2.5">Divergence (CPI - Deflator)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {deflatorData?.data?.map((row, idx) => {
-                const divergence = (row.cpi && row.gdpDeflator) ? (row.cpi - row.gdpDeflator).toFixed(2) : "-";
-                return (
-                  <tr key={idx} className="hover:bg-slate-50/70">
-                    <td className="p-2.5 font-semibold text-slate-900">{row.period}</td>
-                    <td className="p-2.5 font-mono font-bold text-emerald-800">{row.gdpDeflator}%</td>
-                    <td className="p-2.5 font-mono text-slate-800">{row.cpi}%</td>
-                    <td className="p-2.5 font-mono text-slate-800">{row.wpi}%</td>
-                    <td className="p-2.5 font-mono text-slate-600">+{divergence}% pts</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      {/* Quarterly Deflator vs Inflation Trajectory Section */}
+      <section aria-labelledby="deflator-chart-heading" className="mb-12 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs">
+        <BklitDeflatorLineChart data={deflatorData?.data} baseYear={deflatorData?.baseYear} />
       </section>
+
+      <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-5 text-xs text-[#828387] font-mono flex items-center justify-between">
+        <span>PROVENANCE: MoSPI NATIONAL ACCOUNTS STATISTICS (NAS) • DOUBLE DEFLATION ENGINE</span>
+        <Link href="/methodology" className="underline underline-offset-4 text-[#141416]">
+          Read Splicing Guidelines →
+        </Link>
+      </div>
     </div>
   );
 }

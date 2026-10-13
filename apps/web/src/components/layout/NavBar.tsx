@@ -1,608 +1,451 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { GovernmentTerminalModal } from "@/components/antimetal/GovernmentTerminalModal";
+import { ShinyButton } from "@/components/ui/shiny-button";
+import { DynamicText } from "@/components/kokonutui/dynamic-text";
+import { AnimatePresence, motion } from "motion/react";
 import {
   Menu,
   X,
-  LogOut,
-  LayoutDashboard,
+  Lock,
   TrendingUp,
-  Globe2,
   SlidersHorizontal,
-  Compass,
   FileSpreadsheet,
-  History,
   CheckCircle2,
   Award,
+  Globe2,
   Bot,
+  Compass,
   ShieldCheck,
-  Search,
-  ExternalLink,
+  ArrowRight,
+  Database,
+  BarChart3,
+  BookOpen,
 } from "lucide-react";
 
-interface NavModule {
-  href: string;
-  label: string;
+interface NavOption {
+  title: string;
   description: string;
-  category: "accounts" | "methodology" | "intelligence";
-  icon: typeof LayoutDashboard;
+  href: string;
+  icon: React.ElementType;
   badge?: string;
 }
 
-const ALL_MODULES: NavModule[] = [
-  // 1. Accounts & Growth
-  {
-    href: "/",
-    label: "Macro Dashboard",
-    description: "National Real & Nominal accounts, headline growth, key indicators",
-    category: "accounts",
-    icon: LayoutDashboard,
-  },
-  {
-    href: "/gdp",
-    label: "GDP Explorer",
-    description: "Historical time series, sectoral breakdown & State-level GSDP",
-    category: "accounts",
-    icon: TrendingUp,
-    badge: "Includes State GVA",
-  },
-  {
-    href: "/deflator",
-    label: "Deflator Simulator",
-    description: "Implicit price deflator analysis and inflation-vs-growth modeling",
-    category: "accounts",
-    icon: SlidersHorizontal,
-  },
-  {
-    href: "/gdp/why",
-    label: "Growth Drivers",
-    description: "Demand-side components (PFCE, GFCE, GFCF) and sectoral contribution",
-    category: "accounts",
-    icon: Compass,
-  },
+interface NavSection {
+  category: string;
+  items: NavOption[];
+}
 
-  // 2. Methodology & Revisions
+const NAVIGATION_SECTIONS: NavSection[] = [
   {
-    href: "/methodology",
-    label: "Methodology & Base Years",
-    description: "2011-12 vs 2022-23 base year isolation safeguards & rebasing guide",
-    category: "methodology",
-    icon: FileSpreadsheet,
+    category: "National Accounts & Macro",
+    items: [
+      {
+        title: "Macro Analytics Terminal",
+        description: "Full-viewport executive dashboard, sectoral shares, state rankings & discrepancy telemetry.",
+        href: "/analytics",
+        icon: BarChart3,
+        badge: "New",
+      },
+      {
+        title: "GDP Explorer & State GVA",
+        description: "Official real & nominal series, sectoral decomposition, and 28 state accounts.",
+        href: "/gdp",
+        icon: TrendingUp,
+        badge: "MoSPI",
+      },
+      {
+        title: "Deflator Simulator",
+        description: "Interactive CPI vs WPI vs GDP Deflator modeling under commodity shocks.",
+        href: "/deflator",
+        icon: SlidersHorizontal,
+        badge: "Simulator",
+      },
+      {
+        title: "Growth Drivers & Discrepancies",
+        description: "Deconstruct PFCE, GFCE, GFCF expenditure drivers and statistical anomalies.",
+        href: "/gdp/why",
+        icon: Compass,
+      },
+    ],
   },
   {
-    href: "/revisions",
-    label: "Revisions Monitor",
-    description: "Sequential MoSPI release tracker (FAE → SAE → PE → FRE revisions)",
-    category: "methodology",
-    icon: History,
+    category: "Sovereign Intelligence",
+    items: [
+      {
+        title: "Sovereign Credit Ratings",
+        description: "Historical credit trajectories from Fitch, Moody's, and S&P alongside fiscal metrics.",
+        href: "/ratings",
+        icon: Award,
+      },
+      {
+        title: "Consistency Index",
+        description: "Cross-dataset forensic reconciliation between MoSPI, RBI, and CAG reports.",
+        href: "/consistency",
+        icon: CheckCircle2,
+      },
+      {
+        title: "Global Macro Nexus",
+        description: "Live World Bank multi-country indicators, debt-to-GDP, and balance of payments.",
+        href: "/global",
+        icon: Globe2,
+        badge: "Live",
+      },
+      {
+        title: "3D Particle Observatory",
+        description: "WebGPU / TSL 26,000 instanced particle sovereign ledger in living motion.",
+        href: "/#observatory",
+        icon: Globe2,
+        badge: "WebGPU",
+      },
+      {
+        title: "Sovereign AI Copilot",
+        description: "Autonomous econometric reasoning assistant grounded in official gazettes.",
+        href: "/ai",
+        icon: Bot,
+        badge: "AI",
+      },
+    ],
   },
   {
-    href: "/consistency",
-    label: "Consistency Index",
-    description: "Statistical divergence detection and cross-source integrity scoring",
-    category: "methodology",
-    icon: CheckCircle2,
+    category: "Standards & Verification",
+    items: [
+      {
+        title: "How It Works (Architecture & Sources)",
+        description: "UN SNA 2008 double deflation, sub-national synthesis, and official MoSPI citations.",
+        href: "/how-it-works",
+        icon: Compass,
+        badge: "Guide",
+      },
+      {
+        title: "National Accounts Methodology",
+        description: "Mathematical formulation of double deflation and 2011-12 / 2022-23 base year documentation.",
+        href: "/methodology",
+        icon: BookOpen,
+      },
+      {
+        title: "Data Sources & Provenance",
+        description: "Cryptographic SHA-256 verification and official statistical gazette archives.",
+        href: "/sources",
+        icon: Database,
+      },
+    ],
   },
-  {
-    href: "/sources",
-    label: "Official Data Sources",
-    description: "Institutional registry for MoSPI, RBI, DPIIT, World Bank, and PIB",
-    category: "methodology",
-    icon: ShieldCheck,
-    badge: "Verified Registry",
-  },
-
-  // 3. Global & Intelligence
-  {
-    href: "/global",
-    label: "Global GDP & Economies",
-    description: "Live World Bank comparative metrics across top 10 world economies",
-    category: "intelligence",
-    icon: Globe2,
-    badge: "World Bank Live",
-  },
-  {
-    href: "/ratings",
-    label: "Sovereign Ratings",
-    description: "Moody's, S&P, and Fitch ratings trajectories and criteria evaluation",
-    category: "intelligence",
-    icon: Award,
-  },
-  {
-    href: "/ai",
-    label: "Research Assistant",
-    description: "Domain-grounded macroeconomic intelligence RAG assistant",
-    category: "intelligence",
-    icon: Bot,
-    badge: "AI Powered",
-  },
-  {
-    href: "/about",
-    label: "Sources & Governance",
-    description: "Authoritative data registries, MoSPI/RBI documentation & compliance",
-    category: "intelligence",
-    icon: ShieldCheck,
-  },
-];
-
-// Primary top navigation items shown on desktop
-const PRIMARY_NAV = [
-  { href: "/", label: "Dashboard" },
-  { href: "/gdp", label: "GDP Explorer" },
-  { href: "/global", label: "Global Economies" },
-  { href: "/deflator", label: "Deflator Simulator" },
 ];
 
 export function NavBar() {
-  const path = usePathname();
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
+  const isAuthenticated = !!user;
+  const [govModalOpen, setGovModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const { user, logout, loading } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
 
-  // Close drawer on escape key
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMenuOpen(false);
-      }
-    }
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close hamburger menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Lock background scroll when drawer is open
+  useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
     };
   }, [menuOpen]);
 
-  // Filter modules based on search input inside hamburger
-  const filteredModules = useMemo(() => {
-    if (!searchQuery.trim()) return ALL_MODULES;
-    const q = searchQuery.toLowerCase();
-    return ALL_MODULES.filter(
-      (m) =>
-        m.label.toLowerCase().includes(q) ||
-        m.description.toLowerCase().includes(q)
-    );
-  }, [searchQuery]);
-
-  const accountModules = filteredModules.filter((m) => m.category === "accounts");
-  const methodologyModules = filteredModules.filter((m) => m.category === "methodology");
-  const intelligenceModules = filteredModules.filter((m) => m.category === "intelligence");
-
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs">
-        {/* Top Official Government/Authority Stripe */}
-        <div className="bg-slate-900 text-slate-200 px-4 sm:px-6 py-1.5 text-xs hidden md:flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3 lg:gap-4 overflow-hidden">
-            <span className="flex items-center gap-1.5 font-medium shrink-0">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-              <span className="text-white font-bold">MoSPI NAS:</span> FY 2023-24 (Provisional Estimates)
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="shrink-0">
-              RBI Repo: <strong className="text-white font-semibold">6.50%</strong>
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="shrink-0">
-              CPI: <strong className="text-white font-semibold">4.83%</strong>
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="shrink-0">
-              WPI: <strong className="text-white font-semibold">1.26%</strong>
-            </span>
-            <span className="text-slate-600">|</span>
-            <span className="shrink-0">
-              FX Reserves: <strong className="text-emerald-300 font-semibold">$651.5 Bn</strong>
-            </span>
-          </div>
-          <div className="flex items-center gap-3 font-mono text-[11px] shrink-0">
-            <span className="bg-blue-950 text-blue-200 px-2 py-0.5 rounded-md font-bold border border-blue-800 flex items-center gap-1">
-              <span className="text-amber-400 font-black">&#x20B9;</span> 2022-23 ACTIVE BENCHMARK
-            </span>
-            <span className="text-slate-400 hidden lg:inline">MoSPI &#x2022; RBI VERIFIED</span>
-          </div>
-        </div>
-
-        {/* Main Official Header Navigation */}
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-2.5">
-          {/* Brand with Rupee Symbol Under Magnifying Glass Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-3 group shrink-0"
-            onClick={() => setMenuOpen(false)}
-          >
-            {/* Rupee Under Magnifying Glass Insignia */}
-            <div className="relative h-10 w-10 rounded-lg bg-slate-900 p-1 shadow-sm border border-slate-700 flex items-center justify-center overflow-hidden group-hover:border-blue-500 transition-all">
-              <svg viewBox="0 0 36 36" className="h-8 w-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="15.5" cy="15.5" r="10" fill="#1e3a8a" fillOpacity="0.35" stroke="#38bdf8" strokeWidth="1.8" />
-                <path d="M8.5 13 A 8 8 0 0 1 18.5 8" stroke="#bae6fd" strokeWidth="1" strokeLinecap="round" opacity="0.8" />
-                <g stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 11.5 h9" />
-                  <path d="M11 14.8 h7" />
-                  <path d="M11 11.5 v8 c1.8 0 3.8 -.2 4.8 -1.5 1.1 -1.4 1.1 -4 -.2 -5.2" />
-                  <path d="M13.5 19.5 l4.5 5.5" />
-                </g>
-                <path d="M23 23 L25 25" stroke="#93c5fd" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M25 25 L31.5 31.5" stroke="#cbd5e1" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="31.5" cy="31.5" r="1" fill="#f59e0b" />
-              </svg>
-            </div>
-
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 leading-none group-hover:text-blue-700 transition-colors">
-                  Artha<span className="text-blue-700">Lens</span>
-                </span>
-                <span className="rounded-md bg-slate-100 text-slate-800 border border-slate-300 px-1.5 py-0.5 text-[10px] font-bold uppercase font-mono tracking-wider flex items-center gap-1">
-                  <span className="text-amber-600 font-black">&#x20B9;</span>
-                  <span className="text-slate-400">/</span>
-                  <span className="text-blue-700 font-black">$</span>
-                  <span className="text-slate-700 font-semibold ml-0.5">Macro</span>
-                </span>
-              </div>
-              <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 tracking-normal mt-0.5 hidden xs:inline">
-                National Macroeconomic Accounts & Global Monetary Intelligence
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop Primary Nav (Clean, Uncluttered 4 Core Links) */}
-          <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-1.5 xl:gap-2">
-            {PRIMARY_NAV.map((item) => {
-              const active = path === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`btn-realistic px-3.5 py-1.5 text-xs whitespace-nowrap transition-all ${
-                    active
-                      ? "btn-solid-blue font-extrabold"
-                      : "btn-solid-slate font-semibold text-slate-700"
-                  }`}
-                  aria-current={active ? "page" : undefined}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right Action Area: Hamburger Menu Button + User Profile */}
-          <div className="flex items-center gap-2.5">
-            {/* Sleek Realistic Solid Hamburger / All Modules Button */}
+      {/* Antimetal Floating Capsule Navigation Bar */}
+      <header
+        className={`sticky top-0 z-40 w-full transition-all duration-300 py-3 sm:py-4 px-4 sm:px-6 ${
+          scrolled ? "backdrop-blur-md bg-[#E6E5DF]/85 shadow-xs" : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
+          {/* Left: Aligned Hamburger Menu Button & Telemetry Ticker */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
-              type="button"
-              onClick={() => setMenuOpen(true)}
-              className="btn-realistic btn-solid-navy px-3.5 py-1.5 text-xs font-bold gap-2 group shadow-sm"
-              aria-label="Open all modules menu"
-              title={`Explore all ${ALL_MODULES.length} macroeconomic modules`}
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-3.5 py-1.5 text-[13px] font-sans font-medium text-[#141416] hover:bg-black/5 hover:border-[rgba(20,21,23,0.35)] transition-all shadow-2xs cursor-pointer active:scale-95"
+              aria-label="Toggle navigation menu"
+              aria-expanded={menuOpen}
             >
-              <Menu className="h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform" />
-              <span className="font-extrabold tracking-wide">All Modules</span>
-              <span className="rounded bg-blue-600 text-white text-[10px] font-mono font-bold px-1.5 py-0.2 shadow-inner border border-blue-400/40">
-                {ALL_MODULES.length}
-              </span>
+              <Menu className="h-3.5 w-3.5 text-[#141416]" />
+              <span className="leading-none">Menu</span>
             </button>
 
-            {/* User Session Profile Badge */}
-            <div className="hidden sm:flex items-center">
-              {loading ? (
-                <span className="text-xs text-slate-400 font-mono">...</span>
-              ) : user ? (
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 shadow-2xs">
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="font-bold text-slate-900 truncate max-w-[130px]">{user.name}</span>
-                    <span className="text-[10px] text-slate-500 truncate max-w-[130px]">{user.organization || "Analyst"}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => logout()}
-                    title="Sign Out"
-                    className="text-slate-400 hover:text-red-600 hover:bg-red-50 ml-1 p-1 rounded-md transition-colors cursor-pointer"
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  href="/login"
-                  className="btn-realistic btn-solid-blue px-4 py-1.5 text-xs font-bold whitespace-nowrap shadow-sm"
-                >
-                  Sign In
-                </Link>
-              )}
+            <Link
+              href="/how-it-works"
+              className={`hidden sm:inline-flex items-center rounded-full px-3 py-1.5 text-[13px] font-sans font-medium transition-colors ${
+                pathname === "/how-it-works"
+                  ? "bg-[#141416] text-[#ECEBE5]"
+                  : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
+              }`}
+            >
+              How It Works
+            </Link>
+
+            {/* Live Telemetry Dynamic Text Ticker (Desktop) */}
+            <div className="hidden lg:flex items-center rounded-full border border-[rgba(20,21,23,0.1)] bg-[#ECEBE5]/60 px-3 py-1">
+              <DynamicText
+                words={[
+                  { text: "MoSPI National Accounts • FY24" },
+                  { text: "Double Deflation Matrix Active" },
+                  { text: "Real GDP: ₹173.8L Cr (Base 2011-12)" },
+                  { text: "State GVA • 28 States & 3 UTs" },
+                  { text: "RBI High-Frequency Indicators" },
+                ]}
+                interval={2600}
+                loop={true}
+                className="!min-h-0"
+                containerClassName="!h-4 !min-w-[210px]"
+                textClassName="!text-[11px] !font-mono !text-[#57585C]"
+                dotClassName="!h-1.5 !w-1.5 bg-[#059669]"
+              />
             </div>
+          </div>
+
+          {/* Center Brand Capsule Badge */}
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-4 py-1.5 shadow-2xs hover:border-[rgba(20,21,23,0.3)] transition-all"
+          >
+            <div className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-[#141416]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#D94E34]" />
+            </div>
+            <span className="font-heading text-lg font-bold tracking-tight text-[#141416]">
+              Artha<span className="font-sans font-light text-xs text-[#57585C] ml-1">LENS</span>
+            </span>
+          </Link>
+
+          {/* Right Action Group */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ShinyButton
+              onClick={() => setGovModalOpen(true)}
+              className="!py-1.5 !px-3 sm:!px-3.5 !text-xs !font-sans !font-medium"
+              icon={<Lock className="h-3 w-3 text-[#D94E34]" />}
+            >
+              Government
+            </ShinyButton>
+
+            <Link
+              href="/gdp"
+              className="btn-realistic btn-solid-black text-xs px-3.5 py-1.5 font-sans font-semibold shadow-xs"
+            >
+              GDP Explorer
+            </Link>
+
+            {isAuthenticated ? (
+              <div className="hidden sm:flex items-center gap-2 pl-1">
+                <span className="font-sans text-xs text-[#57585C]">
+                  {user?.name || "Researcher"}
+                </span>
+                <button
+                  onClick={logout}
+                  className="rounded-full px-2.5 py-1 text-xs font-sans text-[#828387] hover:text-[#141416]"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden sm:inline-flex rounded-full px-3 py-1.5 text-xs font-sans font-medium text-[#57585C] hover:text-[#141416] transition-colors"
+              >
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Hamburger Slide-Over Drawer / Backdrop */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          {/* Backdrop Overlay with Smooth Blur */}
-          <div
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-            onClick={() => setMenuOpen(false)}
-            aria-hidden="true"
-          />
+      {/* Aligned Full-Screen / Modal Hamburger Menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <div className="fixed inset-0 z-50 flex items-start justify-center">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+              className="fixed inset-0 bg-[#141416]/50 backdrop-blur-xs"
+            />
 
-          {/* Slide-out Navigation Drawer */}
-          <aside
-            className="relative z-50 w-full max-w-md bg-white shadow-2xl flex flex-col h-full border-l border-slate-200 animate-in slide-in-from-right duration-300"
-            aria-label="All platform modules"
-          >
-            {/* Drawer Header */}
-            <div className="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-lg bg-blue-950 flex items-center justify-center text-amber-400 font-bold border border-blue-800">
-                  &#x20B9;
-                </div>
-                <div>
-                  <h2 className="text-sm font-extrabold text-slate-900">Platform Navigation</h2>
-                  <p className="text-[11px] text-slate-500 font-medium">{ALL_MODULES.length} Core Macroeconomic Intelligence Modules</p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setMenuOpen(false)}
-                className="btn-realistic btn-solid-slate p-1.5 text-slate-700 hover:text-slate-950"
-                aria-label="Close menu"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Quick Search Filter */}
-            <div className="p-4 border-b border-slate-100 bg-white">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Filter modules (e.g. GDP, State GVA, Deflator, Ratings)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Scrollable Module List */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-5">
-              {/* Category 1: Accounts & Output */}
-              {accountModules.length > 0 && (
-                <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-2 flex items-center gap-1.5 font-mono">
-                    <TrendingUp className="h-3 w-3 text-blue-600" />
-                    <span>National Accounts & Production</span>
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -15, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+              className="relative z-10 w-full max-w-5xl mx-4 mt-4 sm:mt-8 max-h-[88vh] overflow-y-auto rounded-3xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] p-6 sm:p-8 shadow-2xl"
+            >
+              {/* Header Bar */}
+              <div className="flex items-center justify-between pb-6 border-b border-[rgba(20,21,23,0.12)]">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 rounded-full border border-[rgba(20,21,23,0.15)] bg-white/60 px-3 py-1">
+                    <span className="h-2 w-2 rounded-full bg-[#D94E34]" />
+                    <span className="font-mono text-xs font-bold text-[#141416] uppercase tracking-wider">
+                      ArthaLens Navigation Hub
+                    </span>
                   </div>
-                  <div className="space-y-1">
-                    {accountModules.map((item) => {
-                      const Icon = item.icon;
-                      const active = path === item.href;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMenuOpen(false)}
-                          className={`flex items-start gap-3 p-2.5 rounded-lg border transition-all ${
-                            active
-                              ? "bg-blue-50/80 border-blue-300 shadow-2xs"
-                              : "border-transparent hover:border-slate-200 hover:bg-slate-50"
-                          }`}
-                        >
-                          <div
-                            className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-                              active
-                                ? "bg-blue-600 text-white shadow-2xs"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`text-xs font-bold leading-tight ${
-                                  active ? "text-blue-950 font-black" : "text-slate-900"
-                                }`}
-                              >
-                                {item.label}
-                              </span>
-                              {item.badge && (
-                                <span className="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.2 rounded-md">
-                                  {item.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                              {item.description}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
+
+                  <div className="hidden md:flex items-center">
+                    <DynamicText
+                      words={[
+                        { text: "Autonomous Macro Intelligence Engine" },
+                        { text: "UN SNA 2008 Double Deflation" },
+                        { text: "28 States & 3 UTs Macro Accounts" },
+                        { text: "MoSPI & RBI Cryptographic Provenance" },
+                      ]}
+                      interval={2400}
+                      loop={true}
+                      className="!min-h-0"
+                      containerClassName="!h-5 !min-w-[240px]"
+                      textClassName="!text-xs !font-mono !text-[#57585C]"
+                      dotClassName="!h-1.5 !w-1.5 bg-[#059669]"
+                    />
                   </div>
                 </div>
-              )}
 
-              {/* Category 2: Methodology & Quality */}
-              {methodologyModules.length > 0 && (
-                <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-2 flex items-center gap-1.5 font-mono">
-                    <FileSpreadsheet className="h-3 w-3 text-purple-600" />
-                    <span>Methodology & Data Integrity</span>
-                  </div>
-                  <div className="space-y-1">
-                    {methodologyModules.map((item) => {
-                      const Icon = item.icon;
-                      const active = path === item.href;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMenuOpen(false)}
-                          className={`flex items-start gap-3 p-2.5 rounded-lg border transition-all ${
-                            active
-                              ? "bg-purple-50/80 border-purple-300 shadow-2xs"
-                              : "border-transparent hover:border-slate-200 hover:bg-slate-50"
-                          }`}
-                        >
-                          <div
-                            className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-                              active
-                                ? "bg-purple-600 text-white shadow-2xs"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`text-xs font-bold leading-tight ${
-                                  active ? "text-purple-950 font-black" : "text-slate-900"
-                                }`}
-                              >
-                                {item.label}
-                              </span>
-                              {item.badge && (
-                                <span className="bg-purple-100 text-purple-800 text-[9px] font-bold px-1.5 py-0.2 rounded-md">
-                                  {item.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                              {item.description}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Category 3: Global & Research */}
-              {intelligenceModules.length > 0 && (
-                <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-2 flex items-center gap-1.5 font-mono">
-                    <Globe2 className="h-3 w-3 text-teal-600" />
-                    <span>Global Benchmarks & Intelligence</span>
-                  </div>
-                  <div className="space-y-1">
-                    {intelligenceModules.map((item) => {
-                      const Icon = item.icon;
-                      const active = path === item.href;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMenuOpen(false)}
-                          className={`flex items-start gap-3 p-2.5 rounded-lg border transition-all ${
-                            active
-                              ? "bg-teal-50/80 border-teal-300 shadow-2xs"
-                              : "border-transparent hover:border-slate-200 hover:bg-slate-50"
-                          }`}
-                        >
-                          <div
-                            className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-                              active
-                                ? "bg-teal-600 text-white shadow-2xs"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                          >
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`text-xs font-bold leading-tight ${
-                                  active ? "text-teal-950 font-black" : "text-slate-900"
-                                }`}
-                              >
-                                {item.label}
-                              </span>
-                              {item.badge && (
-                                <span className="bg-teal-100 text-teal-800 text-[9px] font-bold px-1.5 py-0.2 rounded-md">
-                                  {item.badge}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-500 leading-normal mt-0.5">
-                              {item.description}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {filteredModules.length === 0 && (
-                <div className="text-center py-8 text-slate-400 text-xs">
-                  No modules match &quot;{searchQuery}&quot;
-                </div>
-              )}
-            </div>
-
-            {/* Drawer Footer: User Profile & Official Sovereign Badge */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
-              {/* User Identity inside drawer */}
-              {user ? (
-                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-3 shadow-2xs">
-                  <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-900">{user.name}</span>
-                    <span className="text-[10px] text-slate-500 font-medium">{user.organization || "Public Citizen Explorer"}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      logout();
-                      setMenuOpen(false);
-                    }}
-                    className="btn-realistic btn-solid-slate px-2.5 py-1 text-xs text-red-700 font-bold border-red-200 hover:bg-red-50 hover:border-red-300 gap-1.5"
-                  >
-                    <LogOut className="h-3 w-3" />
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  href="/login"
+                <button
                   onClick={() => setMenuOpen(false)}
-                  className="btn-realistic btn-solid-blue w-full py-2.5 text-xs font-bold text-center block shadow-sm"
+                  className="flex items-center gap-1.5 rounded-full border border-[rgba(20,21,23,0.15)] bg-white/70 px-3 py-1.5 text-xs font-mono font-medium text-[#141416] hover:bg-black/10 transition-all cursor-pointer"
+                  aria-label="Close menu"
                 >
-                  Sign In to ArthaLens
-                </Link>
-              )}
-
-              {/* Verified Authority Provenance */}
-              <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                <span>MoSPI &#x2022; RBI &#x2022; World Bank Verified</span>
-                <span className="text-blue-700 font-bold">Base 2022-23</span>
+                  <X className="h-3.5 w-3.5 text-[#141416]" />
+                  <span>Close</span>
+                </button>
               </div>
-            </div>
-          </aside>
-        </div>
-      )}
+
+              {/* Categorized Options Grid */}
+              <div className="grid gap-8 py-8 md:grid-cols-3">
+                {NAVIGATION_SECTIONS.map((section) => (
+                  <div key={section.category} className="space-y-4">
+                    <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-wider text-[#828387]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#141416]" />
+                      <span>{section.category}</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {section.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = pathname === item.href;
+                        return (
+                          <Link
+                            key={item.title}
+                            href={item.href}
+                            onClick={() => setMenuOpen(false)}
+                            className={`group block rounded-xl p-3 border transition-all ${
+                              isActive
+                                ? "bg-white border-[#141416]/20 shadow-xs"
+                                : "bg-transparent border-transparent hover:bg-white/60 hover:border-[rgba(20,21,23,0.1)]"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-lg bg-black/5 text-[#141416] group-hover:bg-[#141416] group-hover:text-[#ECEBE5] transition-colors">
+                                  <Icon className="h-4 w-4" />
+                                </div>
+                                <span className="font-heading text-sm font-semibold text-[#141416] group-hover:text-[#D94E34] transition-colors">
+                                  {item.title}
+                                </span>
+                              </div>
+                              {item.badge && (
+                                <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-black/5 text-[#57585C]">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="font-sans text-xs text-[#57585C] leading-snug pl-8">
+                              {item.description}
+                            </p>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer Quick Actions */}
+              <div className="pt-6 border-t border-[rgba(20,21,23,0.12)] flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3 text-xs font-mono text-[#828387]">
+                  <span className="h-2 w-2 rounded-full bg-[#059669]" />
+                  <span>DATA PIPELINES SYNCHRONIZED: OFFICIAL MOSPI & RBI RELEASES</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <ShinyButton
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setGovModalOpen(true);
+                    }}
+                    className="!py-1.5 !px-3.5 !text-xs !font-medium"
+                    icon={<Lock className="h-3 w-3 text-[#D94E34]" />}
+                  >
+                    Government Terminal
+                  </ShinyButton>
+
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMenuOpen(false);
+                      }}
+                      className="btn-realistic btn-outline-pill px-4 py-1.5 text-xs font-semibold"
+                    >
+                      Logout ({user?.name || "User"})
+                    </button>
+                  ) : (
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="btn-realistic btn-outline-pill px-4 py-1.5 text-xs font-semibold"
+                    >
+                      Sign in
+                    </Link>
+                  )}
+
+                  <Link
+                    href="/gdp"
+                    onClick={() => setMenuOpen(false)}
+                    className="btn-realistic btn-solid-black px-5 py-1.5 text-xs font-semibold flex items-center gap-1.5"
+                  >
+                    <span>Launch Explorer</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Secret Government Terminal Modal */}
+      <GovernmentTerminalModal
+        isOpen={govModalOpen}
+        onClose={() => setGovModalOpen(false)}
+      />
     </>
   );
 }

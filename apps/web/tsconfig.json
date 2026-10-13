@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@bklitui/ui/charts": ["./src/components/charts/bklit"],
+      "@bklitui/ui/charts/*": ["./src/components/charts/bklit/*"],
+      "@bklitui/ui/*": ["./src/components/charts/bklit/*"]
     }
   },
   "include": [

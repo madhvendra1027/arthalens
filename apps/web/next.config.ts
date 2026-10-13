@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   ...(process.env.DOCKER_BUILD === "1" ? { output: "standalone" } : {}),
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1",
     NEXT_PUBLIC_AI_BASE_URL: process.env.NEXT_PUBLIC_AI_BASE_URL ?? "http://localhost:8001/ai/v1",
@@ -15,6 +23,20 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: "/demo",
+        destination: "/",
+        permanent: false,
+      },
+      {
+        source: "/demo/:path*",
+        destination: "/",
+        permanent: false,
       },
     ];
   },

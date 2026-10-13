@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { GLOBAL_ECONOMIES, CountryEconomy } from "@/data/globalEconomies";
+import { BklitGlobalBarChart } from "@/components/charts/BklitGlobalBarChart";
 import {
   Search,
   ArrowUpDown,
@@ -215,69 +216,9 @@ export default function GlobalEconomiesPage() {
         </div>
       </div>
 
-      {/* Relative Scale Chart Section */}
-      <section aria-labelledby="scale-heading" className="mb-8 rounded-md border border-slate-200 bg-white p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100">
-          <div>
-            <h2 id="scale-heading" className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <Compass className="h-4 w-4 text-blue-700" />
-              Nominal GDP Scale & Annual Real Growth (2024 Benchmark)
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Bar lengths represent comparative nominal GDP size in USD Trillion. Badges show real annual growth rate (YoY %).
-            </p>
-          </div>
-          <div className="text-xs font-mono text-slate-600 mt-2 sm:mt-0 font-semibold">
-            India: &#x20B9;295.36 Lakh Crore ($3.94T)
-          </div>
-        </div>
-
-        <div className="space-y-3 pt-2">
-          {GLOBAL_ECONOMIES.map((country) => {
-            const widthPercent = (country.nominalGdpTrillion / maxGdp) * 100;
-            const isIndia = country.id === "india";
-
-            return (
-              <div key={country.id} className="flex items-center gap-3 text-xs">
-                <div className="w-32 sm:w-40 shrink-0 flex items-center gap-2">
-                  <span className="text-base">{country.flag}</span>
-                  <span className={`truncate ${isIndia ? "font-bold text-blue-900" : "font-semibold text-slate-800"}`}>
-                    {country.name}
-                  </span>
-                </div>
-
-                <div className="flex-1 bg-slate-100 rounded-sm h-5 overflow-hidden p-0.5 border border-slate-200">
-                  <div
-                    className={`h-full rounded-xs transition-all duration-500 flex items-center justify-between px-2 ${
-                      isIndia
-                        ? "bg-blue-800 text-white"
-                        : "bg-slate-600 text-white hover:bg-slate-700"
-                    }`}
-                    style={{ width: `${Math.max(widthPercent, 10)}%` }}
-                  >
-                    <span className="font-mono font-bold text-[10px]">
-                      ${country.nominalGdpTrillion.toFixed(2)}T
-                    </span>
-                  </div>
-                </div>
-
-                <div className="w-20 shrink-0 text-right">
-                  <span
-                    className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-mono font-bold border ${
-                      country.realGdpGrowth >= 4.0
-                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                        : country.realGdpGrowth >= 1.5
-                        ? "bg-blue-50 text-blue-800 border-blue-200"
-                        : "bg-slate-100 text-slate-700 border-slate-200"
-                    }`}
-                  >
-                    +{country.realGdpGrowth}%
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {/* Relative Scale Bklit UI Bar Chart Section */}
+      <section aria-labelledby="scale-heading" className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs">
+        <BklitGlobalBarChart economies={economies} />
       </section>
 
       {/* Interactive Controls Bar */}

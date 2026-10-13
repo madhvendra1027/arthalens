@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @theme {
+  --font-sans: var(--font-sans), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-heading), "Manrope", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono), "IBM Plex Mono", "SF Mono", Consolas, monospace;
+  --font-serif: var(--font-heading), "Manrope", system-ui, sans-serif;
   --color-brand-50: #eff6ff;
   --color-brand-100: #dbeafe;
   --color-brand-500: #2563eb;
@@ -9,19 +13,33 @@
   --color-brand-800: #1e3a8a;
   --color-brand-900: #0f2942;
 
-  --color-surface-white: #ffffff;
-  --color-surface-bg: #f8fafc;
-  --color-surface-50: #f1f5f9;
-  --color-surface-100: #e2e8f0;
-  --color-surface-200: #cbd5e1;
-  --color-surface-600: #475569;
-  --color-surface-700: #334155;
-  --color-surface-800: #1e293b;
-  --color-surface-900: #0f172a;
+  /* Antimetal Warm Paper & Editorial Palette */
+  --color-antimetal-bg: #E6E5DF;
+  --color-antimetal-surface: #DFDED8;
+  --color-antimetal-card: #ECEBE5;
+  --color-antimetal-card-hover: #E3E2DC;
+  --color-antimetal-dark: #141416;
+  --color-antimetal-dark-card: #1B1C1F;
+  --color-antimetal-border: rgba(20, 21, 23, 0.12);
+  --color-antimetal-border-dark: rgba(255, 255, 255, 0.12);
+  --color-antimetal-accent-red: #D94E34;
+  --color-antimetal-accent-amber: #D97706;
+  --color-antimetal-accent-gold: #E5A83B;
+  --color-antimetal-accent-emerald: #059669;
 
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #334155;
-  --color-text-muted: #64748b;
+  --color-surface-white: #ffffff;
+  --color-surface-bg: #E6E5DF;
+  --color-surface-50: #ECEBE5;
+  --color-surface-100: #DFDED8;
+  --color-surface-200: #D0CFCA;
+  --color-surface-600: #55565A;
+  --color-surface-700: #3E3F43;
+  --color-surface-800: #1E1F22;
+  --color-surface-900: #141416;
+
+  --color-text-primary: #141416;
+  --color-text-secondary: #57585C;
+  --color-text-muted: #828387;
   
   --color-official: #059669;
   --color-official-bg: #ecfdf5;
@@ -39,15 +57,77 @@
   --color-derived-bg: #f0f9ff;
   --color-derived-border: #bae6fd;
   
-  --color-danger: #dc2626;
+  --color-danger: #D94E34;
 
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
 }
 
 @layer base {
   :root {
     color-scheme: light;
+    --font-sans: var(--font-sans);
+    --font-heading: var(--font-heading);
+    --font-mono: var(--font-mono);
+    --font-serif: var(--font-heading);
+    --bg-main: #E6E5DF;
+    --text-main: #141416;
+
+    /* Bklit UI Chart Theming */
+    --chart-background: #ECEBE5;
+    --chart-foreground: #141416;
+    --chart-foreground-muted: #57585C;
+    --chart-label: #57585C;
+    --chart-line-primary: #141416;
+    --chart-line-secondary: #059669;
+    --chart-crosshair: rgba(20, 21, 23, 0.4);
+    --chart-grid: rgba(20, 21, 23, 0.08);
+    --chart-indicator-color: #141416;
+    --chart-indicator-secondary-color: #059669;
+    --chart-marker-background: #FFFFFF;
+    --chart-marker-border: #141416;
+    --chart-marker-foreground: #141416;
+    --chart-marker-badge-background: #141416;
+    --chart-marker-badge-foreground: #FFFFFF;
+    --chart-segment-background: rgba(20, 21, 23, 0.05);
+    --chart-segment-line: rgba(20, 21, 23, 0.25);
+    --chart-brush-border: rgba(20, 21, 23, 0.15);
+    --chart-tooltip-background: #FFFFFF;
+    --chart-1: #141416;
+    --chart-2: #059669;
+    --chart-3: #D97706;
+    --chart-4: #2563EB;
+    --chart-5: #7C3AED;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --bg-main: #141416;
+    --text-main: #ECEBE5;
+
+    /* Bklit UI Chart Theming - Dark */
+    --chart-background: #1B1C1F;
+    --chart-foreground: #ECEBE5;
+    --chart-foreground-muted: #9E9EA4;
+    --chart-label: #9E9EA4;
+    --chart-line-primary: #60A5FA;
+    --chart-line-secondary: #34D399;
+    --chart-crosshair: rgba(255, 255, 255, 0.4);
+    --chart-grid: rgba(255, 255, 255, 0.08);
+    --chart-indicator-color: #60A5FA;
+    --chart-indicator-secondary-color: #34D399;
+    --chart-marker-background: #1B1C1F;
+    --chart-marker-border: #ECEBE5;
+    --chart-marker-foreground: #ECEBE5;
+    --chart-marker-badge-background: #ECEBE5;
+    --chart-marker-badge-foreground: #141416;
+    --chart-segment-background: rgba(255, 255, 255, 0.05);
+    --chart-segment-line: rgba(255, 255, 255, 0.25);
+    --chart-brush-border: rgba(255, 255, 255, 0.15);
+    --chart-tooltip-background: #1B1C1F;
+    --chart-1: #60A5FA;
+    --chart-2: #34D399;
+    --chart-3: #FBBF24;
+    --chart-4: #A78BFA;
+    --chart-5: #F87171;
   }
 
   * { box-sizing: border-box; }
@@ -56,147 +136,215 @@
     color-scheme: light;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+    background-color: #E6E5DF;
   }
 
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #E6E5DF;
+    color: #141416;
     font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
     min-height: 100vh;
+    selection-background-color: #141416;
+    selection-color: #E6E5DF;
+  }
+
+  ::selection {
+    background: #141416;
+    color: #E6E5DF;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading, .font-serif {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+
+  .font-mono, code, pre, [data-tabular-nums] {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum" 1, "zero" 1;
   }
 
   select {
     color-scheme: light !important;
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    border-color: #cbd5e1 !important;
+    background-color: #ECEBE5 !important;
+    color: #141416 !important;
+    border-color: rgba(20, 21, 23, 0.2) !important;
   }
   
   select option {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
+    background-color: #ECEBE5 !important;
+    color: #141416 !important;
   }
 
   input, textarea {
     color-scheme: light !important;
-    background-color: #ffffff;
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background-color: #ECEBE5;
+    color: #141416;
+    border-color: rgba(20, 21, 23, 0.2);
   }
 }
 
 @layer utilities {
+  .font-sans { font-family: var(--font-sans); }
+  .font-heading { font-family: var(--font-heading); }
+  .font-mono { font-family: var(--font-mono); }
+  .font-serif { font-family: var(--font-heading); }
+  .tabular-nums { font-feature-settings: "tnum" 1; }
+
   .text-official { color: #059669; }
   .text-provisional { color: #d97706; }
   .text-forecast { color: #7c3aed; }
   .text-derived { color: #0284c7; }
 
   .bg-surface-white { background-color: #ffffff; }
-  .bg-surface-bg { background-color: #f8fafc; }
-  .bg-surface-50 { background-color: #f1f5f9; }
+  .bg-surface-bg { background-color: #E6E5DF; }
+  .bg-surface-50 { background-color: #ECEBE5; }
   
-  .border-surface { border-color: #e2e8f0; }
+  .border-surface { border-color: rgba(20, 21, 23, 0.12); }
 
-  .card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+  /* Antimetal Editorial Card */
+  .card, .antimetal-card {
+    background: #ECEBE5;
+    border: 1px solid rgba(20, 21, 23, 0.12);
     border-radius: 0.5rem;
     padding: 1.25rem;
-    box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    box-shadow: 0 1px 2px rgba(20, 21, 23, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .card:hover {
-    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
-    border-color: #cbd5e1;
+  .card:hover, .antimetal-card:hover {
+    background: #E8E7E0;
+    border-color: rgba(20, 21, 23, 0.22);
+    box-shadow: 0 4px 12px rgba(20, 21, 23, 0.06);
   }
 
-  /* Realistic Solid Tactile Buttons */
+  /* Antimetal Obsidian Dark Card */
+  .antimetal-card-dark {
+    background: #141416;
+    color: #ECEBE5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .antimetal-card-dark:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  /* Editorial Drop Cap */
+  .editorial-dropcap {
+    float: left;
+    font-family: var(--font-serif);
+    font-size: 3.75rem;
+    line-height: 0.8;
+    padding-top: 0.2rem;
+    padding-right: 0.75rem;
+    color: #D94E34;
+    font-weight: 500;
+  }
+
+  /* Architectural Crosshair Corners */
+  .crosshair-corner {
+    position: relative;
+  }
+  .crosshair-corner::before {
+    content: "+";
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(20, 21, 23, 0.35);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .crosshair-corner::after {
+    content: "+";
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(20, 21, 23, 0.35);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* Antimetal Tactile Button Styles */
   .btn-realistic {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    border-radius: 0.5rem;
-    transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    border-radius: 9999px;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
     user-select: none;
   }
 
   .btn-realistic:active {
-    transform: translateY(1.5px) !important;
+    transform: translateY(1px) scale(0.99);
   }
 
-  .btn-solid-blue {
-    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-    color: #ffffff;
-    border: 1px solid #1e40af;
-    border-bottom: 3px solid #172554;
-    box-shadow: 0 2px 4px rgba(29, 78, 216, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  /* Black Obsidian Solid Pill Button */
+  .btn-solid-black {
+    background: #141416;
+    color: #ECEBE5;
+    border: 1px solid #141416;
+    box-shadow: 0 2px 6px rgba(20, 21, 23, 0.15);
   }
-  .btn-solid-blue:hover {
-    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
-    box-shadow: 0 4px 8px rgba(29, 78, 216, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  .btn-solid-black:hover {
+    background: #25262B;
+    border-color: #25262B;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(20, 21, 23, 0.2);
+  }
+
+  /* Outline Ghost Pill Button */
+  .btn-outline-pill {
+    background: transparent;
+    color: #141416;
+    border: 1px solid rgba(20, 21, 23, 0.25);
+  }
+  .btn-outline-pill:hover {
+    background: rgba(20, 21, 23, 0.05);
+    border-color: #141416;
     transform: translateY(-1px);
   }
-  .btn-solid-blue:active {
-    border-bottom-width: 1.5px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35);
+
+  /* Preserved legacy button aliases for backward compatibility */
+  .btn-solid-blue {
+    background: #141416;
+    color: #ECEBE5;
+    border: 1px solid #141416;
+    border-radius: 9999px;
+  }
+  .btn-solid-blue:hover {
+    background: #25262B;
   }
 
   .btn-solid-navy {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-    color: #ffffff;
-    border: 1px solid #334155;
-    border-bottom: 3px solid #020617;
-    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
-  }
-  .btn-solid-navy:hover {
-    background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
-    box-shadow: 0 4px 8px rgba(15, 23, 42, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-  }
-  .btn-solid-navy:active {
-    border-bottom-width: 1.5px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    background: #141416;
+    color: #ECEBE5;
+    border: 1px solid #141416;
+    border-radius: 9999px;
   }
 
   .btn-solid-emerald {
-    background: linear-gradient(180deg, #059669 0%, #047857 100%);
+    background: #059669;
     color: #ffffff;
-    border: 1px solid #065f46;
-    border-bottom: 3px solid #022c22;
-    box-shadow: 0 2px 4px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
-  }
-  .btn-solid-emerald:hover {
-    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 4px 8px rgba(5, 150, 105, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    transform: translateY(-1px);
-  }
-  .btn-solid-emerald:active {
-    border-bottom-width: 1.5px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 1px solid #047857;
+    border-radius: 9999px;
   }
 
   .btn-solid-slate {
-    background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-    color: #1e293b;
-    border: 1px solid #cbd5e1;
-    border-bottom: 3px solid #94a3b8;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: #DFDED8;
+    color: #141416;
+    border: 1px solid rgba(20, 21, 23, 0.15);
+    border-radius: 9999px;
   }
   .btn-solid-slate:hover {
-    background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-    border-color: #94a3b8;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
-    transform: translateY(-1px);
-  }
-  .btn-solid-slate:active {
-    border-bottom-width: 1.5px;
-    background: #cbd5e1;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    background: #D5D4CD;
   }
 }

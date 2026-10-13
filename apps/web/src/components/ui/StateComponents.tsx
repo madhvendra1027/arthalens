@@ -8,20 +8,23 @@ interface ErrorStateProps {
 export function ErrorState({ message, retry }: ErrorStateProps) {
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-md border border-amber-200 bg-amber-50/70 p-8 text-center"
+      className="flex flex-col items-center justify-center rounded-lg border border-[#D94E34]/30 bg-[#ECEBE5] p-8 text-center"
       role="alert"
       aria-live="polite"
     >
-      <p className="mb-1 font-bold text-amber-900 text-sm">
+      <span className="font-mono text-[10px] uppercase font-bold text-[#D94E34] tracking-widest mb-1">
+        TELEMETRY ERROR // MOSPI DATASTORE
+      </span>
+      <p className="mb-1 font-serif text-lg font-bold text-[#141416]">
         Statistical Record Unavailable
       </p>
-      <p className="mb-4 max-w-md text-xs text-slate-600">
+      <p className="mb-4 max-w-md font-mono text-xs text-[#57585C]">
         {message ?? "The requested official data point could not be loaded from the primary store."}
       </p>
       {retry && (
         <button
           onClick={retry}
-          className="btn-realistic btn-solid-blue px-4 py-1.5 text-xs font-bold shadow-sm"
+          className="btn-realistic btn-solid-black px-4 py-1.5 text-xs font-mono font-bold"
         >
           Retry Retrieval
         </button>
@@ -33,9 +36,9 @@ export function ErrorState({ message, retry }: ErrorStateProps) {
 export function EmptyState({ message }: { message?: string }) {
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50/50 p-8 text-center"
+      className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[rgba(20,21,23,0.2)] bg-[#ECEBE5]/60 p-8 text-center"
     >
-      <p className="text-xs text-slate-500 font-medium">
+      <p className="font-mono text-xs text-[#57585C]">
         {message ?? "No historical records found for the selected base series or period."}
       </p>
     </div>
@@ -60,10 +63,10 @@ export function LoadingGrid({ count = 8, cols = 4 }: LoadingGridProps) {
       aria-busy="true"
     >
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="card bg-white border border-slate-200">
-          <div className="skeleton mb-3 h-3 w-24" />
-          <div className="skeleton mb-2 h-8 w-32" />
-          <div className="skeleton h-3 w-20" />
+        <div key={i} className="card bg-[#ECEBE5] border border-[rgba(20,21,23,0.12)] p-5 animate-pulse rounded-lg">
+          <div className="h-3 w-24 bg-black/10 rounded mb-4" />
+          <div className="h-8 w-32 bg-black/15 rounded mb-3" />
+          <div className="h-3 w-20 bg-black/10 rounded" />
         </div>
       ))}
     </div>
@@ -72,12 +75,12 @@ export function LoadingGrid({ count = 8, cols = 4 }: LoadingGridProps) {
 
 export function InlineLoader() {
   return (
-    <div className="flex items-center gap-2 py-2 text-xs text-slate-500">
+    <div className="flex items-center gap-2 py-2 font-mono text-xs text-[#57585C]">
       <div
-        className="h-3 w-3 rounded-full border-2 border-slate-300 border-t-blue-600 animate-spin"
+        className="h-3 w-3 rounded-full border-2 border-[rgba(20,21,23,0.2)] border-t-[#141416] animate-spin"
         aria-hidden="true"
       />
-      <span>Fetching official series...</span>
+      <span>Querying official sovereign series...</span>
     </div>
   );
 }

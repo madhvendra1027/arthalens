@@ -1,10 +1,30 @@
-﻿import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata } from "next";
+import { Inter, Manrope, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
 import { Providers } from "@/components/Providers";
+import { AntimetalFooter } from "@/components/antimetal/AntimetalFooter";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+  weight: ["500", "600", "700", "800"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://arthalens-production.up.railway.app"),
@@ -94,7 +114,7 @@ export default function RootLayout({
         "url": "https://arthalens-production.up.railway.app",
         "name": "ArthaLens Macroeconomic Intelligence",
         "description": "Official India National Accounts Statistics, GDP growth rates, and economic indicators portal.",
-        "inLanguage": "en-IN"
+        "inLanguage": "en-IN",
       },
       {
         "@type": "Dataset",
@@ -106,7 +126,7 @@ export default function RootLayout({
           "@type": "GovernmentOrganization",
           "name": "Ministry of Statistics and Programme Implementation (MoSPI)",
           "alternateName": "National Statistical Office (NSO)",
-          "url": "https://www.mospi.gov.in"
+          "url": "https://www.mospi.gov.in",
         },
         "temporalCoverage": "2011/2024",
         "spatialCoverage": "India",
@@ -116,9 +136,9 @@ export default function RootLayout({
           "Gross Value Added (GVA) at Constant Basic Prices",
           "Implicit GDP Deflator",
           "Consumer Price Index (CPI Combined)",
-          "Wholesale Price Index (WPI)"
+          "Wholesale Price Index (WPI)",
         ],
-        "license": "https://data.gov.in/open-government-data-ogd-platform-india"
+        "license": "https://data.gov.in/open-government-data-ogd-platform-india",
       },
       {
         "@type": "FAQPage",
@@ -129,48 +149,52 @@ export default function RootLayout({
             "name": "What is India's GDP growth rate for FY 2023-24?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "According to the Provisional Estimates released by the National Statistical Office (NSO), MoSPI, India's Real GDP grew by 8.2% in FY 2023-24, compared to 7.0% in FY 2022-23."
-            }
+              "text": "According to the Provisional Estimates released by the National Statistical Office (NSO), MoSPI, India's Real GDP grew by 8.2% in FY 2023-24, compared to 7.0% in FY 2022-23.",
+            },
           },
           {
             "@type": "Question",
             "name": "What is India's Nominal GDP size in FY 2023-24?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "India's Nominal GDP (at Current Prices) for FY 2023-24 is estimated at ₹295.36 Lakh Crore (approximately $3.55 Trillion USD), recording a growth rate of 9.6% over FY 2022-23."
-            }
+              "text": "India's Nominal GDP (at Current Prices) for FY 2023-24 is estimated at ₹295.36 Lakh Crore (approximately $3.55 Trillion USD), recording a growth rate of 9.6% over FY 2022-23.",
+            },
           },
           {
             "@type": "Question",
             "name": "What is the difference between Real GDP and Nominal GDP in India?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Real GDP measures total economic output at constant basic prices, removing the distortive effect of price inflation. Nominal GDP measures output at current market prices without adjusting for inflation."
-            }
+              "text": "Real GDP measures total economic output at constant basic prices, removing the distortive effect of price inflation. Nominal GDP measures output at current market prices without adjusting for inflation.",
+            },
           },
           {
             "@type": "Question",
             "name": "What is India's GDP Deflator and how does it relate to CPI and WPI?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "The Implicit GDP Deflator measures inflation across all goods and services produced in the domestic economy. In FY 2023-24, the GDP Deflator stood at 1.4%, reflecting low wholesale commodity inflation (WPI 1.26%) relative to retail consumer inflation (CPI 4.83%)."
-            }
+              "text": "The Implicit GDP Deflator measures inflation across all goods and services produced in the domestic economy. In FY 2023-24, the GDP Deflator stood at 1.4%, reflecting low wholesale commodity inflation (WPI 1.26%) relative to retail consumer inflation (CPI 4.83%).",
+            },
           },
           {
             "@type": "Question",
             "name": "What are the official base years for India's GDP calculation?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "The current benchmark series uses base year 2022-23, which incorporates modern administrative registries including MCA-21 and GSTN data, superseding the historical 2011-12 base year series."
-            }
-          }
-        ]
-      }
-    ]
+              "text": "The current benchmark series uses base year 2022-23, which incorporates modern administrative registries including MCA-21 and GSTN data, superseding the historical 2011-12 base year series.",
+            },
+          },
+        ],
+      },
+    ],
   };
 
   return (
-    <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      className={`${inter.variable} ${manrope.variable} ${ibmPlexMono.variable}`}
+      data-scroll-behavior="smooth"
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -205,17 +229,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body>
+      <body className="bg-[#E6E5DF] text-[#141416]">
         <Providers>
           <NavBar />
           <main className="min-h-screen">{children}</main>
-          <footer className="border-t border-surface px-6 py-8 text-center text-sm text-[--color-text-muted]">
-            <p>
-              ArthaLens — Official statistics reproduced with provenance from MoSPI, RBI, and Government of India.
-              Derived analytics, forecasts, and AI interpretations are not official government estimates.
-            </p>
-            <p className="mt-1 font-mono text-xs">Open Government Data Framework Compliant • Not investment advice.</p>
-          </footer>
+          <AntimetalFooter />
         </Providers>
       </body>
     </html>

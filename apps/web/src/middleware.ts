@@ -2,6 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Immediately redirect any legacy /demo route to home
+  if (pathname.startsWith("/demo")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   const sessionToken = request.cookies.get("arthalens_session")?.value;
 
   // Unprotected / Public Explorer Paths
