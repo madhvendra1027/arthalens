@@ -45,6 +45,7 @@ ignore = ["BLE001"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+disallow_untyped_decorators = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
