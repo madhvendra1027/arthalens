@@ -1,6 +1,8 @@
 package com.arthalens.api.domain.methodology.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.*;
 import java.util.List;
 import java.util.UUID;
@@ -22,9 +24,8 @@ public class MethodologyVersion {
     @Column(name = "deflation_method", nullable = false)
     private String deflationMethod;
 
-    @ElementCollection
-    @CollectionTable(name = "methodology_versions", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "primary_data_sources")
+    @Column(name = "primary_data_sources", columnDefinition = "text[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
     private List<String> primaryDataSources;
 
     @Column(name = "coverage_from")
@@ -33,9 +34,8 @@ public class MethodologyVersion {
     @Column(name = "coverage_to")
     private String coverageTo;
 
-    @ElementCollection
-    @CollectionTable(name = "methodology_versions", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "key_changes")
+    @Column(name = "key_changes", columnDefinition = "text[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
     private List<String> keyChanges;
 
     @Column(name = "release_date")
