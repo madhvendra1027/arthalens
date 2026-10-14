@@ -308,8 +308,8 @@ export function EditorialVideoSection() {
 
                   {/* Terminal Log Stream */}
                   <div className="p-4 rounded-xl border border-white/10 bg-black/60 font-mono text-xs space-y-1 text-[#828387]">
-                    <div className="text-white/40">// REAL-TIME STREAM INGESTION LOG:</div>
-                    <div className="text-[#059669]">[INFO] 2024-10-13T22:40:01Z - Ingested Press Note 'Provisional Estimates of GDP 2023-24'</div>
+                    <div className="text-white/40">{"//"} REAL-TIME STREAM INGESTION LOG:</div>
+                    <div className="text-[#059669]">[INFO] 2024-10-13T22:40:01Z - Ingested Press Note &apos;Provisional Estimates of GDP 2023-24&apos;</div>
                     <div className="text-white/80">[INFO] 2024-10-13T22:40:02Z - Computed cryptographic signature on official Gazette PDF (Govt of India Open Data License)</div>
                     <div className="text-[#E5A83B]">[VALIDATION] 0 schema anomalies detected across 42 econometric tables. Ready for double deflation.</div>
                   </div>

@@ -6,7 +6,6 @@ import { BklitGlobalBarChart } from "@/components/charts/BklitGlobalBarChart";
 import {
   Search,
   ArrowUpDown,
-  Compass,
   ChevronDown,
   ChevronUp,
   FileText,
@@ -87,8 +86,6 @@ export default function GlobalEconomiesPage() {
         return list.sort((a, b) => a.rank - b.rank);
     }
   }, [economies, searchTerm, sortBy]);
-
-  const maxGdp = Math.max(...economies.map((c) => c.nominalGdpTrillion), 1);
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">

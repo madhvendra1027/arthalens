@@ -3,12 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  BookOpen,
   CheckCircle2,
-  SlidersHorizontal,
-  TrendingUp,
   ShieldCheck,
-  Database,
   ArrowRight,
   ExternalLink,
   Cpu,

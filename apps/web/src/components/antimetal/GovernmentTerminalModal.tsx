@@ -36,8 +36,8 @@ export function GovernmentTerminalModal({ isOpen, onClose }: Props) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const width = (canvas.width = window.innerWidth);
+    const height = (canvas.height = window.innerHeight);
 
     const particles: { angle: number; dist: number; speed: number; size: number }[] = [];
     for (let i = 0; i < 120; i++) {

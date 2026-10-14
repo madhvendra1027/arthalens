@@ -109,12 +109,12 @@ export function AgentArmySelector() {
       // Project 3D points to 2D
       const projected = points.map((p) => {
         // Rotate around Y
-        let x1 = p.x * Math.cos(angleY) + p.z * Math.sin(angleY);
-        let z1 = -p.x * Math.sin(angleY) + p.z * Math.cos(angleY);
+        const x1 = p.x * Math.cos(angleY) + p.z * Math.sin(angleY);
+        const z1 = -p.x * Math.sin(angleY) + p.z * Math.cos(angleY);
 
         // Rotate around X
-        let y2 = p.y * Math.cos(angleX) - z1 * Math.sin(angleX);
-        let z2 = p.y * Math.sin(angleX) + z1 * Math.cos(angleX);
+        const y2 = p.y * Math.cos(angleX) - z1 * Math.sin(angleX);
+        const z2 = p.y * Math.sin(angleX) + z1 * Math.cos(angleX);
 
         // Perspective
         const fov = 400;
@@ -235,7 +235,7 @@ export function AgentArmySelector() {
             <div className="relative w-full h-[400px] sm:h-[480px]">
               <canvas ref={canvasRef} className="w-full h-full cursor-grab" />
               <div className="absolute bottom-4 right-4 font-mono text-[10px] text-[#828387]">
-                [DYNAMIC 3D TENSOR: {activeAgent.title.toUpperCase()} // {activeAgent.sphereDensity} VERTICES]
+                [DYNAMIC 3D TENSOR: {activeAgent.title.toUpperCase()} {"//"} {activeAgent.sphereDensity} VERTICES]
               </div>
             </div>
           </div>

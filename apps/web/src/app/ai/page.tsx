@@ -1,6 +1,5 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
-import Link from "next/link";
 
 const DISCLAIMER =
   "ArthaLens Research Assistant is a statistical inquiry aid citing official MoSPI & RBI releases. Not investment advice.";
@@ -38,7 +37,6 @@ export default function AIPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | undefined>();
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -89,7 +87,7 @@ export default function AIPage() {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err) {
+    } catch {
       // Offline fallback grounded answers
       const isMethodologyQ = query.toLowerCase().includes("base") || query.toLowerCase().includes("methodology");
       const isDeflatorQ = query.toLowerCase().includes("deflator");

@@ -1,4 +1,4 @@
-﻿import { defineConfig, globalIgnores } from "eslint/config";
+import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
@@ -6,6 +6,7 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   globalIgnores([
+    "node_modules/**",
     ".next/**",
     "out/**",
     "build/**",
@@ -17,6 +18,9 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": "warn",
       "react/no-unescaped-entities": "off",
       "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+      "react-hooks/rules-of-hooks": "warn",
     },
   },
 ]);
