@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -18,7 +18,7 @@ class IngestionRun:
     run_id: uuid.UUID = field(default_factory=uuid.uuid4)
     source_id: str = ""
     source_name: str = ""
-    started_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = None
     status: str = "running"  # running | complete | partial | failed
     http_status_code: int | None = None
@@ -35,17 +35,17 @@ class IngestionRun:
 
     def complete(self) -> None:
         self.status = "complete"
-        self.completed_at = datetime.now(timezone.utc)
+        self.completed_at = datetime.now(UTC)
 
     def fail(self, message: str) -> None:
         self.status = "failed"
         self.error_message = message
-        self.completed_at = datetime.now(timezone.utc)
+        self.completed_at = datetime.now(UTC)
 
     def partial(self, message: str) -> None:
         self.status = "partial"
         self.error_message = message
-        self.completed_at = datetime.now(timezone.utc)
+        self.completed_at = datetime.now(UTC)
 
     def to_dict(self) -> dict[str, Any]:
         return {

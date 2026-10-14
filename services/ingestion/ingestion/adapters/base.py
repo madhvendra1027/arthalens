@@ -6,13 +6,14 @@ A broken adapter does not affect other adapters.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 import httpx
 import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ingestion.core.provenance import Provenance, compute_content_hash, now_utc
+from ingestion.core.provenance import Provenance, now_utc
 from ingestion.core.run_manager import IngestionRun
 
 logger = structlog.get_logger()

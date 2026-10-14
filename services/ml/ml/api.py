@@ -1,17 +1,16 @@
 """ArthaLens ML Service — extended analytics endpoints."""
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException, Query
+import structlog
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Any
-import structlog
 
-from ml.consistency.scorer import ConsistencyScorer, ConsistencyInput
-from ml.consistency.sector_contribution import compute_sector_contributions
-from ml.consistency.rolling_correlations import compute_rolling_correlations
-from ml.consistency.revision_analytics import compute_revision_stats
 from ml.consistency.deflator_diagnostics import check_deflator_identity
+from ml.consistency.revision_analytics import compute_revision_stats
+from ml.consistency.rolling_correlations import compute_rolling_correlations
+from ml.consistency.scorer import ConsistencyInput, ConsistencyScorer
+from ml.consistency.sector_contribution import compute_sector_contributions
 
 log = structlog.get_logger()
 

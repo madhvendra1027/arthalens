@@ -1,6 +1,5 @@
 """Tests for ML consistency scorer."""
-import pytest
-from ml.consistency.scorer import ConsistencyScorer, DEFAULT_WEIGHTS
+from ml.consistency.scorer import DEFAULT_WEIGHTS, ConsistencyScorer
 
 
 def test_scorer_weights_sum_to_one():

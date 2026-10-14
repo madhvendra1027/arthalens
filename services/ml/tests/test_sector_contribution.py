@@ -1,7 +1,7 @@
 """Tests for sector contribution analytics."""
 import pytest
-from ml.consistency.sector_contribution import compute_sector_contributions, SectorContribution
 
+from ml.consistency.sector_contribution import compute_sector_contributions
 
 SAMPLE_CURRENT = [
     {"sector_code": "AGR", "sector_name": "Agriculture", "value": 2000.0, "period": "FY2024"},

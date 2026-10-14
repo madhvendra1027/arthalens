@@ -141,4 +141,3 @@ class DocumentIndexer:
     async def _upsert_chunk(self, chunk: DocumentChunk) -> None:
         """Upsert a single chunk. Uses content_hash for deduplication."""
         # Placeholder — actual implementation uses asyncpg or psycopg3
-        pass

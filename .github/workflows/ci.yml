@@ -35,12 +35,18 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
+          cache: maven
+      - name: Make mvnw executable
+        working-directory: services/api
+        run: chmod +x ./mvnw
       - name: Build & Test
         working-directory: services/api
         run: ./mvnw -B verify
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
+          POSTGRES_DB: arthalens_test
+          POSTGRES_USER: arthalens
           POSTGRES_PASSWORD: testpassword
 
   ingestion:

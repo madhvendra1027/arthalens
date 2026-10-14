@@ -13,10 +13,8 @@ Sub-scores (all configurable via weights):
 """
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import Any
-
 
 DEFAULT_WEIGHTS = {
     "directional_agreement": 0.30,

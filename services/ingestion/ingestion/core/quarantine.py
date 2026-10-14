@@ -6,8 +6,7 @@ with full context for manual inspection and reprocessing.
 from __future__ import annotations
 
 import json
-import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -25,12 +24,12 @@ class QuarantineManager:
         ingestion_run_id: str,
     ) -> str:
         """Write a row to the quarantine directory. Returns the quarantine file path."""
-        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+        ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
         filename = f"{source_name}_{ts}_{ingestion_run_id[:8]}.jsonl"
         filepath = self.quarantine_dir / filename
 
         record = {
-            "quarantined_at": datetime.now(timezone.utc).isoformat(),
+            "quarantined_at": datetime.now(UTC).isoformat(),
             "ingestion_run_id": ingestion_run_id,
             "source_name": source_name,
             "validation_errors": errors,

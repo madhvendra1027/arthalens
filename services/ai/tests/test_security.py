@@ -1,6 +1,5 @@
 """Tests for RAG security defenses."""
-import pytest
-from rag.security import sanitize_retrieved_content, redact_pii, validate_url_for_fetch
+from rag.security import redact_pii, sanitize_retrieved_content, validate_url_for_fetch
 
 
 def test_prompt_injection_sanitized():

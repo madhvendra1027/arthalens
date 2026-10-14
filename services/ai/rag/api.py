@@ -4,10 +4,10 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+import structlog
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-import structlog
 
 log = structlog.get_logger()
 

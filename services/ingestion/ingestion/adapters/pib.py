@@ -5,12 +5,14 @@ Used primarily to index official rating announcements and fiscal policy statemen
 """
 from __future__ import annotations
 
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 import structlog
 
 from ingestion.core.provenance import Provenance, compute_content_hash
 from ingestion.core.run_manager import IngestionRun
+
 from .base import SourceAdapter
 
 logger = structlog.get_logger()

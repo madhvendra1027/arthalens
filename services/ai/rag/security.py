@@ -10,7 +10,6 @@ from __future__ import annotations
 import re
 from urllib.parse import urlparse
 
-
 ALLOWED_DOMAINS = {
     "mospi.gov.in", "rbi.org.in", "pib.gov.in",
     "dbie.rbi.org.in", "data.gov.in",

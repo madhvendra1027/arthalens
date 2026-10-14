@@ -1,6 +1,5 @@
 """Tests for RAG document ingestion — text splitting and metadata."""
-import pytest
-from rag.ingestion.indexer import split_text_into_chunks, build_chunk_metadata, DocumentChunk
+from rag.ingestion.indexer import DocumentChunk, build_chunk_metadata, split_text_into_chunks
 
 
 def _make_long_text(words: int = 1000) -> str:

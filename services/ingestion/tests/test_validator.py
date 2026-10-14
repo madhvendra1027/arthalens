@@ -1,7 +1,5 @@
 """Tests for the observation validator."""
-import pytest
 from ingestion.core.validator import validate_observation
-
 
 VALID_ROW = {
     "base_year": "2022-23",

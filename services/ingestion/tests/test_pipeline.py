@@ -1,9 +1,9 @@
 """Tests for the ingestion pipeline with mocked adapters."""
-import pytest
-from unittest.mock import MagicMock, patch
-from ingestion.pipeline import IngestionPipeline
-from ingestion.core.run_manager import IngestionRun
+from unittest.mock import MagicMock
+
 from ingestion.core.provenance import Provenance, now_utc
+from ingestion.core.run_manager import IngestionRun
+from ingestion.pipeline import IngestionPipeline
 
 
 def make_mock_adapter(rows):

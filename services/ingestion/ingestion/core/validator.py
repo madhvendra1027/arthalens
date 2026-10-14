@@ -14,7 +14,6 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
-
 VALID_BASE_YEARS = {"2011-12", "2022-23"}
 VALID_STATUSES = {"official", "provisional", "revised", "estimated", "derived", "forecast"}
 VALID_PERIOD_TYPES = {"FY", "Q", "CY", "M"}

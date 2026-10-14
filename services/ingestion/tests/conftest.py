@@ -1,6 +1,8 @@
 """Shared pytest fixtures for ingestion tests."""
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
+
 from ingestion.core.run_manager import IngestionRun
 
 

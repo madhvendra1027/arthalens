@@ -7,17 +7,15 @@ Each step is explicit and logged. Invalid rows go to quarantine, not /dev/null.
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
 import structlog
 
-from ingestion.core.provenance import compute_content_hash
+from ingestion.adapters.base import SourceAdapter
 from ingestion.core.quarantine import QuarantineManager
 from ingestion.core.run_manager import IngestionRun
 from ingestion.core.validator import ValidationResult, validate_observation
-from ingestion.adapters.base import SourceAdapter
 
 logger = structlog.get_logger()
 
