@@ -45,7 +45,7 @@ class PIBAdapter(SourceAdapter):
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(raw, "html.parser")
         for link in soup.find_all("a", href=True):
-            href = link.get("href", "")
+            href = str(link.get("href") or "")
             if "prid=" in href or "/PressReleasePage.aspx" in href:
                 yield {
                     "_adapter": self.adapter_id,

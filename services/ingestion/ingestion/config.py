@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     postgres_port: int = 5432
     postgres_db: str = "arthalens"
     postgres_user: str = "arthalens"
-    postgres_password: str
+    postgres_password: str = "changeme"
 
     ingestion_raw_archive_path: str = "./raw_archive"
     ingestion_quarantine_path: str = "./quarantine"
