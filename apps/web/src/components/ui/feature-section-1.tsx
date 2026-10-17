@@ -1,15 +1,15 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Activity, ShieldCheck, ExternalLink } from "lucide-react";
+import { ArthaLensLogo } from "@/components/ui/ArthaLensLogo";
+import { ShieldCheck, ExternalLink } from "lucide-react";
 
 export interface MenuItem {
   title: string;
   links: {
     text: string;
     url: string;
+    badge?: string;
   }[];
 }
 
@@ -19,10 +19,8 @@ export interface StatusItem {
 }
 
 export interface FooterSectionProps {
-  tagline?: string;
   aboutTitle?: string;
   aboutText?: string;
-  logoSrc?: string;
   status?: StatusItem[];
   menuItems?: MenuItem[];
   copyright?: string;
@@ -32,102 +30,99 @@ export interface FooterSectionProps {
 }
 
 export default function FooterSection({
-  tagline = "Sovereign Macroeconomic Analytics & National Accounts Platform.",
-  aboutTitle = "About ArthaLens",
-  aboutText = "ArthaLens provides institutional-grade transparency for Indian National Accounts, offering real-time GDP decomposition, double-deflation analysis, and cryptographic provenance directly from MoSPI and RBI releases.",
-  logoSrc = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=120&q=80",
+  aboutTitle = "About ArthaLens Observatory",
+  aboutText = "ArthaLens provides institutional-grade transparency for Indian National Accounts. We synthesize real-time GDP decomposition, UN SNA 2008 double deflation, and sub-national GSDP across 31 state economies with cryptographic provenance from official MoSPI and RBI releases.",
   status = [
     { text: "1.4B+", subtext: "Demographic Coverage" },
-    { text: "36", subtext: "States & UTs Modelled" },
-    { text: "99.99%", subtext: "Feed Uptime" },
+    { text: "31", subtext: "States & UTs Modelled" },
+    { text: "2022-23", subtext: "Active Benchmark" },
+    { text: "SHA-256", subtext: "Cryptographic Seal" },
   ],
   menuItems = [
     {
-      title: "Product",
+      title: "Analytical Engines",
       links: [
-        { text: "GDP Explorer", url: "/gdp" },
-        { text: "Deflator Simulator", url: "/deflator" },
-        { text: "Growth Drivers", url: "/gdp/why" },
-        { text: "Sovereign Copilot", url: "/ai" },
+        { text: "GDP Explorer & Accounts", url: "/gdp", badge: "Live" },
+        { text: "Deflator & Inflation Simulator", url: "/deflator" },
+        { text: "Macro Accounts Workspace", url: "/gdp", badge: "Flagship" },
+        { text: "Sovereign AI Copilot", url: "/ai", badge: "MoSPI Grounded" },
       ],
     },
     {
-      title: "Institutions",
+      title: "Institutions & Feeds",
       links: [
-        { text: "MoSPI NAS 2024", url: "/sources" },
-        { text: "Sovereign Ratings", url: "/ratings" },
-        { text: "World Bank Feeds", url: "/global" },
-        { text: "RBI Database (DBIE)", url: "/sources" },
+        { text: "MoSPI NAS Provisional Press Notes", url: "/sources" },
+        { text: "RBI Database on Indian Economy (DBIE)", url: "/sources" },
+        { text: "Sovereign Ratings Matrix (Fitch, Moody's, S&P)", url: "/ratings" },
+        { text: "World Bank WDI Global Nexus", url: "/global" },
+        { text: "State DES Economic Surveys", url: "/sources" },
       ],
     },
     {
-      title: "Methodology",
+      title: "Methodology & Audit",
       links: [
-        { text: "How It Works", url: "/how-it-works" },
-        { text: "Base Year Isolation", url: "/methodology" },
-        { text: "Consistency Scoring", url: "/consistency" },
-        { text: "UN SNA 2008 Standard", url: "/how-it-works" },
+        { text: "System Architecture & Flow", url: "/how-it-works" },
+        { text: "UN SNA 2008 Double Deflation", url: "/how-it-works" },
+        { text: "Base Year Harmonization Standards", url: "/methodology" },
+        { text: "Multi-Source Consistency Audit", url: "/consistency" },
+        { text: "Revision Calendar & Backcast Tables", url: "/revisions" },
       ],
     },
     {
-      title: "Compliance",
+      title: "Governance & Access",
       links: [
-        { text: "Terms of Service", url: "/about" },
-        { text: "Data Governance", url: "/about" },
-        { text: "Open Data Framework", url: "/about" },
-        { text: "Splicing Standards", url: "/about" },
+        { text: "Open Data Framework (OGD India)", url: "/about" },
+        { text: "Data Provenance Manifesto", url: "/about" },
+        { text: "Zero Synthetic Data Guarantee", url: "/about" },
+        { text: "REST API Documentation", url: "/how-it-works" },
+        { text: "Institutional Portal Login", url: "/login" },
       ],
     },
   ],
-  copyright = "© 2026 ArthaLens Macro. Official MoSPI & RBI releases reproduced with cryptographic integrity.",
+  copyright = "© 2026 ArthaLens Macroeconomic Intelligence. Official MoSPI, RBI, and UN SNA 2008 statistics verified with cryptographic provenance. Open Government Data Platform India (OGD).",
   bottomLinks = [
-    { text: "Terms", url: "/about" },
-    { text: "Privacy", url: "/about" },
-    { text: "Security", url: "/about" },
-    { text: "SNA 2008 Spec", url: "/how-it-works" },
+    { text: "Terms of Research", url: "/about" },
+    { text: "Data Provenance", url: "/about" },
+    { text: "Security Architecture", url: "/about" },
+    { text: "UN SNA 2008 Chapter 15", url: "/how-it-works" },
+    { text: "MoSPI NAS 2024", url: "/sources" },
   ],
   showSystemStatus = true,
   className = "",
 }: FooterSectionProps) {
   return (
     <footer
-      className={`relative mt-12 sm:mt-16 border-t border-[rgba(20,21,23,0.12)] bg-[#E6E5DF] text-[#141416] select-none ${className}`}
+      className={`relative mt-16 sm:mt-24 border-t border-[rgba(20,21,23,0.14)] bg-[#E6E5DF] text-[#141416] select-none ${className}`}
+      role="contentinfo"
+      aria-label="Site Footer"
     >
-      {/* Precision Top Crosshairs */}
-      <div className="absolute top-0 left-6 font-mono text-xs text-[#828387] -translate-y-1/2 pointer-events-none">
+      {/* Precision Top Editorial Crosshairs */}
+      <div className="absolute top-0 left-6 sm:left-10 font-mono text-xs text-[#828387] -translate-y-1/2 pointer-events-none select-none">
         +
       </div>
-      <div className="absolute top-0 right-6 font-mono text-xs text-[#828387] -translate-y-1/2 pointer-events-none">
+      <div className="absolute top-0 right-6 sm:right-10 font-mono text-xs text-[#828387] -translate-y-1/2 pointer-events-none select-none">
         +
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10 sm:py-12">
-        {/* --- Branding, Description, Multi-Column Navigation, & Status --- */}
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-10 pb-8 border-b border-[rgba(20,21,23,0.1)]">
-          {/* Logo, About & Telemetry Status Badges */}
-          <div className="max-w-sm text-left space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="relative h-9 w-9 rounded-lg overflow-hidden border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] flex items-center justify-center shadow-sm">
-                <Image
-                  src={logoSrc}
-                  alt="ArthaLens logo"
-                  width={36}
-                  height={36}
-                  className="object-cover h-full w-full"
-                />
-              </div>
+      <div className="mx-auto max-w-7xl px-6 sm:px-8 py-12 sm:py-16">
+        {/* --- Top Row: Identity, About, Provenance Telemetry & Nav Links --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-10 border-b border-[rgba(20,21,23,0.12)]">
+          {/* Identity & About Column (4 cols) */}
+          <div className="lg:col-span-4 space-y-5">
+            <Link href="/" className="inline-flex items-center gap-3 group focus:outline-hidden">
+              <ArthaLensLogo size="md" />
               <div>
-                <span className="font-heading font-bold text-base tracking-tight text-[#141416] block">
+                <span className="font-heading font-bold text-lg tracking-tight text-[#141416] block group-hover:text-[#D94E34] transition-colors">
                   ArthaLens
                 </span>
                 <span className="font-mono text-[10px] uppercase tracking-wider text-[#828387]">
-                  National Accounts
+                  National Accounts Observatory
                 </span>
               </div>
-            </div>
+            </Link>
 
-            <div>
-              <h3 className="mb-1.5 font-heading text-sm font-semibold text-[#141416]">
+            <div className="space-y-2">
+              <h3 className="font-heading text-xs font-bold uppercase tracking-wider text-[#141416]">
                 {aboutTitle}
               </h3>
               <p className="font-sans text-[13px] text-[#57585C] leading-relaxed">
@@ -137,41 +132,53 @@ export default function FooterSection({
 
             {/* Telemetry Status Pills */}
             {status && status.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {status.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 rounded border border-[rgba(20,21,23,0.1)] bg-[#ECEBE5] px-2 py-0.5"
-                  >
-                    <span className="font-mono text-[11px] font-bold text-[#141416]">
-                      {item.text}
-                    </span>
-                    <span className="font-sans text-[10px] text-[#828387]">
-                      {item.subtext}
-                    </span>
-                  </div>
-                ))}
+              <div className="space-y-2 pt-2">
+                <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-[#828387] block">
+                  Observatory Telemetry & Scope
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {status.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] px-2.5 py-1 shadow-2xs"
+                    >
+                      <span className="font-mono text-[11px] font-bold text-[#141416]">
+                        {item.text}
+                      </span>
+                      <span className="font-sans text-[10px] text-[#57585C]">
+                        {item.subtext}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {/* --- Menu Links (Four-Column Structure: Product, Institutions, Methodology, Compliance) --- */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 flex-1">
+          {/* Navigation Links (8 cols: 4 sub-columns) */}
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
             {menuItems.map((section, sectionIdx) => (
-              <div key={sectionIdx} className="space-y-3">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#828387] block">
+              <div key={sectionIdx} className="space-y-3.5">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#141416] block border-b border-[rgba(20,21,23,0.1)] pb-1.5">
                   {section.title}
                 </span>
-                <ul className="space-y-2.5 font-sans text-[14px] sm:text-[15px] font-normal leading-[1.45]">
+                <ul className="space-y-2 font-sans text-[13px]">
                   {section.links.map((link, linkIdx) => (
                     <li key={linkIdx}>
                       <Link
                         href={link.url}
-                        className="text-[#141416] hover:text-[#D94E34] transition-colors inline-flex items-center gap-1 group"
+                        className="group flex items-center justify-between text-[#57585C] hover:text-[#141416] transition-colors py-0.5 leading-snug"
                       >
-                        <span>{link.text}</span>
+                        <span className="group-hover:translate-x-0.5 transition-transform">
+                          {link.text}
+                        </span>
+                        {link.badge && (
+                          <span className="shrink-0 ml-1 rounded-sm bg-[rgba(20,21,23,0.06)] px-1.5 py-0.2 font-mono text-[9px] font-bold uppercase text-[#141416]">
+                            {link.badge}
+                          </span>
+                        )}
                         {link.url.startsWith("http") && (
-                          <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
                         )}
                       </Link>
                     </li>
@@ -180,39 +187,43 @@ export default function FooterSection({
               </div>
             ))}
           </div>
-
-          {/* --- Subdued System Status & Compliance Identifiers --- */}
-          {showSystemStatus && (
-            <div className="lg:max-w-[180px] flex flex-col justify-between space-y-4 pt-2 lg:pt-0 border-t lg:border-t-0 border-[rgba(20,21,23,0.08)]">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-2.5 py-1 font-mono text-[10px] font-semibold tracking-wider text-[#141416]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
-                  <span>SYSTEM ACTIVE</span>
-                </div>
-                <div className="font-mono text-[10px] uppercase tracking-wider text-[#828387] pl-1">
-                  SOC-2 TYPE II • ISO-27001
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 pt-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" />
-                <span className="font-mono text-[10px] text-[#828387] uppercase tracking-wider">
-                  CRYPTOGRAPHIC LOGS
-                </span>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* --- Bottom Bar --- */}
-        <div className="mt-6 flex flex-col md:flex-row justify-between items-start md:items-center text-[11px] font-mono text-[#828387] gap-4">
-          <p>{copyright}</p>
-          <ul className="flex flex-wrap gap-4 font-sans text-xs">
+        {/* --- Middle Row: Verification Badges & Provenance Guarantee --- */}
+        {showSystemStatus && (
+          <div className="py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[rgba(20,21,23,0.08)] text-xs font-mono text-[#57585C]">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-3 py-1 font-mono text-[11px] font-semibold text-[#141416]">
+                <span className="h-2 w-2 rounded-full bg-[#059669] animate-pulse" />
+                <span>OBSERVATORY FEED: ACTIVE</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#828387]">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" />
+                <span>SHA-256 GAZETTE PROVENANCE ENGINE</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 text-[11px] text-[#828387]">
+              <span>STANDARDS: UN SNA 2008 §15</span>
+              <span>•</span>
+              <span>BENCHMARK: 2022-23</span>
+              <span>•</span>
+              <span>MOSPI PRESS NOTE Q4/FY24</span>
+            </div>
+          </div>
+        )}
+
+        {/* --- Bottom Row: Legal, Attribution, & Deep Links --- */}
+        <div className="pt-6 flex flex-col lg:flex-row justify-between items-start lg:items-center text-[11px] font-mono text-[#828387] gap-4">
+          <p className="max-w-xl leading-relaxed">
+            {copyright}
+          </p>
+          <ul className="flex flex-wrap items-center gap-4 sm:gap-5 font-sans text-xs">
             {bottomLinks.map((link, linkIdx) => (
               <li key={linkIdx}>
                 <Link
                   href={link.url}
-                  className="hover:text-[#D94E34] underline underline-offset-4 transition-colors"
+                  className="text-[#57585C] hover:text-[#D94E34] transition-colors underline underline-offset-4"
                 >
                   {link.text}
                 </Link>

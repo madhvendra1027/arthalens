@@ -39,10 +39,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // If user is already authenticated and visits /login, redirect to dashboard
-  if (pathname === "/login" && sessionToken) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  // Allow visiting /login so users can authenticate or switch accounts
+  return NextResponse.next();
 
   return NextResponse.next();
 }

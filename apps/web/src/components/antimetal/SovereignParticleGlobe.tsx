@@ -138,10 +138,11 @@ export function SovereignParticleGlobe({
       const COLUMNS = 200;
       let globeYaw = Math.random() * Math.PI * 2;
 
-      // Try WebGPURenderer with automatic backend negotiation
+      // WebGPURenderer with stable WebGL backend negotiation for universal device compatibility
       const renderer = new THREE.WebGPURenderer({
         canvas,
         antialias: true,
+        forceWebGL: true,
       });
 
       await renderer.init();

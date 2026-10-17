@@ -45,18 +45,11 @@ const NAVIGATION_SECTIONS: NavSection[] = [
     category: "National Accounts & Macro",
     items: [
       {
-        title: "Macro Analytics Terminal",
-        description: "Full-viewport executive dashboard, sectoral shares, state rankings & discrepancy telemetry.",
-        href: "/analytics",
-        icon: BarChart3,
-        badge: "New",
-      },
-      {
-        title: "GDP Explorer & State GVA",
-        description: "Official real & nominal series, sectoral decomposition, and 28 state accounts.",
+        title: "Macro Accounts Workspace",
+        description: "Unified national accounts, sectoral GVA across 8 industries, 28 state accounts, and time series.",
         href: "/gdp",
         icon: TrendingUp,
-        badge: "MoSPI",
+        badge: "Flagship",
       },
       {
         title: "Deflator Simulator",
@@ -66,9 +59,15 @@ const NAVIGATION_SECTIONS: NavSection[] = [
         badge: "Simulator",
       },
       {
-        title: "Growth Drivers & Discrepancies",
-        description: "Deconstruct PFCE, GFCE, GFCF expenditure drivers and statistical anomalies.",
-        href: "/gdp/why",
+        title: "MoSPI Release Revisions",
+        description: "1st AE -> 2nd AE -> Provisional Estimates lifecycle variance tracker.",
+        href: "/revisions",
+        icon: BarChart3,
+      },
+      {
+        title: "Sector & State Composition",
+        description: "Deconstruct 28 states & 3 UTs economic output and industry weights.",
+        href: "/gdp?view=composition",
         icon: Compass,
       },
     ],
@@ -250,7 +249,7 @@ export function NavBar() {
               href="/gdp"
               className="btn-realistic btn-solid-black text-xs px-3.5 py-1.5 font-sans font-semibold shadow-xs"
             >
-              GDP Explorer
+              Macro Workspace
             </Link>
 
             {isAuthenticated ? (

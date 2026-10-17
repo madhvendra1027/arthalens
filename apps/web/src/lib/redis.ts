@@ -26,6 +26,7 @@ const REDIS_URL = process.env.REDIS_URL;
 // Preserve singleton Redis across Next.js Turbopack / HMR reloads
 declare global {
   var _redisInstance: Redis | null | undefined;
+  var _redisAvailable: boolean | undefined;
   var _inMemoryFallbackSessions: Map<string, { data: SessionData; exp: number }> | undefined;
   var _inMemoryFallbackUsers: Map<string, UserRecord> | undefined;
 }
@@ -45,23 +46,23 @@ function getRedisClient(): Redis | null {
     try {
       global._redisInstance = new Redis(REDIS_URL, {
         maxRetriesPerRequest: 1,
-        connectTimeout: 1500,
-        retryStrategy: (times) => {
-          if (times > 2) return null;
-          return 500;
-        },
+        connectTimeout: 800,
+        enableOfflineQueue: false,
+        retryStrategy: () => null, // Do not block if Redis is offline locally
         lazyConnect: true,
       });
 
       global._redisInstance.on("connect", () => {
+        global._redisAvailable = true;
         console.log("[Redis] Connected successfully to Redis server at " + REDIS_URL);
       });
 
       global._redisInstance.on("error", (err) => {
-        console.warn("[Redis] Client error (operating with resilient fallback):", err.message);
+        global._redisAvailable = false;
+        // Resilient fallback silently handles this
       });
     } catch (err) {
-      console.warn("[Redis] Failed to initialize Redis client, using memory fallback:", err);
+      global._redisAvailable = false;
       global._redisInstance = null;
     }
   }
@@ -73,15 +74,15 @@ export const redis = getRedisClient();
 // Session Management Functions
 export async function setSession(token: string, sessionData: SessionData, ttlSeconds: number = 86400): Promise<void> {
   const client = getRedisClient();
-  if (client) {
+  if (client && global._redisAvailable) {
     try {
       await client.set(`session:${token}`, JSON.stringify(sessionData), "EX", ttlSeconds);
     } catch (err) {
-      console.warn("[Redis] Falling back to memory for setSession:", err);
+      global._redisAvailable = false;
     }
   }
 
-  // Also maintain in-memory fallback for instant zero-downtime resiliency
+  // Always maintain in-memory fallback for instant zero-downtime resiliency
   global._inMemoryFallbackSessions!.set(token, {
     data: sessionData,
     exp: Date.now() + ttlSeconds * 1000,
@@ -90,14 +91,14 @@ export async function setSession(token: string, sessionData: SessionData, ttlSec
 
 export async function getSession(token: string): Promise<SessionData | null> {
   const client = getRedisClient();
-  if (client) {
+  if (client && global._redisAvailable) {
     try {
       const raw = await client.get(`session:${token}`);
       if (raw) {
         return JSON.parse(raw) as SessionData;
       }
     } catch (err) {
-      console.warn("[Redis] Falling back to memory for getSession:", err);
+      global._redisAvailable = false;
     }
   }
 
@@ -114,11 +115,11 @@ export async function getSession(token: string): Promise<SessionData | null> {
 
 export async function deleteSession(token: string): Promise<void> {
   const client = getRedisClient();
-  if (client) {
+  if (client && global._redisAvailable) {
     try {
       await client.del(`session:${token}`);
     } catch (err) {
-      console.warn("[Redis] Error deleting session from Redis:", err);
+      global._redisAvailable = false;
     }
   }
   global._inMemoryFallbackSessions!.delete(token);
@@ -127,12 +128,12 @@ export async function deleteSession(token: string): Promise<void> {
 // User Record Storage Functions
 export async function saveUser(user: UserRecord): Promise<void> {
   const client = getRedisClient();
-  if (client) {
+  if (client && global._redisAvailable) {
     try {
       await client.set(`user:${user.email.toLowerCase()}`, JSON.stringify(user));
       await client.sadd("users:all", user.email.toLowerCase());
     } catch (err) {
-      console.warn("[Redis] Falling back to memory for saveUser:", err);
+      global._redisAvailable = false;
     }
   }
   global._inMemoryFallbackUsers!.set(user.email.toLowerCase(), user);
@@ -141,16 +142,17 @@ export async function saveUser(user: UserRecord): Promise<void> {
 export async function getUserByEmail(email: string): Promise<UserRecord | null> {
   const normalized = email.toLowerCase().trim();
   const client = getRedisClient();
-  if (client) {
+  if (client && global._redisAvailable) {
     try {
       const raw = await client.get(`user:${normalized}`);
       if (raw) {
         return JSON.parse(raw) as UserRecord;
       }
     } catch (err) {
-      console.warn("[Redis] Falling back to memory for getUserByEmail:", err);
+      global._redisAvailable = false;
     }
   }
 
   return global._inMemoryFallbackUsers!.get(normalized) || null;
 }
+

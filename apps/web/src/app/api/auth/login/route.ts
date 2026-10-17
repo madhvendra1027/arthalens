@@ -4,7 +4,7 @@ import { ensureDemoUserExists, generateSessionToken, verifyPassword } from "@/li
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { email, password, isDemo } = body;
 
     // Ensure default demo user exists in Redis for zero-friction evaluation
