@@ -90,23 +90,23 @@ export function AnalyticalCapabilitiesSection() {
         +
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 sm:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="max-w-3xl mb-14 space-y-3">
+        <div className="max-w-3xl mb-10 sm:mb-14 space-y-3">
           <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#D94E34]">
             <span className="h-2 w-2 rounded-full bg-[#D94E34]" />
             <span>CHAPTER 05 // ANALYTICAL WORKFLOW</span>
           </div>
-          <h2 className="font-heading text-4xl sm:text-6xl font-extrabold tracking-tight text-[#141416] leading-[1.05]">
+          <h2 className="font-heading text-3xl sm:text-6xl font-extrabold tracking-tight text-[#141416] leading-[1.05]">
             From analysis to understanding.
           </h2>
-          <p className="font-sans text-base sm:text-lg text-[#57585C] leading-relaxed pt-2">
+          <p className="font-sans text-sm sm:text-lg text-[#57585C] leading-relaxed pt-2">
             Institutional research requires moving seamlessly from observing a macroeconomic puzzle to interrogating primary evidence and deriving an audit-grade interpretation.
           </p>
         </div>
 
         {/* Asymmetrical Split: Engine Directory (5 cols) vs Research Copilot Console (7 cols) */}
-        <div className="grid gap-12 lg:grid-cols-12 items-start">
+        <div className="grid gap-8 lg:gap-12 lg:grid-cols-12 items-start">
           {/* Left: The Four Analytical Engines as a clean editorial index (No repetitive card boxes) */}
           <div className="lg:col-span-5 space-y-6">
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#828387] block pb-2 border-b border-[rgba(20,21,23,0.12)]">
@@ -198,11 +198,11 @@ export function AnalyticalCapabilitiesSection() {
 
           {/* Right: The Sovereign Copilot Interactive Research Console (7 cols) */}
           <div className="lg:col-span-7">
-            <div className="rounded-3xl bg-[#141416] text-[#ECEBE5] p-6 sm:p-8 space-y-6 shadow-2xl border border-[rgba(255,255,255,0.12)]">
+            <div className="rounded-3xl bg-[#141416] text-[#ECEBE5] p-4 sm:p-6 lg:p-8 space-y-6 shadow-2xl border border-[rgba(255,255,255,0.12)]">
               {/* Terminal Title Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[rgba(255,255,255,0.1)]">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-[#D94E34] flex items-center justify-center text-white font-bold">
+                  <div className="h-8 w-8 rounded-lg bg-[#D94E34] flex items-center justify-center text-white font-bold shrink-0">
                     <Bot className="h-4.5 w-4.5" />
                   </div>
                   <div>
@@ -216,14 +216,14 @@ export function AnalyticalCapabilitiesSection() {
                 </div>
 
                 {/* Question Selector Pills */}
-                <div className="inline-flex rounded-xl bg-[#1E1F23] p-1 text-xs font-mono">
+                <div className="flex flex-wrap rounded-xl bg-[#1E1F23] p-1 text-xs font-mono max-w-full overflow-x-auto [scrollbar-width:none]">
                   {COPILOT_DEMOS.map((demo) => (
                     <button
                       key={demo.id}
                       type="button"
                       onClick={() => setSelectedDemoId(demo.id)}
                       className={clsx(
-                        "px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer",
+                        "px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap",
                         selectedDemoId === demo.id
                           ? "bg-[#D94E34] text-white shadow-xs"
                           : "text-[#9E9EA4] hover:text-white"
@@ -277,7 +277,7 @@ export function AnalyticalCapabilitiesSection() {
               </div>
 
               {/* Conclusion Banner */}
-              <div className="p-3.5 rounded-xl bg-[#232428] border border-[rgba(255,255,255,0.08)] text-xs font-sans text-white font-medium flex items-center justify-between gap-4">
+              <div className="p-3.5 rounded-xl bg-[#232428] border border-[rgba(255,255,255,0.08)] text-xs font-sans text-white font-medium flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <span>{currentDemo.conclusion}</span>
                 <Link
                   href="/ai"

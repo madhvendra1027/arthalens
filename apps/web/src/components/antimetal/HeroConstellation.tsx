@@ -583,6 +583,26 @@ export function HeroConstellation() {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || e.touches.length === 0) return;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    mousePosRef.current = { x, y };
+
+    for (const node of nodesRef.current) {
+      const dist = Math.sqrt((node.x - x) ** 2 + (node.y - y) ** 2);
+      if (dist < node.baseRadius * 3 + 14) {
+        setActiveSelectedNode(node);
+        setHoveredNode(node);
+        hoveredNodeRef.current = node;
+        return;
+      }
+    }
+  };
+
   const handleMouseLeave = () => {
     mousePosRef.current = { x: -1000, y: -1000 };
     hoveredNodeRef.current = null;
@@ -601,10 +621,10 @@ export function HeroConstellation() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
           <span className="font-bold text-[#141416]">MACRO CONSTELLATION GRAPH</span>
-          <span>• 15 INTERCONNECTED SOVEREIGN NODES</span>
+          <span>• 15 SOVEREIGN NODES</span>
         </div>
         <div className="hidden sm:inline-flex items-center gap-1.5 text-[9px]">
-          <span>CLICK ANY NODE TO PIN DEEP-LINK</span>
+          <span>TAP ANY NODE TO PIN</span>
         </div>
       </div>
 
@@ -614,6 +634,7 @@ export function HeroConstellation() {
         onMouseMove={handleMouseMove}
         onClick={handleClick}
         onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
         role="img"
         aria-label="Interactive macro constellation diagram displaying connections between Indian macroeconomic variables"
         className="w-full h-full cursor-crosshair touch-none"

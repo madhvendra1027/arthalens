@@ -22,17 +22,17 @@ export default function RatingsPage() {
   const { data, isLoading, isError, error, refetch } = useRatings(agency);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
       {/* Official Antimetal Header Banner */}
-      <div className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs flex flex-wrap items-center justify-between gap-6">
+      <div className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="rounded-full bg-[#141416] text-[#ECEBE5] px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider">
               SOVEREIGN DEBT INTELLIGENCE
             </span>
             <span className="font-mono text-xs text-[#828387]">• Moody's • S&P • Fitch</span>
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-[#141416]">
+          <h1 className="font-serif text-2xl sm:text-4xl font-normal tracking-tight text-[#141416]">
             India Sovereign Credit Ratings Monitor
           </h1>
           <p className="text-xs sm:text-sm text-[#57585C] mt-2 max-w-2xl leading-relaxed">
@@ -41,12 +41,12 @@ export default function RatingsPage() {
         </div>
 
         {/* Agency Filter Tabs */}
-        <div className="flex rounded-full border border-[rgba(20,21,23,0.15)] bg-[#E3E2DC] p-1 shadow-2xs gap-1">
+        <div className="flex flex-wrap sm:flex-nowrap rounded-2xl sm:rounded-full border border-[rgba(20,21,23,0.15)] bg-[#E3E2DC] p-1 shadow-2xs gap-1 max-w-full overflow-x-auto [scrollbar-width:none] touch-pan-x">
           {AGENCIES.map((a) => (
             <button
               key={a.key}
               onClick={() => setAgency(a.key)}
-              className={`btn-realistic rounded-full px-4 py-1.5 text-xs transition-all ${
+              className={`btn-realistic rounded-full px-3.5 sm:px-4 py-1.5 text-xs transition-all whitespace-nowrap ${
                 agency === a.key
                   ? "btn-solid-black text-white font-bold"
                   : "text-[#57585C] hover:text-[#141416]"
@@ -143,49 +143,54 @@ export default function RatingsPage() {
             </div>
 
             {/* Scale Comparison Reference Matrix */}
-            <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs">
-              <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#57585C] mb-4 border-b border-[rgba(20,21,23,0.1)] pb-2">
-                Sovereign Rating Scale Classification Reference
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
+            <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-6 shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-[rgba(20,21,23,0.1)] pb-2">
+                <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#57585C]">
+                  Sovereign Rating Scale Classification Reference
+                </h2>
+                <span className="text-[10px] font-mono text-[#828387] sm:hidden">
+                  ← Swipe table horizontally →
+                </span>
+              </div>
+              <div className="overflow-x-auto max-w-full -mx-2 px-2 sm:mx-0 sm:px-0 [scrollbar-width:thin] touch-pan-x">
+                <table className="w-full min-w-[500px] text-left text-xs font-mono">
                   <thead>
                     <tr className="text-[#828387] border-b border-[rgba(20,21,23,0.1)]">
-                      <th className="p-3">Credit Tier</th>
-                      <th className="p-3">Moody's Scale</th>
-                      <th className="p-3">S&P Global Scale</th>
-                      <th className="p-3">Fitch Scale</th>
-                      <th className="p-3">India's Assigned Grade</th>
+                      <th className="p-2 sm:p-3">Credit Tier</th>
+                      <th className="p-2 sm:p-3">Moody's Scale</th>
+                      <th className="p-2 sm:p-3">S&P Global Scale</th>
+                      <th className="p-2 sm:p-3">Fitch Scale</th>
+                      <th className="p-2 sm:p-3">India's Assigned Grade</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[rgba(20,21,23,0.06)] text-[#57585C]">
                     <tr>
-                      <td className="p-3 font-semibold text-[#141416]">Prime & High Grade</td>
-                      <td className="p-3">Aaa — Aa3</td>
-                      <td className="p-3">AAA — AA-</td>
-                      <td className="p-3">AAA — AA-</td>
-                      <td className="p-3 text-[#828387]">—</td>
+                      <td className="p-2 sm:p-3 font-semibold text-[#141416]">Prime & High Grade</td>
+                      <td className="p-2 sm:p-3">Aaa — Aa3</td>
+                      <td className="p-2 sm:p-3">AAA — AA-</td>
+                      <td className="p-2 sm:p-3">AAA — AA-</td>
+                      <td className="p-2 sm:p-3 text-[#828387]">—</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-semibold text-[#141416]">Upper Medium Grade</td>
-                      <td className="p-3">A1 — A3</td>
-                      <td className="p-3">A+ — A-</td>
-                      <td className="p-3">A+ — A-</td>
-                      <td className="p-3 text-[#828387]">—</td>
+                      <td className="p-2 sm:p-3 font-semibold text-[#141416]">Upper Medium Grade</td>
+                      <td className="p-2 sm:p-3">A1 — A3</td>
+                      <td className="p-2 sm:p-3">A+ — A-</td>
+                      <td className="p-2 sm:p-3">A+ — A-</td>
+                      <td className="p-2 sm:p-3 text-[#828387]">—</td>
                     </tr>
                     <tr className="bg-black/5 font-semibold text-[#141416]">
-                      <td className="p-3 font-bold text-[#141416]">Lower Medium Grade (Investment Tier)</td>
-                      <td className="p-3 font-bold">Baa3 (Active)</td>
-                      <td className="p-3 font-bold">BBB- (Active)</td>
-                      <td className="p-3 font-bold">BBB- (Active)</td>
-                      <td className="p-3 font-bold text-[#059669]">✓ S&P Outlook Positive (May 2024)</td>
+                      <td className="p-2 sm:p-3 font-bold text-[#141416]">Lower Medium Grade (Investment Tier)</td>
+                      <td className="p-2 sm:p-3 font-bold">Baa3 (Active)</td>
+                      <td className="p-2 sm:p-3 font-bold">BBB- (Active)</td>
+                      <td className="p-2 sm:p-3 font-bold">BBB- (Active)</td>
+                      <td className="p-2 sm:p-3 font-bold text-[#059669]">✓ S&P Outlook Positive (May 2024)</td>
                     </tr>
                     <tr>
-                      <td className="p-3 font-semibold text-[#D94E34]">Speculative / Non-Investment Grade</td>
-                      <td className="p-3">Ba1 and below</td>
-                      <td className="p-3">BB+ and below</td>
-                      <td className="p-3">BB+ and below</td>
-                      <td className="p-3 text-[#828387]">—</td>
+                      <td className="p-2 sm:p-3 font-semibold text-[#D94E34]">Speculative / Non-Investment Grade</td>
+                      <td className="p-2 sm:p-3">Ba1 and below</td>
+                      <td className="p-2 sm:p-3">BB+ and below</td>
+                      <td className="p-2 sm:p-3">BB+ and below</td>
+                      <td className="p-2 sm:p-3 text-[#828387]">—</td>
                     </tr>
                   </tbody>
                 </table>

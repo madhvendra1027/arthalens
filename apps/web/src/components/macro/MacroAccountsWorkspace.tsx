@@ -133,7 +133,7 @@ export function MacroAccountsWorkspace({
       {/* =========================================================================
           WORKSPACE HEADER & SOVEREIGN ATTESTATION
           ========================================================================= */}
-      <div className="rounded-3xl border border-[rgba(20,21,23,0.14)] bg-[#ECEBE5] p-6 sm:p-8 shadow-xs">
+      <div className="rounded-3xl border border-[rgba(20,21,23,0.14)] bg-[#ECEBE5] p-4 sm:p-6 lg:p-8 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
             {/* Top Provenance Badges */}
@@ -151,7 +151,7 @@ export function MacroAccountsWorkspace({
             </div>
 
             {/* Headline */}
-            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#141416]">
+            <h1 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#141416]">
               India National Accounts & GVA Workspace
             </h1>
 
@@ -163,8 +163,8 @@ export function MacroAccountsWorkspace({
             </p>
 
             {/* Live Telemetry Dynamic Bar */}
-            <div className="flex items-center gap-2 pt-1 font-mono text-[11px] text-[#57585C]">
-              <span className="font-bold text-[#141416]">Telemetry:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 pt-1 font-mono text-[11px] text-[#57585C] max-w-full overflow-hidden">
+              <span className="font-bold text-[#141416] shrink-0">Telemetry:</span>
               <DynamicText
                 words={[
                   { text: "Real (+8.2%) vs Nominal (+9.6%) Decomposition" },
@@ -175,8 +175,8 @@ export function MacroAccountsWorkspace({
                 interval={2600}
                 loop={true}
                 className="!min-h-0"
-                containerClassName="!h-4 !min-w-[260px]"
-                textClassName="!text-[11px] !font-mono !font-medium !text-[#141416]"
+                containerClassName="!h-4 min-w-0 max-w-full flex-1"
+                textClassName="!text-[11px] !font-mono !font-medium !text-[#141416] truncate"
                 dotClassName="!h-1.5 !w-1.5 bg-[#D94E34]"
               />
             </div>
@@ -209,82 +209,86 @@ export function MacroAccountsWorkspace({
         {/* =========================================================================
             PRIMARY WORKSPACE CONTROLS & NAVIGATION FILTER BAR
             ========================================================================= */}
-        <div className="mt-8 pt-6 border-t border-[rgba(20,21,23,0.12)] flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-8 pt-6 border-t border-[rgba(20,21,23,0.12)] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Main View Segmenter */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387] mr-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full lg:w-auto">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387] shrink-0">
               Workspace View:
             </span>
-            <div className="inline-flex rounded-full bg-[#DFDED8] p-1 border border-[rgba(20,21,23,0.12)]">
-              {(
-                [
-                  { id: "overview", label: "Macro Pulse", icon: TrendingUp },
-                  { id: "composition", label: "Sector & State Output", icon: Layers },
-                  { id: "trends", label: "Time Series & Revisions", icon: BarChart3 },
-                  { id: "deflator", label: "Deflator & Price Wedge", icon: SlidersHorizontal },
-                ] as const
-              ).map((tab) => {
-                const Icon = tab.icon;
-                const isActive = currentView === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => updateParam({ view: tab.id })}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-mono font-semibold transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
-                        : "text-[#57585C] hover:text-[#141416]"
-                    }`}
-                  >
-                    <Icon className="h-3 w-3" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
+            <div className="w-full sm:w-auto max-w-full overflow-x-auto [scrollbar-width:none] touch-pan-x -mx-1 px-1">
+              <div className="inline-flex min-w-max rounded-full bg-[#DFDED8] p-1 border border-[rgba(20,21,23,0.12)]">
+                {(
+                  [
+                    { id: "overview", label: "Macro Pulse", icon: TrendingUp },
+                    { id: "composition", label: "Sector & State Output", icon: Layers },
+                    { id: "trends", label: "Time Series & Revisions", icon: BarChart3 },
+                    { id: "deflator", label: "Deflator & Price Wedge", icon: SlidersHorizontal },
+                  ] as const
+                ).map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = currentView === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => updateParam({ view: tab.id })}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 sm:px-3.5 py-1.5 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                        isActive
+                          ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
+                          : "text-[#57585C] hover:text-[#141416]"
+                      }`}
+                    >
+                      <Icon className="h-3 w-3" />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
           {/* Secondary Filters: Base Year & Price Basis */}
           <div className="flex flex-wrap items-center gap-3">
             {/* Base Year Switcher */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387]">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 w-full sm:w-auto">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387] shrink-0">
                 Base Year:
               </span>
-              <RubberSegment
-                items={["2022-23 Active Benchmark", "2011-12 Historical Series"]}
-                defaultValue={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
-                value={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
-                onChange={(val) =>
-                  updateParam({ base_year: val.startsWith("2022") ? "2022-23" : "2011-12" })
-                }
-                trackColor="#DFDED8"
-                thumbColor="#141416"
-                textColor="#57585C"
-                activeTextColor="#ECEBE5"
-                size="sm"
-                radius={9999}
-                inset={2}
-                equalSlots
-                stretch={60}
-                squash={3}
-                speed={1}
-                glide={75}
-                preset="macro-base"
-              />
+              <div className="max-w-full overflow-x-auto [scrollbar-width:none]">
+                <RubberSegment
+                  items={["2022-23 Active Benchmark", "2011-12 Historical Series"]}
+                  defaultValue={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
+                  value={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
+                  onChange={(val) =>
+                    updateParam({ base_year: val.startsWith("2022") ? "2022-23" : "2011-12" })
+                  }
+                  trackColor="#DFDED8"
+                  thumbColor="#141416"
+                  textColor="#57585C"
+                  activeTextColor="#ECEBE5"
+                  size="sm"
+                  radius={9999}
+                  inset={2}
+                  equalSlots
+                  stretch={60}
+                  squash={3}
+                  speed={1}
+                  glide={75}
+                  preset="macro-base"
+                />
+              </div>
             </div>
 
             {/* Valuation Switcher */}
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387]">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387] shrink-0">
                 Price:
               </span>
               <div className="inline-flex rounded-full bg-[#DFDED8] p-1 border border-[rgba(20,21,23,0.12)]">
                 <button
                   type="button"
                   onClick={() => updateParam({ price_type: "constant" })}
-                  className={`rounded-full px-3 py-1 text-xs font-mono font-semibold transition-all cursor-pointer ${
+                  className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     priceType === "constant"
                       ? "bg-[#141416] text-[#ECEBE5]"
                       : "text-[#57585C] hover:text-[#141416]"
@@ -295,7 +299,7 @@ export function MacroAccountsWorkspace({
                 <button
                   type="button"
                   onClick={() => updateParam({ price_type: "current" })}
-                  className={`rounded-full px-3 py-1 text-xs font-mono font-semibold transition-all cursor-pointer ${
+                  className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     priceType === "current"
                       ? "bg-[#141416] text-[#ECEBE5]"
                       : "text-[#57585C] hover:text-[#141416]"

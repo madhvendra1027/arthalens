@@ -264,20 +264,22 @@ export function NavBar() {
           </Link>
 
           {/* Right Action Group */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             <NotificationCenter />
 
-            <ShinyButton
-              onClick={() => setGovModalOpen(true)}
-              className="!py-1.5 !px-3 sm:!px-3.5 !text-xs !font-sans !font-medium"
-              icon={<Lock className="h-3 w-3 text-[#D94E34]" />}
-            >
-              Government
-            </ShinyButton>
+            <div className="hidden sm:inline-flex">
+              <ShinyButton
+                onClick={() => setGovModalOpen(true)}
+                className="!py-1.5 !px-3 sm:!px-3.5 !text-xs !font-sans !font-medium"
+                icon={<Lock className="h-3 w-3 text-[#D94E34]" />}
+              >
+                Government
+              </ShinyButton>
+            </div>
 
             <Link
               href="/gdp"
-              className="btn-realistic btn-solid-black text-xs px-3.5 py-1.5 font-sans font-semibold shadow-xs"
+              className="hidden md:inline-flex btn-realistic btn-solid-black text-xs px-3.5 py-1.5 font-sans font-semibold shadow-xs"
             >
               Macro Workspace
             </Link>
@@ -309,7 +311,7 @@ export function NavBar() {
       {/* Aligned Full-Screen / Modal Hamburger Menu */}
       <AnimatePresence>
         {menuOpen && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -326,7 +328,7 @@ export function NavBar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -15, scale: 0.98 }}
               transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-              className="relative z-10 w-full max-w-5xl mx-4 mt-4 sm:mt-8 max-h-[88vh] overflow-y-auto rounded-3xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] p-6 sm:p-8 shadow-2xl"
+              className="relative z-10 w-[calc(100vw-1rem)] sm:w-full max-w-5xl my-auto max-h-[92vh] overflow-y-auto rounded-2xl sm:rounded-3xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] p-4 sm:p-6 md:p-8 shadow-2xl"
             >
               {/* Header Bar */}
               <div className="flex items-center justify-between pb-6 border-b border-[rgba(20,21,23,0.12)]">
@@ -417,19 +419,19 @@ export function NavBar() {
               </div>
 
               {/* Footer Quick Actions */}
-              <div className="pt-6 border-t border-[rgba(20,21,23,0.12)] flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-3 text-xs font-mono text-[#828387]">
-                  <span className="h-2 w-2 rounded-full bg-[#059669]" />
-                  <span>DATA PIPELINES SYNCHRONIZED: OFFICIAL MOSPI & RBI RELEASES</span>
+              <div className="pt-6 border-t border-[rgba(20,21,23,0.12)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-xs font-mono text-[#828387]">
+                  <span className="h-2 w-2 rounded-full bg-[#059669] shrink-0" />
+                  <span>DATA PIPELINES SYNCHRONIZED: OFFICIAL MOSPI & RBI</span>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <ShinyButton
                     onClick={() => {
                       setMenuOpen(false);
                       setGovModalOpen(true);
                     }}
-                    className="!py-1.5 !px-3.5 !text-xs !font-medium"
+                    className="!py-1.5 !px-3 sm:!px-3.5 !text-xs !font-medium"
                     icon={<Lock className="h-3 w-3 text-[#D94E34]" />}
                   >
                     Government Terminal
@@ -441,7 +443,7 @@ export function NavBar() {
                         logout();
                         setMenuOpen(false);
                       }}
-                      className="btn-realistic btn-outline-pill px-4 py-1.5 text-xs font-semibold"
+                      className="btn-realistic btn-outline-pill px-3.5 py-1.5 text-xs font-semibold"
                     >
                       Logout ({user?.name || "User"})
                     </button>
@@ -449,7 +451,7 @@ export function NavBar() {
                     <Link
                       href="/login"
                       onClick={() => setMenuOpen(false)}
-                      className="btn-realistic btn-outline-pill px-4 py-1.5 text-xs font-semibold"
+                      className="btn-realistic btn-outline-pill px-3.5 py-1.5 text-xs font-semibold"
                     >
                       Sign in
                     </Link>
@@ -458,7 +460,7 @@ export function NavBar() {
                   <Link
                     href="/gdp"
                     onClick={() => setMenuOpen(false)}
-                    className="btn-realistic btn-solid-black px-5 py-1.5 text-xs font-semibold flex items-center gap-1.5"
+                    className="btn-realistic btn-solid-black px-4 py-1.5 text-xs font-semibold flex items-center gap-1.5"
                   >
                     <span>Launch Explorer</span>
                     <ArrowRight className="h-3.5 w-3.5" />

@@ -62,7 +62,7 @@ export function BklitDeflatorLineChart({
             Implicit GDP Deflator vs CPI vs WPI Inflation (YoY %)
           </p>
         </div>
-        <div className="flex items-center gap-3 text-xs font-mono text-[#57585C] mt-2 sm:mt-0">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs font-mono text-[#57585C] mt-2 sm:mt-0">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-3 rounded-xs bg-[#D94E34]" />
             GDP Deflator

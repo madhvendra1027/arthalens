@@ -114,24 +114,24 @@ export function EvidenceProvenanceTrail() {
         +
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 sm:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header: Wide Architectural Layout */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 pb-8 border-b border-[rgba(20,21,23,0.14)]">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10 sm:mb-14 pb-6 sm:pb-8 border-b border-[rgba(20,21,23,0.14)]">
           <div className="max-w-3xl space-y-3">
             <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#059669]">
               <ShieldCheck className="h-4 w-4 text-[#059669]" />
               <span>CHAPTER 04 // THE PROVENANCE TRAIL</span>
             </div>
-            <h2 className="font-heading text-4xl sm:text-6xl font-extrabold tracking-tight text-[#141416] leading-[1.05]">
+            <h2 className="font-heading text-3xl sm:text-6xl font-extrabold tracking-tight text-[#141416] leading-[1.05]">
               Follow the evidence.
             </h2>
-            <p className="font-sans text-base sm:text-lg text-[#57585C] leading-relaxed max-w-2xl pt-2">
+            <p className="font-sans text-sm sm:text-lg text-[#57585C] leading-relaxed max-w-2xl pt-2">
               Every economic calculation in ArthaLens can be traced from its primary gazette statement and corporate tax feeds to its mathematical transformation and cross-agency audit. Zero synthetic data.
             </p>
           </div>
 
           {/* Metric Selector Tabs */}
-          <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#DFDED8] border border-[rgba(20,21,23,0.15)] shadow-xs">
+          <div className="flex flex-wrap p-1 rounded-xl bg-[#DFDED8] border border-[rgba(20,21,23,0.15)] shadow-xs max-w-full overflow-x-auto [scrollbar-width:none]">
             {PROVENANCE_METRICS.map((metric) => (
               <button
                 key={metric.id}
@@ -141,7 +141,7 @@ export function EvidenceProvenanceTrail() {
                   setActiveStage(1);
                 }}
                 className={clsx(
-                  "px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-2",
+                  "px-3 sm:px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-1.5 sm:gap-2 whitespace-nowrap",
                   selectedMetricId === metric.id
                     ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
                     : "text-[#57585C] hover:text-[#141416]"

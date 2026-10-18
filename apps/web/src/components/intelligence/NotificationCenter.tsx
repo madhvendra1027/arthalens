@@ -143,7 +143,7 @@ export function NotificationCenter({ className = "" }: NotificationCenterProps) 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="absolute right-0 mt-2 z-50 w-[340px] sm:w-[420px] max-h-[85vh] flex flex-col rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] shadow-2xl backdrop-blur-md overflow-hidden"
+            className="fixed sm:absolute right-2 sm:right-0 left-2 sm:left-auto top-14 sm:top-auto sm:mt-2 z-50 w-auto sm:w-[400px] max-w-[calc(100vw-1rem)] max-h-[85vh] flex flex-col rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] shadow-2xl backdrop-blur-md overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-[rgba(20,21,23,0.1)] bg-white/40">

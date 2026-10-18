@@ -18,16 +18,16 @@ export default function DeflatorPage() {
   const impliedInflation = impliedInflationNum.toFixed(2);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
       {/* Official Antimetal Header Banner */}
-      <div className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-6 shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2 mb-2">
           <span className="rounded-full bg-[#141416] text-[#ECEBE5] px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider">
             02 // DEFLATOR LABORATORY
           </span>
           <span className="font-mono text-xs text-[#828387]">• Methodology: UN SNA 2008 Standard Deflation</span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-[#141416]">
+        <h1 className="font-serif text-2xl sm:text-4xl font-normal tracking-tight text-[#141416]">
           GDP Deflator & Price Index Arithmetic Simulator
         </h1>
         <p className="text-xs sm:text-sm text-[#57585C] mt-2 max-w-3xl leading-relaxed">
@@ -36,15 +36,15 @@ export default function DeflatorPage() {
       </div>
 
       <div
-        className="mb-8 rounded-lg border border-[rgba(20,21,23,0.15)] bg-[#E3E2DC] p-4 text-xs sm:text-sm text-[#141416] font-mono"
+        className="mb-8 rounded-lg border border-[rgba(20,21,23,0.15)] bg-[#E3E2DC] p-3.5 sm:p-4 text-xs sm:text-sm text-[#141416] font-mono leading-relaxed"
         role="alert"
       >
         <strong>Note on Statistical Methodology:</strong> The GDP Deflator is an implicit price index reflecting domestic output across all 14 economic sub-sectors. Adjusting simulation inputs below computes mathematical transformations without altering official records.
       </div>
 
       {/* Simulator Section */}
-      <div className="grid gap-8 lg:grid-cols-2 mb-12">
-        <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs space-y-6">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2 mb-12">
+        <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-6 shadow-2xs space-y-6">
           <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#57585C] border-b border-[rgba(20,21,23,0.1)] pb-2">
             Nominal to Real GDP Conversion Tool
           </h2>
@@ -136,13 +136,13 @@ export default function DeflatorPage() {
       </div>
 
       {/* Quarterly Deflator vs Inflation Trajectory Section */}
-      <section aria-labelledby="deflator-chart-heading" className="mb-12 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs">
+      <section aria-labelledby="deflator-chart-heading" className="mb-12 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-6 shadow-2xs">
         <BklitDeflatorLineChart data={deflatorData?.data} baseYear={deflatorData?.baseYear} />
       </section>
 
-      <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-5 text-xs text-[#828387] font-mono flex items-center justify-between">
+      <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-5 text-xs text-[#828387] font-mono flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
         <span>PROVENANCE: MoSPI NATIONAL ACCOUNTS STATISTICS (NAS) • DOUBLE DEFLATION ENGINE</span>
-        <Link href="/methodology" className="underline underline-offset-4 text-[#141416]">
+        <Link href="/methodology" className="underline underline-offset-4 text-[#141416] shrink-0">
           Read Splicing Guidelines →
         </Link>
       </div>

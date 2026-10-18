@@ -104,7 +104,7 @@ export function RubberSegment({
       role="tablist"
       aria-disabled={disabled}
       className={cn(
-        "relative inline-flex items-center select-none border border-[rgba(20,21,23,0.12)] p-1 shadow-2xs transition-colors",
+        "relative inline-flex items-center select-none border border-[rgba(20,21,23,0.12)] p-1 shadow-2xs transition-colors max-w-full overflow-hidden",
         disabled && "opacity-50 pointer-events-none",
         className
       )}
@@ -127,7 +127,7 @@ export function RubberSegment({
             tabIndex={isSelected ? 0 : -1}
             onClick={() => handleSelect(idx)}
             className={cn(
-              "relative z-10 flex items-center justify-center font-medium transition-colors font-sans focus:outline-none cursor-pointer",
+              "relative z-10 flex items-center justify-center font-medium transition-colors font-sans focus:outline-none cursor-pointer min-w-0",
               sizeStyles,
               equalSlots ? "flex-1" : "flex-initial"
             )}

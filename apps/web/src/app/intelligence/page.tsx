@@ -258,8 +258,9 @@ function IntelligenceContent() {
   return (
     <div className="min-h-screen bg-[#ECEBE5] text-[#141416]">
       {/* Top Global Market Ticker Tape */}
-      <div className="w-full border-b border-[rgba(20,21,23,0.12)] bg-[#E3E2DC]/80 overflow-x-auto py-2 px-4 shadow-xs">
-        <div className="mx-auto max-w-7xl flex items-center justify-between gap-4 min-w-max">
+      <div className="w-full max-w-full overflow-hidden border-b border-[rgba(20,21,23,0.12)] bg-[#E3E2DC]/80 py-2 shadow-xs">
+        <div className="w-full max-w-full overflow-x-auto px-4 [scrollbar-width:none] [-ms-overflow-style:none] touch-pan-x">
+          <div className="mx-auto max-w-7xl flex items-center justify-between gap-4 min-w-max">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#059669] animate-pulse" />
             <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#141416]">
@@ -301,6 +302,7 @@ function IntelligenceContent() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Main Container */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6">

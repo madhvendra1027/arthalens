@@ -91,17 +91,17 @@ export function ContinueInvestigationSection() {
         +
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 sm:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="max-w-3xl mb-14 space-y-3">
+        <div className="max-w-3xl mb-10 sm:mb-14 space-y-3">
           <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#141416]">
             <span className="h-2 w-2 rounded-full bg-[#059669]" />
             <span>CHAPTER 06 // CONTINUING RESEARCH</span>
           </div>
-          <h2 className="font-heading text-4xl sm:text-6xl font-extrabold tracking-tight text-[#141416] leading-[1.05]">
+          <h2 className="font-heading text-3xl sm:text-6xl font-extrabold tracking-tight text-[#141416] leading-[1.05]">
             The economy is a living record.
           </h2>
-          <p className="font-sans text-base sm:text-lg text-[#57585C] leading-relaxed pt-2">
+          <p className="font-sans text-sm sm:text-base text-[#57585C] leading-relaxed pt-2">
             Choose an analytical portal below to begin interrogating India's macroeconomic architecture:
           </p>
         </div>
@@ -114,7 +114,7 @@ export function ContinueInvestigationSection() {
               <Link
                 key={pathway.code}
                 href={pathway.href}
-                className="group relative flex flex-col justify-between p-6 sm:p-7 rounded-2xl bg-[#E6E5DF] border border-[rgba(20,21,23,0.12)] hover:border-[#141416] hover:bg-[#DFDED8] transition-all duration-200"
+                className="group relative flex flex-col justify-between p-5 sm:p-7 rounded-2xl bg-[#E6E5DF] border border-[rgba(20,21,23,0.12)] hover:border-[#141416] hover:bg-[#DFDED8] transition-all duration-200"
               >
                 <div>
                   <div className="flex items-center justify-between text-xs font-mono mb-4">
@@ -125,7 +125,7 @@ export function ContinueInvestigationSection() {
                   </div>
 
                   <div className="flex items-center gap-3 mb-2.5">
-                    <div className="h-9 w-9 rounded-xl bg-[#ECEBE5] border border-[rgba(20,21,23,0.1)] flex items-center justify-center text-[#141416] group-hover:bg-[#141416] group-hover:text-white transition-colors">
+                    <div className="h-9 w-9 rounded-xl bg-[#ECEBE5] border border-[rgba(20,21,23,0.1)] flex items-center justify-center text-[#141416] group-hover:bg-[#141416] group-hover:text-white transition-colors shrink-0">
                       <Icon className="h-4.5 w-4.5" />
                     </div>
                     <h3 className="font-heading text-lg font-bold text-[#141416] group-hover:text-[#D94E34] transition-colors">
@@ -148,8 +148,8 @@ export function ContinueInvestigationSection() {
         </div>
 
         {/* Sovereign Open Data Guarantee Banner */}
-        <div className="mt-14 p-6 sm:p-8 rounded-3xl bg-[#DFDED8]/80 border border-[rgba(20,21,23,0.14)] flex flex-col sm:flex-row sm:items-center justify-between gap-6 text-xs font-mono text-[#57585C]">
-          <div className="flex items-center gap-4">
+        <div className="mt-10 sm:mt-14 p-4 sm:p-6 lg:p-8 rounded-3xl bg-[#DFDED8]/80 border border-[rgba(20,21,23,0.14)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 text-xs font-mono text-[#57585C]">
+          <div className="flex items-center gap-3 sm:gap-4">
             <ShieldCheck className="h-6 w-6 text-[#059669] shrink-0" />
             <div className="space-y-0.5">
               <span className="font-bold text-sm text-[#141416] block">

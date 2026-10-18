@@ -49,7 +49,7 @@ export function LookBeneathHeadline() {
       {/* Subtle architectural grid lines */}
       <div className="absolute inset-0 bg-[radial-gradient(#25262B_1px,transparent_1px)] [background-size:32px_32px] opacity-25 pointer-events-none" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Editorial Section Header: Dramatic Contrast & Scale */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-14 pb-8 border-b border-[rgba(255,255,255,0.12)]">
           <div className="max-w-3xl space-y-3">
@@ -57,53 +57,53 @@ export function LookBeneathHeadline() {
               <span className="h-2 w-2 rounded-full bg-[#D94E34] animate-pulse" />
               <span>CHAPTER 03 // THE ANOMALIES BENEATH</span>
             </div>
-            <h2 className="font-heading text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.02]">
+            <h2 className="font-heading text-3xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.05] sm:leading-[1.02]">
               Headline numbers conceal as much as they reveal.
             </h2>
-            <p className="font-sans text-base sm:text-lg text-[#9E9EA4] leading-relaxed max-w-2xl pt-2">
+            <p className="font-sans text-sm sm:text-lg text-[#9E9EA4] leading-relaxed max-w-2xl pt-2">
               National growth rates are composite accounting constructions. A single deflator choice, base-year shift, or input price collapse can fabricate or erase percentage points of real growth.
             </p>
           </div>
 
           {/* High-Contrast Scenario Switcher */}
-          <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#1E1F23] border border-[rgba(255,255,255,0.15)] shadow-inner">
+          <div className="flex flex-wrap p-1 rounded-xl bg-[#1E1F23] border border-[rgba(255,255,255,0.15)] shadow-inner max-w-full overflow-x-auto [scrollbar-width:none]">
             <button
               type="button"
               onClick={() => setActiveScenario("double-deflation")}
               className={clsx(
-                "px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-2",
+                "px-3.5 sm:px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-1.5 sm:gap-2 whitespace-nowrap",
                 activeScenario === "double-deflation"
                   ? "bg-[#D94E34] text-white shadow-sm"
                   : "text-[#9E9EA4] hover:text-white"
               )}
             >
-              <Scale className="h-3.5 w-3.5" />
+              <Scale className="h-3.5 w-3.5 shrink-0" />
               <span>Double Deflation</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveScenario("deflator")}
               className={clsx(
-                "px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-2",
+                "px-3.5 sm:px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-1.5 sm:gap-2 whitespace-nowrap",
                 activeScenario === "deflator"
                   ? "bg-[#D94E34] text-white shadow-sm"
                   : "text-[#9E9EA4] hover:text-white"
               )}
             >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
+              <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" />
               <span>The Deflator Wedge</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveScenario("base-year")}
               className={clsx(
-                "px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-2",
+                "px-3.5 sm:px-4 py-2 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer flex items-center gap-1.5 sm:gap-2 whitespace-nowrap",
                 activeScenario === "base-year"
                   ? "bg-[#D94E34] text-white shadow-sm"
                   : "text-[#9E9EA4] hover:text-white"
               )}
             >
-              <Layers className="h-3.5 w-3.5" />
+              <Layers className="h-3.5 w-3.5 shrink-0" />
               <span>Base Year Harmonization</span>
             </button>
           </div>

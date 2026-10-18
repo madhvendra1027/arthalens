@@ -42,16 +42,16 @@ export default function HomePage() {
       {/* =========================================================================
           CHAPTER 1: THE SIGNAL (SOVEREIGN MACRO OBSERVATORY HERO)
           ========================================================================= */}
-      <section className="relative pt-8 sm:pt-14 pb-12 sm:pb-20 border-b border-[rgba(20,21,23,0.14)]">
-        <div className="mx-auto max-w-7xl px-6 sm:px-8">
-          <div className="grid gap-12 lg:grid-cols-12 items-center">
+      <section className="relative pt-6 sm:pt-14 pb-10 sm:pb-20 border-b border-[rgba(20,21,23,0.14)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:gap-12 lg:grid-cols-12 items-center">
             {/* Left Column: Monumental Editorial Statement & Ambition (6 cols) */}
-            <div className="lg:col-span-6 space-y-6 z-10">
-              <div className="space-y-4">
+            <div className="lg:col-span-6 space-y-5 sm:space-y-6 z-10">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Official Sovereign Telemetry Badge */}
-                <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-4 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-[#141416] shadow-xs">
-                  <span className="h-2 w-2 rounded-full bg-[#059669] animate-pulse" />
-                  <span>SOVEREIGN OBSERVATORY •</span>
+                <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-3 sm:px-4 py-1.5 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#141416] shadow-xs">
+                  <span className="h-2 w-2 rounded-full bg-[#059669] animate-pulse shrink-0" />
+                  <span className="shrink-0">SOVEREIGN OBSERVATORY •</span>
                   <DynamicText
                     words={[
                       { text: "OFFICIAL MOSPI & RBI DATA" },
@@ -62,25 +62,25 @@ export default function HomePage() {
                     interval={2600}
                     loop={true}
                     className="!min-h-0"
-                    containerClassName="!h-4 !min-w-[170px]"
-                    textClassName="!text-[11px] !font-mono !font-bold !text-[#141416]"
+                    containerClassName="!h-4 min-w-0 max-w-full flex-1"
+                    textClassName="!text-[10px] sm:!text-[11px] !font-mono !font-bold !text-[#141416] truncate"
                     dotClassName="hidden"
                   />
                 </div>
 
                 {/* Oversized Editorial Headline */}
-                <h1 className="font-heading text-5xl sm:text-7xl lg:text-[5rem] font-extrabold leading-[0.96] tracking-tight text-[#141416]">
+                <h1 className="font-heading text-4xl sm:text-7xl lg:text-[5rem] font-extrabold leading-[1.0] sm:leading-[0.96] tracking-tight text-[#141416]">
                   See the economy beneath the numbers.
                 </h1>
 
                 {/* Authoritative Editorial Thesis */}
-                <p className="font-sans text-base sm:text-lg text-[#57585C] leading-relaxed max-w-xl pt-1">
+                <p className="font-sans text-sm sm:text-lg text-[#57585C] leading-relaxed max-w-xl pt-1">
                   ArthaLens is India's sovereign macroeconomic intelligence observatory. We synthesize official National Accounts, model double-deflation under UN SNA 2008 standards, and audit state economic accounts with cryptographic provenance.
                 </p>
 
                 {/* High-Frequency Active Telemetry Micro-Feed */}
-                <div className="flex items-center gap-2 pt-2 font-mono text-xs text-[#57585C]">
-                  <span className="font-semibold text-[#141416]">Active Telemetry:</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 pt-2 font-mono text-xs text-[#57585C] max-w-full overflow-hidden">
+                  <span className="font-semibold text-[#141416] shrink-0">Active Telemetry:</span>
                   <DynamicText
                     words={[
                       { text: "Real (+8.2%) vs Nominal (+9.6%) GDP Decomposition" },
@@ -91,47 +91,47 @@ export default function HomePage() {
                     interval={2800}
                     loop={true}
                     className="!min-h-0"
-                    containerClassName="!h-5 !min-w-[270px] sm:!min-w-[320px]"
-                    textClassName="!text-xs !font-mono !font-medium !text-[#141416]"
+                    containerClassName="!h-5 min-w-0 max-w-full flex-1"
+                    textClassName="!text-xs !font-mono !font-medium !text-[#141416] truncate"
                     dotClassName="!h-1.5 !w-1.5 bg-[#D94E34]"
                   />
                 </div>
               </div>
 
               {/* Direct Action Calls */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 pt-2">
                 <Link
                   href="/gdp"
                   onClick={() => trackEvent("cta_click", { label: "hero_macro_workspace", destination: "/gdp" })}
                   aria-label="Explore Macro Accounts Workspace"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#141416] px-6 py-3 font-mono text-xs font-semibold tracking-wide text-[#ECEBE5] shadow-xs hover:bg-[#D94E34] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#D94E34] focus-visible:ring-offset-2 focus:outline-hidden"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#141416] px-5 sm:px-6 py-2.5 sm:py-3 font-mono text-xs font-semibold tracking-wide text-[#ECEBE5] shadow-xs hover:bg-[#D94E34] transition-colors cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-[#D94E34] focus-visible:ring-offset-2 focus:outline-hidden"
                 >
-                  <BarChart3 className="h-3.5 w-3.5" />
+                  <BarChart3 className="h-3.5 w-3.5 shrink-0" />
                   <span>Explore Macro Accounts Workspace</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-3.5 w-3.5 shrink-0" />
                 </Link>
                 <Link
                   href="/deflator"
                   onClick={() => trackEvent("cta_click", { label: "hero_deflator_simulator", destination: "/deflator" })}
                   aria-label="Launch Inflation and Deflator Simulator"
-                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.2)] bg-[#ECEBE5] px-5 py-3 font-mono text-xs font-semibold tracking-wide text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#141416] focus-visible:ring-offset-2 focus:outline-hidden"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-[rgba(20,21,23,0.2)] bg-[#ECEBE5] px-4 sm:px-5 py-2.5 sm:py-3 font-mono text-xs font-semibold tracking-wide text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-[#141416] focus-visible:ring-offset-2 focus:outline-hidden"
                 >
-                  <SlidersHorizontal className="h-3.5 w-3.5 text-[#D94E34]" />
+                  <SlidersHorizontal className="h-3.5 w-3.5 text-[#D94E34] shrink-0" />
                   <span>Deflator Simulator</span>
                 </Link>
                 <Link
                   href="/methodology"
                   aria-label="Read UN SNA 2008 National Accounts Methodology"
-                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 font-mono text-xs font-semibold text-[#57585C] hover:text-[#141416] transition-colors focus-visible:ring-2 focus-visible:ring-[#141416] focus:outline-hidden"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 sm:py-3 font-mono text-xs font-semibold text-[#57585C] hover:text-[#141416] transition-colors text-center focus-visible:ring-2 focus-visible:ring-[#141416] focus:outline-hidden"
                 >
-                  <Compass className="h-3.5 w-3.5 text-[#059669]" />
+                  <Compass className="h-3.5 w-3.5 text-[#059669] shrink-0" />
                   <span>Methodology</span>
                 </Link>
               </div>
 
               {/* Primary Source Guarantee */}
-              <div className="pt-4 border-t border-[rgba(20,21,23,0.12)] flex items-center gap-3 text-[11px] font-mono text-[#828387]">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" />
+              <div className="pt-3 sm:pt-4 border-t border-[rgba(20,21,23,0.12)] flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-mono text-[#828387]">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#059669] shrink-0" />
                 <span>PRIMARY PROVENANCE: MOSPI NAS 2024 • RBI DBIE • UN SNA 2008 • SHA-256</span>
               </div>
             </div>
@@ -198,7 +198,7 @@ export default function HomePage() {
           </DotField>
         </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 space-y-12">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
           {/* Section Header */}
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-[rgba(20,21,23,0.14)]">
             <div className="space-y-2 max-w-2xl">
@@ -215,25 +215,27 @@ export default function HomePage() {
             </div>
 
             {/* Base Year Switcher */}
-            <RubberSegment
-              items={["2022-23 Active Benchmark", "2011-12 Historical Series"]}
-              defaultValue="2022-23 Active Benchmark"
-              value={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
-              onChange={(val) => setBaseYear(val.startsWith("2022") ? "2022-23" : "2011-12")}
-              trackColor="#ECEBE5"
-              thumbColor="#141416"
-              textColor="#57585C"
-              activeTextColor="#ECEBE5"
-              size="sm"
-              radius={9999}
-              inset={2}
-              equalSlots
-              stretch={80}
-              squash={3}
-              speed={1}
-              glide={75}
-              preset="base-years"
-            />
+            <div className="max-w-full overflow-x-auto [scrollbar-width:none]">
+              <RubberSegment
+                items={["2022-23 Active Benchmark", "2011-12 Historical Series"]}
+                defaultValue="2022-23 Active Benchmark"
+                value={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
+                onChange={(val) => setBaseYear(val.startsWith("2022") ? "2022-23" : "2011-12")}
+                trackColor="#ECEBE5"
+                thumbColor="#141416"
+                textColor="#57585C"
+                activeTextColor="#ECEBE5"
+                size="sm"
+                radius={9999}
+                inset={2}
+                equalSlots
+                stretch={80}
+                squash={3}
+                speed={1}
+                glide={75}
+                preset="base-years"
+              />
+            </div>
           </div>
 
           {isLoading && <LoadingGrid count={4} cols={2} />}
