@@ -1,36 +1,18 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import {
-  animate,
-  cancelFrame,
-  frame,
-  motionValue,
-  press,
-  transformValue,
-} from "motion";
-import { threeEffect } from "motion/three";
-import * as THREE from "three/webgpu";
-import {
-  attribute,
-  cos,
-  mix,
-  positionLocal,
-  sin,
-  time,
-  uniform,
-  vec3,
-} from "three/tsl";
+import Link from "next/link";
+import * as THREE from "three";
 import {
   Maximize2,
   Minimize2,
   RotateCcw,
-  Sparkles,
-  Layers,
   Globe2,
-  Lock,
-  Unlock,
-  CheckCircle2,
+  ShieldCheck,
+  ArrowRight,
+  X,
+  Play,
+  Pause,
 } from "lucide-react";
 
 export interface MacroScene {
@@ -77,6 +59,219 @@ export const MACRO_SCENES: MacroScene[] = [
   },
 ];
 
+export interface SovereignAnchor {
+  id: string;
+  name: string;
+  hub: string;
+  code: string;
+  lat: number;
+  lon: number;
+  category: "growth" | "external" | "prices" | "monetary" | "global";
+  primaryMetric: string;
+  metricLabel: string;
+  period: string;
+  provenance: string;
+  summary: string;
+  secondaryMetrics: { label: string; value: string }[];
+  link: string;
+  linkText: string;
+  color: string;
+}
+
+export const SOVEREIGN_ANCHORS: SovereignAnchor[] = [
+  {
+    id: "delhi-mospi",
+    name: "New Delhi // MoSPI Central Observatory",
+    hub: "Central Macro Benchmark",
+    code: "NSO-NAS-01",
+    lat: 28.6139,
+    lon: 77.209,
+    category: "growth",
+    primaryMetric: "+8.2% YoY",
+    metricLabel: "Real GDP Growth",
+    period: "FY 2023-24 (Provisional Estimates)",
+    provenance: "MoSPI NSO Statement 1.1 • SHA-256 Gazette Verified",
+    summary:
+      "Official Constant Price National Accounts utilizing benchmark base year 2022-23 weights, synthesizing over 1.4 million corporate filings via MCA-21 and single-deflation industrial adjustments.",
+    secondaryMetrics: [
+      { label: "Nominal Output", value: "₹295.36L Cr (+9.6%)" },
+      { label: "Implicit Deflator", value: "1.40%" },
+      { label: "Active Benchmark", value: "2022-23 Series" },
+    ],
+    link: "/gdp",
+    linkText: "Explore Macro Accounts Workspace",
+    color: "#059669",
+  },
+  {
+    id: "mumbai-rbi",
+    name: "Mumbai // Reserve Bank of India",
+    hub: "Monetary Authority & External Desk",
+    code: "RBI-DBIE-02",
+    lat: 18.922,
+    lon: 72.8347,
+    category: "monetary",
+    primaryMetric: "$652.89 Billion",
+    metricLabel: "Sovereign Forex Buffer",
+    period: "Weekly Statistical Supplement (May 2024)",
+    provenance: "RBI DBIE Table 4 & Bulletin BoP Accounts",
+    summary:
+      "Strategic external liquidity reserve providing ~11.2 months of merchandise import cover. Monetary policy repo rate held at 6.50% to balance growth with target headline CPI inflation.",
+    secondaryMetrics: [
+      { label: "Policy Repo Rate", value: "6.50%" },
+      { label: "Current Account", value: "-0.7% GDP" },
+      { label: "Import Coverage", value: "11.2 Months" },
+    ],
+    link: "/ratings",
+    linkText: "Inspect Sovereign Ratings & Reserves",
+    color: "#D94E34",
+  },
+  {
+    id: "bengaluru-services",
+    name: "Bengaluru // Technology Services Corridor",
+    hub: "Services GVA & IT Exports",
+    code: "DES-BLR-03",
+    lat: 12.9716,
+    lon: 77.5946,
+    category: "growth",
+    primaryMetric: "+7.9% YoY",
+    metricLabel: "Services Sector GVA",
+    period: "FY 2023-24",
+    provenance: "MoSPI NAS Statement 2.1 & RBI Services Telemetry",
+    summary:
+      "Digital enterprise services, financial intermediation, and high-tech software exports. Services constitute 54.2% of total Gross Value Added with accelerating cross-border billing.",
+    secondaryMetrics: [
+      { label: "Services Share", value: "54.2% GVA" },
+      { label: "Net Software Trade", value: "$32.4B / qtr" },
+      { label: "Formal Tech Base", value: ">5.4M Workforce" },
+    ],
+    link: "/gdp",
+    linkText: "Analyze Sectoral Decomposition",
+    color: "#E5A83B",
+  },
+  {
+    id: "gujarat-industry",
+    name: "Gujarat // Capital & Industrial Corridor",
+    hub: "Manufacturing & Capital Formation",
+    code: "GIFT-IND-04",
+    lat: 23.2156,
+    lon: 72.6369,
+    category: "prices",
+    primaryMetric: "+9.9% YoY",
+    metricLabel: "Manufacturing GVA",
+    period: "FY 2023-24",
+    provenance: "DPIIT IIP Industrial Index & ASI Annual Survey",
+    summary:
+      "Industrial manufacturing output expanded +9.9% driven by wholesale commodity input cost deflation (-1.2% WPI). Gross Fixed Capital Formation held firm at 33.5% of GDP.",
+    secondaryMetrics: [
+      { label: "GFCF Share", value: "33.5% GDP" },
+      { label: "WPI Input Deflation", value: "-1.20% YoY" },
+      { label: "Capacity Utilization", value: "75.8% (OBICUS)" },
+    ],
+    link: "/deflator",
+    linkText: "Launch Deflator Simulator",
+    color: "#141416",
+  },
+  {
+    id: "dc-unsna",
+    name: "Washington D.C. // UN SNA & World Bank ICP Desk",
+    hub: "Global PPP & Accounting Standards",
+    code: "WB-ICP-05",
+    lat: 38.9072,
+    lon: -77.0369,
+    category: "global",
+    primaryMetric: "$10.51 Trillion",
+    metricLabel: "India Output (PPP)",
+    period: "World Bank International Comparison Program 2024",
+    provenance: "World Bank WDI & UN SNA 2008 Chapter 15",
+    summary:
+      "Purchasing Power Parity conversion positioning India as the 3rd largest global economy. Global methodological benchmark for double-deflation national income reconciliation.",
+    secondaryMetrics: [
+      { label: "Global PPP Rank", value: "3rd Largest" },
+      { label: "Share of World GDP", value: "7.2% (PPP)" },
+      { label: "Method Standard", value: "UN SNA 2008 §15" },
+    ],
+    link: "/methodology",
+    linkText: "Review UN SNA 2008 Methodology",
+    color: "#059669",
+  },
+  {
+    id: "london-debt",
+    name: "London // European Sovereign Debt Desk",
+    hub: "External Debt & FX Settlements",
+    code: "MOF-EXT-06",
+    lat: 51.5074,
+    lon: -0.1278,
+    category: "external",
+    primaryMetric: "18.7% GDP",
+    metricLabel: "External Debt Ratio",
+    period: "FY 2023-24 Status Report",
+    provenance: "Ministry of Finance External Debt Division & ECB",
+    summary:
+      "Low sovereign external debt vulnerability with long maturity profiles. Current account deficit safely contained at 0.7% of GDP with robust inward remittances.",
+    secondaryMetrics: [
+      { label: "Long-Term Ratio", value: "81.6% Total Debt" },
+      { label: "CAD / GDP", value: "-0.7% YoY" },
+      { label: "Annual Remittances", value: "$120 Billion" },
+    ],
+    link: "/global",
+    linkText: "Examine Global Macro Telemetry",
+    color: "#E5A83B",
+  },
+  {
+    id: "tokyo-bilateral",
+    name: "Tokyo // Asia-Pacific Bilateral Corridor",
+    hub: "Strategic Infrastructure & Bilateral Swaps",
+    code: "JICA-AP-07",
+    lat: 35.6762,
+    lon: 139.6503,
+    category: "global",
+    primaryMetric: "₹1.42L Cr",
+    metricLabel: "Bilateral Capital Corridor",
+    period: "FY 2023-24 Cumulative JICA & FDI",
+    provenance: "DPIIT FDI Statistics & JICA Official Releases",
+    summary:
+      "Long-term concessional infrastructure financing for Western Dedicated Freight Corridor and High-Speed Rail, coupled with a $75 Billion bilateral currency swap agreement.",
+    secondaryMetrics: [
+      { label: "Bilateral Swap Facility", value: "$75 Billion" },
+      { label: "Cumulative FDI Share", value: "9.4% Total" },
+      { label: "Infrastructure Tenure", value: "40-Year Concessional" },
+    ],
+    link: "/global",
+    linkText: "Explore Asia-Pacific Corridors",
+    color: "#D94E34",
+  },
+];
+
+// Helper: Convert Lat/Lon degrees to 3D Cartesian coordinates on sphere
+function latLonToVector3(lat: number, lon: number, radius: number): THREE.Vector3 {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+  return new THREE.Vector3(
+    -radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+// Helper: Great-circle 3D arc points between two vectors
+function createGreatCircleArc(
+  v1: THREE.Vector3,
+  v2: THREE.Vector3,
+  numPoints: number,
+  altitude: number
+): THREE.Vector3[] {
+  const points: THREE.Vector3[] = [];
+  for (let i = 0; i <= numPoints; i++) {
+    const t = i / numPoints;
+    const v = new THREE.Vector3().lerpVectors(v1, v2, t);
+    // Arc altitude bell curve
+    const arcHeight = Math.sin(t * Math.PI) * altitude;
+    v.normalize().multiplyScalar(v1.length() + arcHeight);
+    points.push(v);
+  }
+  return points;
+}
+
 interface SovereignParticleGlobeProps {
   className?: string;
   stageHeight?: string;
@@ -86,728 +281,721 @@ interface SovereignParticleGlobeProps {
 export function SovereignParticleGlobe({
   className = "",
   stageHeight = "h-[500px] sm:h-[580px] lg:h-[640px]",
-  showEditorialCard = true,
+  showEditorialCard: _showEditorialCard = true,
 }: SovereignParticleGlobeProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeSceneIdx, setActiveSceneIdx] = useState(0);
-  const [isReady, setIsReady] = useState(false);
-  const [isPressing, setIsPressing] = useState(false);
-  const [isLockedGlobe, setIsLockedGlobe] = useState(false);
-  const [isStageExpanded, setIsStageExpanded] = useState(false);
-  const [currentGlobeAmount, setCurrentGlobeAmount] = useState(0);
-  const [particleCount, setParticleCount] = useState(25000);
 
-  // References to keep track of Three runtime objects
-  const cleanupRef = useRef<(() => void) | null>(null);
-  const globeValueRef = useRef<any>(null);
-  const sceneSwitchRef = useRef<((url: string) => Promise<void>) | null>(null);
+  const [activeAnchor, setActiveAnchor] = useState<SovereignAnchor | null>(SOVEREIGN_ANCHORS[0]);
+  const [isRotating, setIsRotating] = useState<boolean>(true);
+  const [isStageExpanded, setIsStageExpanded] = useState<boolean>(false);
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [webglSupported, setWebglSupported] = useState<boolean>(true);
+  const [projectedMarkers, setProjectedMarkers] = useState<
+    { id: string; x: number; y: number; visible: boolean; anchor: SovereignAnchor }[]
+  >([]);
 
-  const activeScene = MACRO_SCENES[activeSceneIdx];
+  // Drag interaction refs
+  const isDraggingRef = useRef(false);
+  const previousPointerPosRef = useRef({ x: 0, y: 0 });
+  const rotationVelocityRef = useRef({ x: 0, y: 0.002 });
+  const globeGroupRef = useRef<THREE.Group | null>(null);
+  const targetRotationRef = useRef<{ x: number; y: number } | null>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const arcPulseTimesRef = useRef<number[]>([]);
 
-  // Helper smooth fade mapping for the high-resolution overlay
-  const highResolutionMix = (globeAmount: number) => {
-    const amount = Math.max(globeAmount, 0);
-    const start = 0.005;
-    const end = 0.035;
-    const t = Math.min(1, Math.max(0, (amount - start) / (end - start)));
-    return 1 - t * t * (3 - 2 * t);
-  };
+  // Check WebGL availability
+  const checkWebGL = useCallback(() => {
+    try {
+      const testCanvas = document.createElement("canvas");
+      return !!(
+        window.WebGLRenderingContext &&
+        (testCanvas.getContext("webgl2") || testCanvas.getContext("webgl"))
+      );
+    } catch {
+      return false;
+    }
+  }, []);
 
-  const initRuntime = useCallback(async () => {
+  // Center view on a specific anchor
+  const centerOnAnchor = useCallback((anchor: SovereignAnchor) => {
+    const latRad = (anchor.lat * Math.PI) / 180;
+    const lonRad = (anchor.lon * Math.PI) / 180;
+
+    // Target rotation angles to face the camera (+Z axis)
+    const targetY = -lonRad - Math.PI / 2;
+    const targetX = latRad * 0.7;
+
+    targetRotationRef.current = { x: targetX, y: targetY };
+    setActiveAnchor(anchor);
+  }, []);
+
+  // Main Three.js Runtime Initialization
+  useEffect(() => {
+    if (!checkWebGL()) {
+      setWebglSupported(false);
+      setIsReady(true);
+      return;
+    }
+
     const canvas = canvasRef.current;
     const stage = stageRef.current;
     if (!canvas || !stage) return;
 
-    // Teardown any previous run
-    if (cleanupRef.current) {
-      cleanupRef.current();
-      cleanupRef.current = null;
+    const width = stage.clientWidth || 600;
+    const height = stage.clientHeight || 560;
+
+    // 1. Renderer Setup with universal WebGL
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
+    rendererRef.current = renderer;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height, false);
+
+    // 2. Scene and Camera
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 0, 3.4);
+    cameraRef.current = camera;
+
+    // 3. Globe Container Group
+    const globeGroup = new THREE.Group();
+    globeGroupRef.current = globeGroup;
+    scene.add(globeGroup);
+
+    // Initial orientation: Face India (Lat 22° N, Lon 78° E)
+    globeGroup.rotation.y = -((78 * Math.PI) / 180) - Math.PI / 2;
+    globeGroup.rotation.x = (22 * Math.PI) / 180 * 0.6;
+
+    const GLOBE_RADIUS = 1.05;
+
+    // 4. Fibonacci Sphere Particles
+    const isMobile = width < 640;
+    const particleCount = isMobile ? 1800 : 2800;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+
+    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden angle
+
+    const cDefault = new THREE.Color(0x141416); // Antimetal primary ink
+    const cEmerald = new THREE.Color(0x059669); // Sovereign emerald
+    const cAmber = new THREE.Color(0xd97706);   // Data amber
+    const cMint = new THREE.Color(0x10b981);    // High-luminous mint
+
+    for (let i = 0; i < particleCount; i++) {
+      const y = 1 - (i / (particleCount - 1)) * 2;
+      const radiusAtY = Math.sqrt(1 - y * y);
+      const theta = phi * i;
+
+      const x = Math.cos(theta) * radiusAtY;
+      const z = Math.sin(theta) * radiusAtY;
+
+      const r = GLOBE_RADIUS + (Math.random() - 0.5) * 0.015;
+      positions[i * 3] = x * r;
+      positions[i * 3 + 1] = y * r;
+      positions[i * 3 + 2] = z * r;
+
+      // Geographic coordinate estimation to highlight India and key economic zones
+      const latDeg = Math.asin(y) * (180 / Math.PI);
+      const lonDeg = (Math.atan2(z, -x) * (180 / Math.PI)) - 180;
+
+      // Indian Subcontinent bounding box: Lat 8°N to 36°N, Lon 68°E to 98°E
+      const isIndiaZone = latDeg >= 8 && latDeg <= 36 && lonDeg >= 68 && lonDeg <= 98;
+      // Key Global Economic Corridors
+      const isGlobalHub =
+        (latDeg >= 35 && latDeg <= 42 && lonDeg >= -80 && lonDeg <= -70) || // US East
+        (latDeg >= 48 && latDeg <= 56 && lonDeg >= -5 && lonDeg <= 15) ||   // West Europe
+        (latDeg >= 30 && latDeg <= 40 && lonDeg >= 130 && lonDeg <= 145);  // Japan
+
+      if (isIndiaZone) {
+        colors[i * 3] = cEmerald.r;
+        colors[i * 3 + 1] = cEmerald.g;
+        colors[i * 3 + 2] = cEmerald.b;
+        sizes[i] = 4.2;
+      } else if (isGlobalHub) {
+        colors[i * 3] = cAmber.r;
+        colors[i * 3 + 1] = cAmber.g;
+        colors[i * 3 + 2] = cAmber.b;
+        sizes[i] = 3.6;
+      } else {
+        const mixFactor = Math.random();
+        const baseColor = mixFactor > 0.85 ? cMint : cDefault;
+        colors[i * 3] = baseColor.r;
+        colors[i * 3 + 1] = baseColor.g;
+        colors[i * 3 + 2] = baseColor.b;
+        sizes[i] = mixFactor > 0.85 ? 3.0 : 2.2;
+      }
     }
 
-    try {
-      const globe = uniform(1);
-      const globeValue = motionValue(1);
-      globeValueRef.current = globeValue;
+    const particlesGeometry = new THREE.BufferGeometry();
+    particlesGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    particlesGeometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
 
-      // Subscribe local state for telemetry indicator
-      const unsubGlobeValue = globeValue.on("change", (latest: number) => {
-        setCurrentGlobeAmount(Number(latest.toFixed(3)));
+    // Circle particle texture for smooth antialiased dots
+    const makeDotTexture = () => {
+      const pCanvas = document.createElement("canvas");
+      pCanvas.width = 64;
+      pCanvas.height = 64;
+      const ctx = pCanvas.getContext("2d");
+      if (ctx) {
+        ctx.beginPath();
+        ctx.arc(32, 32, 28, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+      }
+      const tex = new THREE.CanvasTexture(pCanvas);
+      tex.needsUpdate = true;
+      return tex;
+    };
+
+    const dotTexture = makeDotTexture();
+
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.038,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.82,
+      map: dotTexture,
+      alphaTest: 0.05,
+      sizeAttenuation: true,
+    });
+
+    const particlePoints = new THREE.Points(particlesGeometry, particlesMaterial);
+    globeGroup.add(particlePoints);
+
+    // 5. Orbital & Coordinate Rings (Fine technical gridlines)
+    const createRing = (radius: number, yPos: number, colorHex: number, opacity: number) => {
+      const ringPts: THREE.Vector3[] = [];
+      const segments = 96;
+      for (let s = 0; s <= segments; s++) {
+        const angle = (s / segments) * Math.PI * 2;
+        ringPts.push(
+          new THREE.Vector3(Math.cos(angle) * radius, yPos, Math.sin(angle) * radius)
+        );
+      }
+      const geom = new THREE.BufferGeometry().setFromPoints(ringPts);
+      const mat = new THREE.LineBasicMaterial({
+        color: colorHex,
+        transparent: true,
+        opacity,
+        linewidth: 1,
       });
+      return new THREE.Line(geom, mat);
+    };
 
-      const COLUMNS = 200;
-      let globeYaw = Math.random() * Math.PI * 2;
+    // Equator & Tropics
+    globeGroup.add(createRing(GLOBE_RADIUS * 1.002, 0, 0x141416, 0.18));
+    globeGroup.add(createRing(GLOBE_RADIUS * 0.94, GLOBE_RADIUS * 0.38, 0x059669, 0.15)); // Tropic of Cancer (India)
+    globeGroup.add(createRing(GLOBE_RADIUS * 0.94, -GLOBE_RADIUS * 0.38, 0x141416, 0.12));
 
-      // WebGPURenderer with stable WebGL backend negotiation for universal device compatibility
-      const renderer = new THREE.WebGPURenderer({
-        canvas,
-        antialias: true,
-        forceWebGL: true,
+    // Outer Geodetic Halo Ring
+    const outerHaloPts: THREE.Vector3[] = [];
+    for (let s = 0; s <= 128; s++) {
+      const angle = (s / 128) * Math.PI * 2;
+      outerHaloPts.push(
+        new THREE.Vector3(Math.cos(angle) * (GLOBE_RADIUS * 1.18), 0, Math.sin(angle) * (GLOBE_RADIUS * 1.18))
+      );
+    }
+    const outerHaloGeom = new THREE.BufferGeometry().setFromPoints(outerHaloPts);
+    const outerHaloMat = new THREE.LineDashedMaterial({
+      color: 0x828387,
+      transparent: true,
+      opacity: 0.22,
+      dashSize: 0.05,
+      gapSize: 0.04,
+    });
+    const outerHalo = new THREE.Line(outerHaloGeom, outerHaloMat);
+    outerHalo.computeLineDistances();
+    outerHalo.rotation.x = Math.PI / 6;
+    globeGroup.add(outerHalo);
+
+    // 6. 3D Inter-Hub Geodesic Arcs & Light Pulses
+    const arcData: {
+      from: SovereignAnchor;
+      to: SovereignAnchor;
+      points: THREE.Vector3[];
+      pulseObj: THREE.Mesh;
+    }[] = [];
+
+    const delhiAnchor = SOVEREIGN_ANCHORS[0]; // New Delhi central hub
+    const targetAnchors = [
+      SOVEREIGN_ANCHORS[1], // Mumbai
+      SOVEREIGN_ANCHORS[2], // Bengaluru
+      SOVEREIGN_ANCHORS[3], // Gujarat
+      SOVEREIGN_ANCHORS[4], // Washington D.C.
+      SOVEREIGN_ANCHORS[5], // London
+      SOVEREIGN_ANCHORS[6], // Tokyo
+    ];
+
+    const pulseGeo = new THREE.SphereGeometry(0.016, 8, 8);
+
+    targetAnchors.forEach((target) => {
+      const vFrom = latLonToVector3(delhiAnchor.lat, delhiAnchor.lon, GLOBE_RADIUS);
+      const vTo = latLonToVector3(target.lat, target.lon, GLOBE_RADIUS);
+      const arcPoints = createGreatCircleArc(vFrom, vTo, 48, 0.18);
+
+      const arcGeom = new THREE.BufferGeometry().setFromPoints(arcPoints);
+      const arcMat = new THREE.LineBasicMaterial({
+        color: target.id.includes("dc") || target.id.includes("london") ? 0xd97706 : 0x059669,
+        transparent: true,
+        opacity: 0.38,
+        linewidth: 1,
       });
+      const arcLine = new THREE.Line(arcGeom, arcMat);
+      globeGroup.add(arcLine);
 
-      await renderer.init();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      // Pulse traveling mesh along arc
+      const pulseMat = new THREE.MeshBasicMaterial({
+        color: target.color === "#059669" ? 0x10b981 : 0xd94e34,
+      });
+      const pulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
+      globeGroup.add(pulseMesh);
 
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe6e5df); // Warm Antimetal paper tone
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
-      camera.position.z = 4;
+      arcData.push({
+        from: delhiAnchor,
+        to: target,
+        points: arcPoints,
+        pulseObj: pulseMesh,
+      });
+    });
 
-      let particlesObj: any = null;
-      let photoMeshObj: any = null;
-      let pressCleanup: (() => void) | null = null;
-      let isUnmounted = false;
+    arcPulseTimesRef.current = arcData.map((_, i) => (i * 0.18) % 1);
 
-      const loadPhoto = (url: string): Promise<any> => {
-        return new Promise((resolve, reject) => {
-          const image = new Image();
-          image.crossOrigin = "anonymous";
-          image.onload = () => {
-            const source = document.createElement("canvas");
-            source.width = image.naturalWidth;
-            source.height = image.naturalHeight;
+    // 7. Check for user motion preference
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      setIsRotating(false);
+    }
 
-            const context = source.getContext("2d", { willReadFrequently: true });
-            if (!context) {
-              reject(new Error("Failed to get 2d context"));
-              return;
-            }
-            context.drawImage(image, 0, 0);
+    // 8. Animation & Render Loop
+    let tick = 0;
 
-            const map = new THREE.Texture(image);
-            map.colorSpace = THREE.SRGBColorSpace;
-            map.needsUpdate = true;
+    const render = () => {
+      tick += 0.016;
 
-            resolve({
-              width: source.width,
-              height: source.height,
-              pixels: context.getImageData(0, 0, source.width, source.height).data,
-              map,
-            });
-          };
-          image.onerror = () => reject(new Error(`Failed to load ${url}`));
-          image.src = url;
-        });
-      };
+      // Handle smooth targeting rotation if an anchor was selected
+      if (targetRotationRef.current) {
+        const { x: tX, y: tY } = targetRotationRef.current;
+        globeGroup.rotation.x += (tX - globeGroup.rotation.x) * 0.08;
+        globeGroup.rotation.y += (tY - globeGroup.rotation.y) * 0.08;
 
-      const createParticles = (photo: any) => {
-        const imageAspect = photo.width / photo.height;
-        const rows = Math.round(COLUMNS / imageAspect);
-        const count = COLUMNS * rows;
-        setParticleCount(count);
-
-        const imagePositions = new Float32Array(count * 3);
-        const globePositions = new Float32Array(count * 3);
-        const colours = new Float32Array(count * 3);
-        const phases = new Float32Array(count);
-        const speeds = new Float32Array(count);
-        const colour = new THREE.Color();
-
-        for (let index = 0; index < count; index++) {
-          const column = index % COLUMNS;
-          const row = Math.floor(index / COLUMNS);
-          const sampleX = Math.min(
-            photo.width - 1,
-            Math.floor(((column + 0.5) / COLUMNS) * photo.width)
-          );
-          const sampleY = Math.min(
-            photo.height - 1,
-            Math.floor(((row + 0.5) / rows) * photo.height)
-          );
-          const pixel = (sampleY * photo.width + sampleX) * 4;
-          const offset = index * 3;
-
-          colour.setRGB(
-            photo.pixels[pixel] / 255,
-            photo.pixels[pixel + 1] / 255,
-            photo.pixels[pixel + 2] / 255,
-            THREE.SRGBColorSpace
-          );
-          colours[offset] = colour.r;
-          colours[offset + 1] = colour.g;
-          colours[offset + 2] = colour.b;
-          phases[index] = Math.random() * Math.PI * 2;
-          speeds[index] = 0.7 + Math.random() * 0.35;
+        if (
+          Math.abs(tX - globeGroup.rotation.x) < 0.005 &&
+          Math.abs(tY - globeGroup.rotation.y) < 0.005
+        ) {
+          targetRotationRef.current = null;
         }
+      } else if (isRotating && !isDraggingRef.current && !prefersReducedMotion) {
+        // Natural gentle orbit
+        globeGroup.rotation.y += rotationVelocityRef.current.y;
+      }
 
-        const geometry = (new THREE.InstancedBufferGeometry() as any).copy(
-          new THREE.PlaneGeometry(1, 1) as any
+      // Handle drag inertia
+      if (!isDraggingRef.current) {
+        rotationVelocityRef.current.x *= 0.94;
+        rotationVelocityRef.current.y =
+          rotationVelocityRef.current.y * 0.94 + (isRotating ? 0.002 * 0.06 : 0);
+        globeGroup.rotation.y += rotationVelocityRef.current.y;
+        globeGroup.rotation.x = Math.max(
+          -Math.PI * 0.35,
+          Math.min(Math.PI * 0.35, globeGroup.rotation.x + rotationVelocityRef.current.x)
         );
-        geometry.instanceCount = count;
-        geometry.setAttribute(
-          "imagePosition",
-          new THREE.InstancedBufferAttribute(imagePositions, 3)
-        );
-        geometry.setAttribute(
-          "globePosition",
-          new THREE.InstancedBufferAttribute(globePositions, 3)
-        );
-        geometry.setAttribute(
-          "colour",
-          new THREE.InstancedBufferAttribute(colours, 3)
-        );
-        geometry.setAttribute("phase", new THREE.InstancedBufferAttribute(phases, 1));
-        geometry.setAttribute("speed", new THREE.InstancedBufferAttribute(speeds, 1));
+      }
 
-        const imagePosition = attribute("imagePosition");
-        const spherePosition = attribute("globePosition");
-        const phase = attribute("phase");
-        const speed = attribute("speed");
-        const particleSize = uniform(new THREE.Vector2(0.01, 0.01));
-        const turbulence = vec3(
-          sin(time.mul(speed.add(0.6)).add(phase)).mul(0.045),
-          cos(time.mul(speed.add(0.37)).add(phase.mul(1.71))).mul(0.035),
-          sin(time.mul(speed.add(0.22)).add(phase.mul(2.13))).mul(0.045)
-        );
-        const material = new THREE.MeshBasicNodeMaterial({
-          toneMapped: false,
-        });
+      // Animate arc pulses
+      arcData.forEach((arc, i) => {
+        const t = (arcPulseTimesRef.current[i] + 0.008) % 1;
+        arcPulseTimesRef.current[i] = t;
+        const ptIndex = Math.floor(t * (arc.points.length - 1));
+        const currentPt = arc.points[ptIndex];
+        if (currentPt) {
+          arc.pulseObj.position.copy(currentPt);
+        }
+      });
 
-        material.colorNode = attribute("colour");
-        const particleCenter = mix(
-          imagePosition,
-          spherePosition.add(turbulence),
-          globe
-        );
-        material.positionNode = particleCenter.add(
-          vec3(positionLocal.xy.mul(particleSize), 0)
-        );
+      // Subtle atmospheric particle breathing
+      particlesMaterial.size = 0.038 + Math.sin(tick * 1.5) * 0.003;
+
+      renderer.render(scene, camera);
+
+      // 9. Project 3D Anchors into 2D Screen Space for Interactive Overlay Pins
+      globeGroup.updateMatrixWorld();
+      const currentWidth = stage.clientWidth || width;
+      const currentHeight = stage.clientHeight || height;
+
+      const projected = SOVEREIGN_ANCHORS.map((anchor) => {
+        const v3 = latLonToVector3(anchor.lat, anchor.lon, GLOBE_RADIUS);
+        v3.applyMatrix4(globeGroup.matrixWorld);
+
+        // Distance to camera determines whether anchor is on front or back hemisphere
+        const isFacingCamera = v3.z > 0.05;
+
+        // Project into normalized device coordinates [-1, 1]
+        v3.project(camera);
+
+        const x = (v3.x * 0.5 + 0.5) * currentWidth;
+        const y = (-v3.y * 0.5 + 0.5) * currentHeight;
 
         return {
-          imageAspect,
-          columns: COLUMNS,
-          rows,
-          particleSize,
-          object: new THREE.Mesh(geometry, material as any),
+          id: anchor.id,
+          x,
+          y,
+          visible: isFacingCamera && x >= 0 && x <= currentWidth && y >= 0 && y <= currentHeight,
+          anchor,
         };
-      };
+      });
 
-      const createPhotoOverlay = (photo: any) => {
-        const photoMaterial = new THREE.MeshBasicMaterial({
-          map: photo.map,
-          toneMapped: false,
-          transparent: true,
-          depthWrite: false,
-          depthTest: false,
-          opacity: 0,
-        });
+      setProjectedMarkers(projected);
 
-        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), photoMaterial);
-        mesh.renderOrder = 1;
-        return mesh;
-      };
-
-      const layoutParticles = (
-        particles: any,
-        photoMesh: any,
-        aspect: number
-      ) => {
-        const { columns, imageAspect, object, particleSize, rows } = particles;
-        const imageHalfHeight = Math.min(0.72, (0.86 * aspect) / imageAspect);
-        const imageHalfWidth = imageHalfHeight * imageAspect;
-        const globeRadius = Math.min(0.58, aspect * 0.82);
-        const position = object.geometry.getAttribute("imagePosition");
-        const sphere = object.geometry.getAttribute("globePosition");
-        const yawCos = Math.cos(globeYaw);
-        const yawSin = Math.sin(globeYaw);
-        const tilt = -0.28;
-
-        for (let index = 0; index < position.count; index++) {
-          const column = index % columns;
-          const row = Math.floor(index / columns);
-          const x = (column + 0.5) / columns;
-          const y = (row + 0.5) / rows;
-          const sphereY = 1 - (index / Math.max(position.count - 1, 1)) * 2;
-          const ringRadius = Math.sqrt(Math.max(0, 1 - sphereY * sphereY));
-          const angle = index * 2.39996323;
-          const sphereX = Math.cos(angle) * ringRadius;
-          const sphereZ = Math.sin(angle) * ringRadius;
-          const spunX = sphereX * yawCos + sphereZ * yawSin;
-          const spunZ = -sphereX * yawSin + sphereZ * yawCos;
-
-          position.setXYZ(
-            index,
-            (x - 0.5) * imageHalfWidth * 2,
-            (0.5 - y) * imageHalfHeight * 2,
-            0
-          );
-          sphere.setXYZ(
-            index,
-            spunX * globeRadius,
-            (sphereY * Math.cos(tilt) - spunZ * Math.sin(tilt)) * globeRadius,
-            (sphereY * Math.sin(tilt) + spunZ * Math.cos(tilt)) * globeRadius
-          );
-        }
-
-        position.needsUpdate = true;
-        sphere.needsUpdate = true;
-        particleSize.value.set(
-          ((imageHalfWidth * 2) / columns) * 1.01,
-          ((imageHalfHeight * 2) / rows) * 1.01
-        );
-        photoMesh.scale.set(imageHalfWidth * 2, imageHalfHeight * 2, 1);
-      };
-
-      const runParticleMotion = (photoMesh: any) => {
-        threeEffect(globe, { value: globeValue });
-        threeEffect(photoMesh.material, {
-          opacity: transformValue(() => highResolutionMix(globeValue.get())),
-        });
-
-        // Initial settling animation: start as globe, spring into photograph
-        animate(globeValue, 0, {
-          type: "spring",
-          stiffness: 55,
-          damping: 16,
-          mass: 1,
-          delay: 0.8,
-        });
-
-        // Press interaction on canvas
-        pressCleanup = press(canvas, () => {
-          setIsPressing(true);
-          animate(globeValue, 1, {
-            type: "spring",
-            stiffness: 120,
-            damping: 18,
-            mass: 0.9,
-          });
-
-          return () => {
-            setIsPressing(false);
-            if (!isLockedGlobe) {
-              animate(globeValue, 0, {
-                type: "spring",
-                stiffness: 70,
-                damping: 16,
-                mass: 1,
-              });
-            }
-          };
-        });
-      };
-
-      const loadAndBuildScene = async (url: string) => {
-        if (particlesObj) {
-          scene.remove(particlesObj.object);
-          particlesObj.object.geometry.dispose();
-          particlesObj.object.material.dispose();
-        }
-        if (photoMeshObj) {
-          scene.remove(photoMeshObj);
-          photoMeshObj.geometry.dispose();
-          photoMeshObj.material.dispose();
-        }
-
-        const photo = await loadPhoto(url);
-        if (isUnmounted) return;
-
-        particlesObj = createParticles(photo);
-        photoMeshObj = createPhotoOverlay(photo);
-
-        scene.add(particlesObj.object);
-        scene.add(photoMeshObj);
-
-        const width = Math.max(stage.clientWidth, 1);
-        const height = Math.max(stage.clientHeight, 1);
-        const aspect = width / height;
-
-        renderer.setSize(width, height, false);
-        camera.left = -aspect;
-        camera.right = aspect;
-        camera.top = 1;
-        camera.bottom = -1;
-        camera.updateProjectionMatrix();
-        layoutParticles(particlesObj, photoMeshObj, aspect);
-
-        runParticleMotion(photoMeshObj);
-      };
-
-      sceneSwitchRef.current = loadAndBuildScene;
-
-      await loadAndBuildScene(MACRO_SCENES[activeSceneIdx].url);
-      if (isUnmounted) return;
-
-      const resize = () => {
-        if (!stage || !canvas) return;
-        const width = Math.max(stage.clientWidth, 1);
-        const height = Math.max(stage.clientHeight, 1);
-        const aspect = width / height;
-
-        renderer.setSize(width, height, false);
-        camera.left = -aspect;
-        camera.right = aspect;
-        camera.top = 1;
-        camera.bottom = -1;
-        camera.updateProjectionMatrix();
-        if (particlesObj && photoMeshObj) {
-          layoutParticles(particlesObj, photoMeshObj, aspect);
-        }
-      };
-
-      const resizeObserver = new ResizeObserver(resize);
-      resizeObserver.observe(stage);
-
-      canvas.dataset.ready = "true";
-      setIsReady(true);
-
-      // Render loop via motion frame
-      let isRunning = true;
-      const renderFrame = () => {
-        if (isRunning && renderer && scene && camera) {
-          // Slow ambient yaw spin when formed as globe
-          if (globeValue.get() > 0.05) {
-            globeYaw += 0.0025 * globeValue.get();
-            if (particlesObj && photoMeshObj) {
-              const width = Math.max(stage.clientWidth, 1);
-              const height = Math.max(stage.clientHeight, 1);
-              layoutParticles(particlesObj, photoMeshObj, width / height);
-            }
-          }
-          renderer.render(scene, camera);
-        }
-      };
-
-      frame.render(renderFrame, true);
-
-      cleanupRef.current = () => {
-        isUnmounted = true;
-        isRunning = false;
-        if (pressCleanup) pressCleanup();
-        unsubGlobeValue();
-        resizeObserver.disconnect();
-        cancelFrame(renderFrame);
-        if (renderer && typeof renderer.dispose === "function") {
-          renderer.dispose();
-        }
-      };
-    } catch (err) {
-      console.error("WebGPU initialization failed:", err);
-      setIsReady(false);
-    }
-  }, [activeSceneIdx, isLockedGlobe]);
-
-  useEffect(() => {
-    initRuntime();
-    return () => {
-      if (cleanupRef.current) {
-        cleanupRef.current();
-        cleanupRef.current = null;
-      }
+      animFrameRef.current = requestAnimationFrame(render);
     };
-  }, [initRuntime]);
 
-  const handleSceneSelect = async (idx: number) => {
-    setActiveSceneIdx(idx);
-    if (sceneSwitchRef.current) {
-      setIsReady(false);
-      try {
-        await sceneSwitchRef.current(MACRO_SCENES[idx].url);
-        setIsReady(true);
-      } catch {
-        setIsReady(false);
+    render();
+    setIsReady(true);
+
+    // 10. ResizeObserver to handle container dimension changes reliably
+    const handleResize = () => {
+      if (!stage || !renderer || !camera) return;
+      const newWidth = stage.clientWidth;
+      const newHeight = stage.clientHeight;
+      if (newWidth === 0 || newHeight === 0) return;
+
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(newWidth, newHeight, false);
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(stage);
+    resizeObserverRef.current = resizeObserver;
+
+    // 11. Cleanup
+    return () => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
       }
+      resizeObserver.disconnect();
+      dotTexture.dispose();
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
+      outerHaloGeom.dispose();
+      outerHaloMat.dispose();
+      pulseGeo.dispose();
+      renderer.dispose();
+    };
+  }, [checkWebGL, centerOnAnchor, isRotating]);
+
+  // Pointer drag event handlers for free 3D rotation
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    targetRotationRef.current = null;
+    previousPointerPosRef.current = { x: e.clientX, y: e.clientY };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current || !globeGroupRef.current) return;
+    const deltaX = e.clientX - previousPointerPosRef.current.x;
+    const deltaY = e.clientY - previousPointerPosRef.current.y;
+
+    previousPointerPosRef.current = { x: e.clientX, y: e.clientY };
+
+    const sensitivity = 0.005;
+    globeGroupRef.current.rotation.y += deltaX * sensitivity;
+    globeGroupRef.current.rotation.x = Math.max(
+      -Math.PI * 0.38,
+      Math.min(Math.PI * 0.38, globeGroupRef.current.rotation.x + deltaY * sensitivity)
+    );
+
+    rotationVelocityRef.current = {
+      x: deltaY * sensitivity * 0.3,
+      y: deltaX * sensitivity * 0.3,
+    };
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    isDraggingRef.current = false;
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignored if capture already lost
     }
   };
 
-  const handleToggleGlobeLock = () => {
-    if (!globeValueRef.current) return;
-    const nextLocked = !isLockedGlobe;
-    setIsLockedGlobe(nextLocked);
-    if (nextLocked) {
-      animate(globeValueRef.current, 1, {
-        type: "spring",
-        stiffness: 100,
-        damping: 18,
-      });
-    } else {
-      animate(globeValueRef.current, 0, {
-        type: "spring",
-        stiffness: 70,
-        damping: 16,
-      });
-    }
-  };
-
-  const handleTriggerSpring = (toValue: number) => {
-    if (globeValueRef.current) {
-      animate(globeValueRef.current, toValue, {
-        type: "spring",
-        stiffness: toValue === 1 ? 120 : 70,
-        damping: 16,
-        mass: 1,
-      });
-    }
+  const handleResetOrientation = () => {
+    if (!globeGroupRef.current) return;
+    targetRotationRef.current = {
+      x: (22 * Math.PI) / 180 * 0.6,
+      y: -((78 * Math.PI) / 180) - Math.PI / 2,
+    };
+    setActiveAnchor(SOVEREIGN_ANCHORS[0]);
   };
 
   return (
     <div
-      className={`relative w-full rounded-xl border border-[rgba(20,21,23,0.14)] bg-[#E6E5DF] shadow-md overflow-hidden ${
-        isStageExpanded
-          ? "fixed inset-0 z-50 rounded-none border-none h-screen w-screen bg-[#141416]"
-          : className
-      }`}
+      className={`relative w-full rounded-2xl border border-[rgba(20,21,23,0.14)] bg-[#ECEBE5] shadow-xs transition-all duration-300 ${
+        isStageExpanded ? "fixed inset-4 z-50 rounded-3xl shadow-2xl overflow-hidden" : ""
+      } ${className}`}
     >
-      {/* 1. TOP EDITORIAL MASTHEAD & PROVENANCE BAR */}
-      <div
-        className={`flex flex-wrap items-center justify-between gap-4 border-b px-5 py-3.5 backdrop-blur-md transition-colors ${
-          isStageExpanded
-            ? "border-white/10 bg-[#141416]/90 text-white"
-            : "border-[rgba(20,21,23,0.12)] bg-[#ECEBE5]/95 text-[#141416]"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${
-                currentGlobeAmount > 0.5
-                  ? "bg-[#D94E34] animate-pulse"
-                  : "bg-[#059669]"
-              }`}
-            />
-            <span
-              className={`font-mono text-[11px] font-bold tracking-widest uppercase ${
-                isStageExpanded ? "text-[#E5A83B]" : "text-[#141416]"
-              }`}
-            >
-              {activeScene.code}
-            </span>
-          </div>
-
-          <span
-            className={`hidden sm:inline-block h-3.5 w-px ${
-              isStageExpanded ? "bg-white/20" : "bg-black/15"
-            }`}
-          />
-
-          <span
-            className={`font-mono text-[10px] hidden md:inline-block ${
-              isStageExpanded ? "text-white/60" : "text-[#57585C]"
-            }`}
-          >
-            {particleCount.toLocaleString()} PARTICLES • WEBGPU TSL MORPH
+      {/* 1. TOP TECHNICAL CONTROL BAR */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(20,21,23,0.12)] bg-[#E6E5DF]/70 px-4 py-2.5 backdrop-blur-md">
+        <div className="flex items-center gap-2.5 font-mono text-[11px] text-[#141416]">
+          <span className="flex h-2 w-2 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#059669] opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#059669]" />
+          </span>
+          <span className="font-bold uppercase tracking-wider">
+            3D SOVEREIGN PARTICLE GLOBE
+          </span>
+          <span className="text-[#828387] hidden sm:inline">•</span>
+          <span className="text-[#57585C] hidden sm:inline">
+            FIBONACCI LATTICE // 2,800 POINTS
           </span>
         </div>
 
-        {/* Scene Selection Pills */}
-        <div className="flex items-center gap-1 rounded-full border border-[rgba(20,21,23,0.12)] bg-[#DFDED8]/70 p-1">
-          {MACRO_SCENES.map((scene, idx) => (
-            <button
-              key={scene.id}
-              onClick={() => handleSceneSelect(idx)}
-              className={`btn-realistic rounded-full px-3 py-1 text-[11px] font-mono transition-all ${
-                activeSceneIdx === idx
-                  ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
-                  : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
-              }`}
-              title={scene.title}
-            >
-              0{idx + 1}
-            </button>
-          ))}
-        </div>
-
-        {/* Header Action Tools */}
-        <div className="flex items-center gap-2">
-          {/* Lock Globe Mode Toggle */}
+        {/* Action Controls */}
+        <div className="flex items-center gap-1.5 font-mono text-[10px]">
+          {/* Rotation Toggle */}
           <button
-            onClick={handleToggleGlobeLock}
-            className={`btn-realistic flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-mono transition-all ${
-              isLockedGlobe
-                ? "border-[#D94E34] bg-[#D94E34] text-white"
-                : isStageExpanded
-                ? "border-white/20 bg-white/5 text-white/80 hover:bg-white/10"
-                : "border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] text-[#141416] hover:bg-black/5"
-            }`}
-            title="Lock 3D Particle Globe Rotation"
+            onClick={() => setIsRotating((prev) => !prev)}
+            className="inline-flex items-center gap-1 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-2.5 py-1 text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer"
+            title={isRotating ? "Pause Auto-Rotation" : "Resume Auto-Rotation"}
+            aria-label={isRotating ? "Pause Auto-Rotation" : "Resume Auto-Rotation"}
           >
-            {isLockedGlobe ? (
-              <Lock className="h-3 w-3" />
-            ) : (
-              <Unlock className="h-3 w-3" />
-            )}
-            <span className="hidden sm:inline">
-              {isLockedGlobe ? "Locked 3D" : "Hold Mode"}
-            </span>
+            {isRotating ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+            <span className="hidden md:inline">{isRotating ? "Orbiting" : "Paused"}</span>
           </button>
 
-          {/* Full Stage Maximize / Minimize Button */}
+          {/* Reset Orientation */}
           <button
-            onClick={() => setIsStageExpanded(!isStageExpanded)}
-            className={`btn-realistic flex h-7 w-7 items-center justify-center rounded-full border transition-all ${
-              isStageExpanded
-                ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
-                : "border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] text-[#141416] hover:bg-black/5"
-            }`}
-            title={isStageExpanded ? "Exit Fullscreen Stage" : "Expand Fullscreen Stage"}
+            onClick={handleResetOrientation}
+            className="inline-flex items-center gap-1 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-2.5 py-1 text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer"
+            title="Reset to New Delhi View"
+            aria-label="Reset to New Delhi View"
           >
-            {isStageExpanded ? (
-              <Minimize2 className="h-3.5 w-3.5" />
-            ) : (
-              <Maximize2 className="h-3.5 w-3.5" />
-            )}
+            <RotateCcw className="h-3 w-3" />
+            <span className="hidden md:inline">Reset</span>
+          </button>
+
+          {/* Fullscreen Expansion Toggle */}
+          <button
+            onClick={() => setIsStageExpanded((prev) => !prev)}
+            className="inline-flex items-center gap-1 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-2.5 py-1 text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer"
+            title={isStageExpanded ? "Exit Expanded View" : "Expand Stage"}
+            aria-label={isStageExpanded ? "Exit Expanded View" : "Expand Stage"}
+          >
+            {isStageExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
           </button>
         </div>
       </div>
 
-      {/* 2. MAIN INTERACTIVE MOTION STAGE CANVAS CONTAINER */}
+      {/* 2. MAIN 3D MOTION STAGE CANVAS CONTAINER */}
       <div
         ref={stageRef}
-        className={`stage relative w-full select-none overflow-hidden ${
-          isStageExpanded ? "h-[calc(100vh-140px)]" : stageHeight
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        className={`relative w-full select-none overflow-hidden touch-none cursor-grab active:cursor-grabbing ${
+          isStageExpanded ? "h-[calc(100vh-180px)]" : stageHeight
         }`}
       >
-        {/* Subtle Architectural Crosshairs */}
-        <div className="pointer-events-none absolute inset-0 z-10 p-6 flex flex-col justify-between">
-          <div className="flex justify-between font-mono text-[10px] text-[#828387] opacity-60">
-            <span>+ TOP_LEFT // OBS_NORTH</span>
-            <span>+ TOP_RIGHT // TSL_RUN</span>
+        {/* Architectural Grid & Crosshairs */}
+        <div className="pointer-events-none absolute inset-0 z-10 p-5 flex flex-col justify-between">
+          <div className="flex justify-between font-mono text-[9px] text-[#828387] opacity-60">
+            <span>+ ORBIT_LAT // 28.61° N</span>
+            <span>+ SHA-256 PROVENANCE ACTIVE</span>
           </div>
-          <div className="flex justify-between font-mono text-[10px] text-[#828387] opacity-60">
-            <span>+ BTM_LEFT // NAS_MORTICE</span>
-            <span>+ BTM_RIGHT // LAT_28.61</span>
-          </div>
-        </div>
-
-        {/* The Motion Stage Canvas */}
-        <canvas
-          ref={canvasRef}
-          role="button"
-          tabIndex={0}
-          aria-label="Hold to form a particle globe"
-          className="block w-full h-full cursor-crosshair touch-none transition-opacity duration-300"
-          style={{ opacity: isReady ? 1 : 0.4 }}
-        />
-
-        {/* Dynamic Tactile Hold Indicator Badge (Center-Bottom) */}
-        <div className="pointer-events-none absolute bottom-6 inset-x-0 z-20 flex flex-col items-center justify-center gap-2">
-          <div
-            className={`flex items-center gap-2.5 rounded-full border px-4 py-1.5 shadow-lg backdrop-blur-md transition-all duration-200 ${
-              isPressing || isLockedGlobe
-                ? "border-[#D94E34]/50 bg-[#141416]/90 text-white scale-105"
-                : "border-[rgba(20,21,23,0.2)] bg-[#ECEBE5]/90 text-[#141416]"
-            }`}
-          >
-            <div
-              className={`h-2 w-2 rounded-full transition-colors ${
-                isPressing || isLockedGlobe
-                  ? "bg-[#D94E34] animate-ping"
-                  : "bg-[#059669]"
-              }`}
-            />
-            <span className="font-mono text-xs font-bold tracking-tight">
-              {isPressing || isLockedGlobe
-                ? "3D PARTICLE GLOBE ACTIVE"
-                : "PRESS & HOLD CANVAS TO FORM 3D GLOBE"}
-            </span>
-
-            <span className="font-mono text-[10px] text-[#828387] pl-1 border-l border-[rgba(20,21,23,0.15)]">
-              {(currentGlobeAmount * 100).toFixed(0)}% MORPH
-            </span>
-          </div>
-
-          <p className="font-mono text-[10px] text-[#828387] tracking-wider uppercase hidden sm:block">
-            TSL INSTANCED VERTEX SHADER • FIBONACCI SPHERE DISTRIBUTION
-          </p>
-        </div>
-
-        {/* Floating Telemetry Metric Stamp (Top-Left of Canvas) */}
-        <div className="pointer-events-none absolute top-5 left-5 z-20 hidden sm:block rounded-md border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5]/90 p-3 shadow-xs backdrop-blur-xs max-w-xs">
-          <div className="font-mono text-[9px] uppercase tracking-wider text-[#828387]">
-            {activeScene.metricLabel}
-          </div>
-          <div className="font-serif text-2xl font-black text-[#141416] leading-none mt-1">
-            {activeScene.metric}
-          </div>
-          <div className="mt-1.5 pt-1 border-t border-[rgba(20,21,23,0.08)] font-mono text-[9px] text-[#57585C]">
-            PROVENANCE: {activeScene.provenance}
+          <div className="flex justify-between font-mono text-[9px] text-[#828387] opacity-60">
+            <span>+ DRAG TO ROTATE 3D SPHERE</span>
+            <span>+ CLICK ANCHOR PIN TO INSPECT</span>
           </div>
         </div>
 
-        {/* Touch / Quick Trigger Buttons for Mobile / Click */}
-        <div className="absolute top-5 right-5 z-20 flex flex-col gap-2">
-          <button
-            onMouseDown={() => handleTriggerSpring(1)}
-            onMouseUp={() => !isLockedGlobe && handleTriggerSpring(0)}
-            onTouchStart={() => handleTriggerSpring(1)}
-            onTouchEnd={() => !isLockedGlobe && handleTriggerSpring(0)}
-            className="btn-realistic btn-solid-black px-3.5 py-1.5 text-xs font-mono tracking-wide shadow-md"
-          >
-            Hold 3D Globe
-          </button>
-          <button
-            onClick={() => handleTriggerSpring(0)}
-            className="btn-realistic btn-outline-pill px-3.5 py-1 text-[11px] font-mono bg-[#ECEBE5]/80 backdrop-blur-xs"
-          >
-            Reset Image
-          </button>
-        </div>
-      </div>
-
-      {/* 3. PROFESSIONAL EDITORIAL TYPOGRAPHY & CAPTION FOOTER */}
-      {showEditorialCard && (
-        <div
-          className={`border-t p-5 sm:p-6 transition-colors ${
-            isStageExpanded
-              ? "border-white/10 bg-[#1B1C1F] text-white"
-              : "border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] text-[#141416]"
-          }`}
-        >
-          <div className="grid gap-6 md:grid-cols-12 items-center">
-            {/* Headline and Thesis (8 cols) */}
-            <div className="md:col-span-8 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#D94E34]">
-                  OBSERVATORY TELEMETRY
-                </span>
-                <span className="text-[#828387]">•</span>
-                <span className="font-mono text-[10px] text-[#828387]">
-                  {activeScene.provenance}
-                </span>
-              </div>
-              <h3 className="font-serif text-xl sm:text-2xl font-normal tracking-tight">
-                {activeScene.title}
+        {/* WebGL Canvas */}
+        {webglSupported ? (
+          <canvas
+            ref={canvasRef}
+            role="img"
+            aria-label="Interactive 3D particle globe visualizing sovereign macroeconomic corridors and official data centers"
+            className="block w-full h-full transition-opacity duration-300"
+            style={{ opacity: isReady ? 1 : 0.3 }}
+          />
+        ) : (
+          /* Graceful 2D Fallback if WebGL unavailable */
+          <div className="h-full w-full flex flex-col items-center justify-center p-8 text-center space-y-4">
+            <Globe2 className="h-12 w-12 text-[#059669]" />
+            <div className="space-y-1">
+              <h3 className="font-heading text-lg font-bold text-[#141416]">
+                Sovereign Geodetic Registry
               </h3>
-              <p
-                className={`font-sans text-xs sm:text-sm leading-relaxed max-w-2xl ${
-                  isStageExpanded ? "text-white/70" : "text-[#57585C]"
-                }`}
-              >
-                {activeScene.subtitle}. High-resolution photographic fidelity
-                dissolves into a Fibonacci particle lattice governed by Three
-                Shading Language (TSL) uniforms and harmonic turbulence vectors.
+              <p className="font-sans text-xs text-[#57585C] max-w-md">
+                Interactive 3D hardware acceleration is currently resting. All sovereign macroeconomic hubs remain fully accessible via the telemetry directory below.
               </p>
             </div>
+          </div>
+        )}
 
-            {/* Quick Metrics & Scene Selector Links (4 cols) */}
-            <div className="md:col-span-4 flex flex-col gap-2 border-t md:border-t-0 md:border-l border-[rgba(20,21,23,0.1)] md:pl-6 pt-3 md:pt-0">
-              <span className="font-mono text-[10px] uppercase font-bold text-[#828387]">
-                SCENE RECONCILIATION
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {MACRO_SCENES.map((scene, idx) => (
-                  <button
-                    key={scene.id}
-                    onClick={() => handleSceneSelect(idx)}
-                    className={`btn-realistic rounded px-2.5 py-1 text-left text-xs font-mono transition-all ${
-                      activeSceneIdx === idx
-                        ? "bg-[#141416] text-[#ECEBE5] font-bold"
-                        : "bg-[rgba(20,21,23,0.05)] text-[#57585C] hover:text-[#141416]"
-                    }`}
-                  >
-                    0{idx + 1} {scene.title.split(" ")[0]}
-                  </button>
-                ))}
+        {/* 3. INTERACTIVE 3D SCREEN-SPACE ANCHOR PINS */}
+        {webglSupported &&
+          projectedMarkers.map((marker) => {
+            if (!marker.visible) return null;
+            const isSelected = activeAnchor?.id === marker.id;
+
+            return (
+              <div
+                key={marker.id}
+                className="absolute z-20 -translate-x-1/2 -translate-y-1/2 pointer-events-auto transition-transform duration-100 ease-out"
+                style={{
+                  left: `${marker.x}px`,
+                  top: `${marker.y}px`,
+                }}
+              >
+                <button
+                  onClick={() => centerOnAnchor(marker.anchor)}
+                  aria-label={`Inspect ${marker.anchor.name}`}
+                  className={`group relative flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold shadow-md transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-[#141416] text-[#ECEBE5] ring-2 ring-[#059669] scale-110"
+                      : "bg-[#ECEBE5]/90 text-[#141416] hover:bg-[#141416] hover:text-[#ECEBE5] border border-[rgba(20,21,23,0.2)]"
+                  }`}
+                >
+                  <span
+                    className="h-1.5 w-1.5 rounded-full animate-pulse"
+                    style={{ backgroundColor: marker.anchor.color }}
+                  />
+                  <span className="truncate max-w-[95px] sm:max-w-[120px]">
+                    {marker.anchor.name.split("//")[0].trim()}
+                  </span>
+                  <span className="text-[9px] opacity-70">
+                    {marker.anchor.primaryMetric}
+                  </span>
+                </button>
               </div>
-              <div className="text-[10px] font-mono text-[#828387] pt-1 flex items-center gap-1.5">
-                <CheckCircle2 className="h-3 w-3 text-[#059669]" />
-                <span>SNA 2008 & World Bank ICP Compliant</span>
+            );
+          })}
+
+        {/* 4. ACTIVE ANCHOR TELEMETRY INSPECTION OVERLAY CARD */}
+        {activeAnchor && (
+          <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:left-4 z-30 sm:max-w-md rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5]/96 p-4.5 sm:p-5 shadow-xl backdrop-blur-md transition-all">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#141416]/5 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-[#141416]">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: activeAnchor.color }}
+                  />
+                  <span>{activeAnchor.hub}</span>
+                  <span className="text-[#828387]">•</span>
+                  <span>{activeAnchor.code}</span>
+                </div>
+                <h4 className="font-heading text-sm sm:text-base font-bold text-[#141416]">
+                  {activeAnchor.name}
+                </h4>
+              </div>
+
+              <button
+                onClick={() => setActiveAnchor(null)}
+                aria-label="Close details"
+                className="rounded-full p-1 text-[#828387] hover:bg-black/5 hover:text-[#141416] transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Primary Value Callout */}
+            <div className="my-3 flex items-baseline justify-between border-y border-[rgba(20,21,23,0.1)] py-2">
+              <div>
+                <div className="font-mono text-[10px] uppercase text-[#828387]">
+                  {activeAnchor.metricLabel}
+                </div>
+                <div className="font-heading text-2xl sm:text-3xl font-extrabold text-[#141416]">
+                  {activeAnchor.primaryMetric}
+                </div>
+              </div>
+              <div className="text-right font-mono text-[10px] text-[#57585C]">
+                <div>{activeAnchor.period}</div>
+                <div className="text-[9px] text-[#059669] font-bold">SHA-256 GAZETTE VERIFIED</div>
               </div>
             </div>
+
+            {/* Concise Summary */}
+            <p className="font-sans text-xs text-[#57585C] leading-relaxed mb-3">
+              {activeAnchor.summary}
+            </p>
+
+            {/* Secondary Metric Micro-Grid */}
+            <div className="grid grid-cols-3 gap-2 py-2 border-t border-[rgba(20,21,23,0.08)] mb-3">
+              {activeAnchor.secondaryMetrics.map((sec, sIdx) => (
+                <div key={sIdx} className="space-y-0.5">
+                  <div className="font-mono text-[9px] uppercase text-[#828387] truncate">
+                    {sec.label}
+                  </div>
+                  <div className="font-mono text-xs font-bold text-[#141416] truncate">
+                    {sec.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Provenance & Direct Navigation */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-[rgba(20,21,23,0.12)]">
+              <div className="flex items-center gap-1.5 font-mono text-[10px] text-[#828387] truncate">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#059669] shrink-0" />
+                <span className="truncate">{activeAnchor.provenance}</span>
+              </div>
+              <Link
+                href={activeAnchor.link}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#141416] px-3 py-1.5 font-mono text-[11px] font-bold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors shrink-0 shadow-xs cursor-pointer"
+              >
+                <span>{activeAnchor.linkText}</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 5. ACCESSIBLE KEYBOARD & TOUCH HUB SELECTOR BAR (Bottom Navigation) */}
+      <div className="border-t border-[rgba(20,21,23,0.12)] bg-[#E6E5DF]/60 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-wider text-[#57585C]">
+            <Globe2 className="h-3.5 w-3.5 text-[#059669]" />
+            <span>SELECT SOVEREIGN CORRIDOR:</span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            {SOVEREIGN_ANCHORS.map((anchor) => {
+              const isSelected = activeAnchor?.id === anchor.id;
+              return (
+                <button
+                  key={anchor.id}
+                  onClick={() => centerOnAnchor(anchor)}
+                  aria-pressed={isSelected}
+                  className={`rounded-full px-2.5 py-1 font-mono text-[10px] transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-[#141416] text-[#ECEBE5] font-bold shadow-xs"
+                      : "bg-[#ECEBE5] text-[#57585C] hover:text-[#141416] hover:bg-black/5 border border-[rgba(20,21,23,0.14)]"
+                  }`}
+                >
+                  {anchor.name.split("//")[0].trim()}
+                </button>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

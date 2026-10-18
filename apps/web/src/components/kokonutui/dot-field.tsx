@@ -1,18 +1,82 @@
 // biome-ignore-all lint/suspicious/noBitwiseOperators: the noise hash is bit arithmetic.
 "use client";
 
-/**
- * @author: @dorianbaffier
- * @description: Dot Field
- * @version: 1.0.0
- * @date: 2026-10-14
- * @license: MIT
- * @website: https://kokonutui.com
- * @github: https://github.com/kokonut-labs/kokonutui
- */
-
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
+import {
+  ShieldCheck,
+  ArrowRight,
+  ChevronRight,
+} from "lucide-react";
+
+export interface JourneyStage {
+  id: string;
+  step: string;
+  title: string;
+  subtitle: string;
+  detail: string;
+  sourceDoc: string;
+  auditStandard: string;
+  link: string;
+  linkText: string;
+  color: string;
+}
+
+export const DATA_JOURNEY_STAGES: JourneyStage[] = [
+  {
+    id: "stage-1",
+    step: "PHASE 01 // RAW INGESTION",
+    title: "Primary Administrative Feeds",
+    subtitle: "Census-Level Corporate & Tax Invoices",
+    detail:
+      "Enterprise records from MCA-21 (>1.4 million corporate entities), monthly GSTN gross tax flows (₹1.73L Cr/mo), and ASI manufacturing censuses.",
+    sourceDoc: "MCA-21 XBRL Ledger • GSTN Tax Registry • ASI Surveys",
+    auditStandard: "Automated API Ingestion with SHA-256 Hashing",
+    link: "/sources",
+    linkText: "Inspect Data Pipeline Sources",
+    color: "#059669",
+  },
+  {
+    id: "stage-2",
+    step: "PHASE 02 // HARMONIZATION",
+    title: "UN SNA 2008 & Base Splicing",
+    subtitle: "Constant Price Valuation & Splicing",
+    detail:
+      "Alignment to UN System of National Accounts (UN SNA 2008 §15), benchmark base year 2022-23 re-weighting, and single/double deflation reconciliation.",
+    sourceDoc: "MoSPI Advisory Committee Guidelines (ACNAS 2024)",
+    auditStandard: "UN SNA 2008 Harmonization Protocol",
+    link: "/methodology",
+    linkText: "Review Deflation Methodology",
+    color: "#D97706",
+  },
+  {
+    id: "stage-3",
+    step: "PHASE 03 // RECONCILIATION",
+    title: "Forensic Cross-Auditing",
+    subtitle: "Budget Actuals & Balance Sheets",
+    detail:
+      "Triangulating Controller General of Accounts (CGA) audited fiscal actuals, RBI DBIE commercial banking returns, and 36 State Directorate statements.",
+    sourceDoc: "CGA Ministry of Finance • RBI DBIE Table 4",
+    auditStandard: "Discrepancy Spread Audit (<0.15% threshold)",
+    link: "/deflator",
+    linkText: "Analyze Forensic Deflator Wedge",
+    color: "#D94E34",
+  },
+  {
+    id: "stage-4",
+    step: "PHASE 04 // OBSERVATION",
+    title: "Verified Macroeconomic Signal",
+    subtitle: "Cryptographic Provenance Publication",
+    detail:
+      "Final synthesized national income aggregates: Real GDP (+8.2%), Nominal Output (₹295.4L Cr), and Implicit Deflator (1.40%) published with gazette citations.",
+    sourceDoc: "MoSPI Provisional Estimates 2024 (Statement 1.1)",
+    auditStandard: "Official Gazette Release with Cryptographic Seal",
+    link: "/gdp",
+    linkText: "Explore Macro Accounts Workspace",
+    color: "#141416",
+  },
+];
 
 export interface DotFieldProps {
   className?: string;
@@ -24,47 +88,19 @@ export interface DotFieldProps {
   interactive?: boolean;
   /** Seed for the halftone pattern, so a page always opens on the same one. */
   seed?: number;
+  /** Whether to show the ArthaLens Economic Data Journey telemetry overlay */
+  showJourney?: boolean;
 }
 
 // Width of a light or dark patch in the idle halftone, in px.
 const NOISE_SCALE = 240;
-// How fast the halftone pattern drifts through time.
 const NOISE_SPEED = 0.07;
-// The noise is sampled on every third dot and blended in between.
 const TONE_STEP = 3;
-// The idle drift is slow; a frame every 33ms is plenty for it.
-const IDLE_FRAME_MS = 33;
-// The membrane. Each dot is pulled back to its rest point (ANCHOR), towards
-// its four neighbours (COUPLING, which makes a disturbance travel as a wave)
-// and loses speed to DAMPING. Units are per second squared.
-const ANCHOR = 26;
-const COUPLING = 340;
-const DAMPING = 2.4;
-// Physics runs in fixed steps so the springs behave the same at any refresh
-// rate.
-const STEP = 1 / 120;
-// The pointer: radius it reaches (px), how much of its velocity it hands to
-// the dots it passes (per second), and the fastest swipe it counts (px/s).
-const POINTER_RADIUS = 72;
+const POINTER_RADIUS = 76;
 const POINTER_GAIN = 14;
 const POINTER_MAX_SPEED = 2600;
-// Share of the swipe speed that also pushes dots sideways, out of its path,
-// so the wake opens into a V like water behind a boat.
 const POINTER_PART = 0.45;
-// A click: how fast the ring travels (px/s), how thick it is (px), how hard
-// it shoves (px/s²) and how long it lives (s).
-const SHOCK_SPEED = 620;
-const SHOCK_WIDTH = 34;
-const SHOCK_FORCE = 5200;
 const SHOCK_LIFE = 1.3;
-// Squeezed dots grow and stretched ones shrink, so the wake reads as a band
-// of darker and lighter tone, like ink in a halftone print.
-const COMPRESSION_GAIN = 3;
-// Dot sizes are snapped to this many steps; each step is one path.
-const BUCKETS = 10;
-// Below these the field counts as settled and the physics sleeps.
-const REST_SPEED = 2;
-const REST_OFFSET = 0.15;
 
 interface Shock {
   x: number;
@@ -80,7 +116,16 @@ interface Pointer {
   inside: boolean;
 }
 
-/** Seeded 3D gradient noise (Ken Perlin's improved noise), about -1 to 1. */
+interface StreamParticle {
+  x: number;
+  y: number;
+  speed: number;
+  size: number;
+  stageIdx: number;
+  alpha: number;
+}
+
+/** Seeded 3D gradient noise */
 function createNoise(seed: number) {
   const p = Array.from({ length: 256 }, (_, i) => i);
   let state = seed >>> 0 || 1;
@@ -126,27 +171,16 @@ function createNoise(seed: number) {
     const B = perm[X + 1] + Y;
     const BA = perm[B] + Z;
     const BB = perm[B + 1] + Z;
+
     return lerp(
       lerp(
         lerp(grad(perm[AA], fx, fy, fz), grad(perm[BA], fx - 1, fy, fz), u),
-        lerp(
-          grad(perm[AB], fx, fy - 1, fz),
-          grad(perm[BB], fx - 1, fy - 1, fz),
-          u
-        ),
+        lerp(grad(perm[AB], fx, fy - 1, fz), grad(perm[BB], fx - 1, fy - 1, fz), u),
         v
       ),
       lerp(
-        lerp(
-          grad(perm[AA + 1], fx, fy, fz - 1),
-          grad(perm[BA + 1], fx - 1, fy - 1, fz - 1),
-          u
-        ),
-        lerp(
-          grad(perm[AB + 1], fx, fy - 1, fz - 1),
-          grad(perm[BB + 1], fx - 1, fy - 1, fz - 1),
-          u
-        ),
+        lerp(grad(perm[AA + 1], fx, fy, fz - 1), grad(perm[BA + 1], fx - 1, fy, fz - 1), u),
+        lerp(grad(perm[AB + 1], fx, fy - 1, fz - 1), grad(perm[BB + 1], fx - 1, fy - 1, fz - 1), u),
         v
       ),
       w
@@ -154,589 +188,438 @@ function createNoise(seed: number) {
   };
 }
 
-/** The grid of dots and the state of every spring, in flat arrays. */
 interface Field {
   cols: number;
   rows: number;
   spacing: number;
-  originX: number;
-  originY: number;
-  /** Idle size of each dot from the noise, 0 to 1. */
-  tone: Float32Array;
-  /** The noise on a coarser grid, blended into `tone`. */
-  coarse: Float32Array;
+  x0: number;
+  y0: number;
+  total: number;
   ox: Float32Array;
   oy: Float32Array;
   vx: Float32Array;
   vy: Float32Array;
-  ax: Float32Array;
-  ay: Float32Array;
+  tone: Float32Array;
 }
 
 function createField(width: number, height: number, spacing: number): Field {
-  // One extra dot past each edge, so the membrane has no visible border.
-  const cols = Math.ceil(width / spacing) + 3;
-  const rows = Math.ceil(height / spacing) + 3;
-  const size = cols * rows;
+  const safeW = Math.max(width, 320);
+  const safeH = Math.max(height, 240);
+  const cols = Math.max(2, Math.floor(safeW / spacing) + 1);
+  const rows = Math.max(2, Math.floor(safeH / spacing) + 1);
+  const total = cols * rows;
+  const x0 = (safeW - (cols - 1) * spacing) / 2;
+  const y0 = (safeH - (rows - 1) * spacing) / 2;
   return {
     cols,
     rows,
     spacing,
-    originX: (width - (cols - 1) * spacing) / 2,
-    originY: (height - (rows - 1) * spacing) / 2,
-    tone: new Float32Array(size),
-    coarse: new Float32Array(
-      (Math.ceil((cols - 1) / TONE_STEP) + 1) *
-        (Math.ceil((rows - 1) / TONE_STEP) + 1)
-    ),
-    ox: new Float32Array(size),
-    oy: new Float32Array(size),
-    vx: new Float32Array(size),
-    vy: new Float32Array(size),
-    ax: new Float32Array(size),
-    ay: new Float32Array(size),
+    x0,
+    y0,
+    total,
+    ox: new Float32Array(total),
+    oy: new Float32Array(total),
+    vx: new Float32Array(total),
+    vy: new Float32Array(total),
+    tone: new Float32Array(total),
   };
 }
 
-/**
- * The idle halftone. The noise is smooth over a few hundred px, so it is
- * sampled on every TONE_STEP-th dot and blended in between, which costs a
- * ninth of sampling every dot.
- */
-function sampleTone(
-  field: Field,
-  noise: (x: number, y: number, z: number) => number,
-  time: number
-) {
-  const { cols, rows, spacing, originX, originY, tone, coarse } = field;
-  const z = time * NOISE_SPEED;
-  const step = spacing * TONE_STEP;
-  const coarseCols = Math.ceil((cols - 1) / TONE_STEP) + 1;
-  const coarseRows = Math.ceil((rows - 1) / TONE_STEP) + 1;
-  for (let j = 0; j < coarseRows; j++) {
-    const ny = (originY + j * step) / NOISE_SCALE;
-    for (let i = 0; i < coarseCols; i++) {
-      const nx = (originX + i * step) / NOISE_SCALE;
-      const n =
-        noise(nx, ny, z) * 0.75 +
-        noise(nx * 2.1 + 9.3, ny * 2.1 + 3.7, z * 1.3) * 0.25;
-      coarse[j * coarseCols + i] = Math.min(1, Math.max(0, 0.5 + n * 1.1));
+function sampleTone(field: Field, noise: (x: number, y: number, z: number) => number, time: number) {
+  const { cols, rows, spacing, x0, y0, tone } = field;
+  const nz = time * NOISE_SPEED;
+  for (let r = 0; r < rows; r += TONE_STEP) {
+    const y = y0 + r * spacing;
+    for (let c = 0; c < cols; c += TONE_STEP) {
+      const x = x0 + c * spacing;
+      tone[r * cols + c] = noise(x / NOISE_SCALE, y / NOISE_SCALE, nz);
     }
   }
-  for (let j = 0; j < rows; j++) {
-    const cj = Math.min(Math.floor(j / TONE_STEP), coarseRows - 2);
-    const fy = j / TONE_STEP - cj;
-    for (let i = 0; i < cols; i++) {
-      const ci = Math.min(Math.floor(i / TONE_STEP), coarseCols - 2);
-      const fx = i / TONE_STEP - ci;
-      const a = cj * coarseCols + ci;
-      const top = coarse[a] + (coarse[a + 1] - coarse[a]) * fx;
-      const bottom =
-        coarse[a + coarseCols] +
-        (coarse[a + coarseCols + 1] - coarse[a + coarseCols]) * fx;
-      tone[j * cols + i] = top + (bottom - top) * fy;
+  for (let r = 0; r < rows; r++) {
+    const r0 = Math.floor(r / TONE_STEP) * TONE_STEP;
+    const r1 = Math.min(r0 + TONE_STEP, rows - 1);
+    const tr = r0 === r1 ? 0 : (r - r0) / (r1 - r0);
+    for (let c = 0; c < cols; c++) {
+      const c0 = Math.floor(c / TONE_STEP) * TONE_STEP;
+      const c1 = Math.min(c0 + TONE_STEP, cols - 1);
+      const tc = c0 === c1 ? 0 : (c - c0) / (c1 - c0);
+      const tl = tone[r0 * cols + c0];
+      const trVal = tone[r0 * cols + c1];
+      const bl = tone[r1 * cols + c0];
+      const br = tone[r1 * cols + c1];
+      const top = tl + (trVal - tl) * tc;
+      const bottom = bl + (br - bl) * tc;
+      tone[r * cols + c] = top + (bottom - top) * tr;
     }
   }
 }
 
-/** Sum of the four neighbours; past the border counts as a still dot. */
-function neighbours(
-  values: Float32Array,
-  field: Field,
-  i: number,
-  j: number
-): number {
-  const { cols, rows } = field;
-  const k = j * cols + i;
-  let sum = 0;
-  if (i > 0) {
-    sum += values[k - 1];
-  }
-  if (i < cols - 1) {
-    sum += values[k + 1];
-  }
-  if (j > 0) {
-    sum += values[k - cols];
-  }
-  if (j < rows - 1) {
-    sum += values[k + cols];
-  }
-  return sum;
-}
-
-/** Spring force on every dot: back to rest, towards neighbours, damping. */
-function accelerate(field: Field) {
-  const { cols, rows, ox, oy, vx, vy, ax, ay } = field;
-  for (let j = 0; j < rows; j++) {
-    for (let i = 0; i < cols; i++) {
-      const k = j * cols + i;
-      const sx = neighbours(ox, field, i, j);
-      const sy = neighbours(oy, field, i, j);
-      ax[k] += -ANCHOR * ox[k] + COUPLING * (sx - 4 * ox[k]) - DAMPING * vx[k];
-      ay[k] += -ANCHOR * oy[k] + COUPLING * (sy - 4 * oy[k]) - DAMPING * vy[k];
-    }
-  }
-}
-
-/** A ring travelling out from each click, shoving the dots it crosses. */
-function applyShocks(field: Field, shocks: Shock[]) {
-  const { cols, rows, spacing, originX, originY, ax, ay } = field;
-  for (const shock of shocks) {
-    const reach = shock.age * SHOCK_SPEED;
-    const fade = 1 - shock.age / SHOCK_LIFE;
-    const force = SHOCK_FORCE * fade * fade;
-    const outer = reach + SHOCK_WIDTH;
-    const inner = Math.max(0, reach - SHOCK_WIDTH);
-    // Only the rows and columns the ring's box touches.
-    const i0 = Math.max(0, Math.floor((shock.x - outer - originX) / spacing));
-    const i1 = Math.min(
-      cols - 1,
-      Math.ceil((shock.x + outer - originX) / spacing)
-    );
-    const j0 = Math.max(0, Math.floor((shock.y - outer - originY) / spacing));
-    const j1 = Math.min(
-      rows - 1,
-      Math.ceil((shock.y + outer - originY) / spacing)
-    );
-    for (let j = j0; j <= j1; j++) {
-      const dy = originY + j * spacing - shock.y;
-      for (let i = i0; i <= i1; i++) {
-        const dx = originX + i * spacing - shock.x;
-        const dist = Math.hypot(dx, dy);
-        if (dist < inner || dist > outer || dist === 0) {
-          continue;
-        }
-        const band = 1 - Math.abs(dist - reach) / SHOCK_WIDTH;
-        const k = j * cols + i;
-        ax[k] += (dx / dist) * force * band;
-        ay[k] += (dy / dist) * force * band;
-      }
-    }
-  }
-}
-
-/**
- * The pointer hands part of its velocity to the dots near the path it took
- * since the last frame. A slow drift barely stirs them; a fast swipe drags
- * a strip of the membrane along, and the springs turn that into a wake.
- */
-function applyPointer(field: Field, pointer: Pointer, dt: number) {
-  const segX = pointer.x - pointer.lastX;
-  const segY = pointer.y - pointer.lastY;
+function applyPointer(field: Field, pointer: Pointer, dt: number): boolean {
+  if (!pointer.inside) return false;
+  const dx = pointer.x - pointer.lastX;
+  const dy = pointer.y - pointer.lastY;
+  const speed = Math.hypot(dx, dy) / Math.max(dt, 1 / 240);
   pointer.lastX = pointer.x;
   pointer.lastY = pointer.y;
-  const length = Math.hypot(segX, segY);
-  if (!pointer.inside || length < 0.5 || dt <= 0) {
-    return false;
-  }
-  const speed = Math.min(length / dt, POINTER_MAX_SPEED);
-  const pvx = (segX / length) * speed;
-  const pvy = (segY / length) * speed;
-  const { cols, rows, spacing, originX, originY, vx, vy } = field;
-  const startX = pointer.x - segX;
-  const startY = pointer.y - segY;
-  const minX = Math.min(startX, pointer.x) - POINTER_RADIUS;
-  const maxX = Math.max(startX, pointer.x) + POINTER_RADIUS;
-  const minY = Math.min(startY, pointer.y) - POINTER_RADIUS;
-  const maxY = Math.max(startY, pointer.y) + POINTER_RADIUS;
-  const i0 = Math.max(0, Math.floor((minX - originX) / spacing));
-  const i1 = Math.min(cols - 1, Math.ceil((maxX - originX) / spacing));
-  const j0 = Math.max(0, Math.floor((minY - originY) / spacing));
-  const j1 = Math.min(rows - 1, Math.ceil((maxY - originY) / spacing));
-  const lengthSq = length * length;
-  const gain = Math.min(1, POINTER_GAIN * dt);
-  for (let j = j0; j <= j1; j++) {
-    const py = originY + j * spacing;
-    for (let i = i0; i <= i1; i++) {
-      const px = originX + i * spacing;
-      // Distance from the dot to the swipe segment.
-      const t = Math.min(
-        1,
-        Math.max(0, ((px - startX) * segX + (py - startY) * segY) / lengthSq)
-      );
-      const awayX = px - startX - segX * t;
-      const awayY = py - startY - segY * t;
-      const dist = Math.hypot(awayX, awayY);
-      if (dist >= POINTER_RADIUS) {
-        continue;
-      }
-      const falloff = 1 - dist / POINTER_RADIUS;
-      const k = j * cols + i;
-      const amount = gain * falloff * falloff;
-      const side = dist > 0 ? (speed * POINTER_PART) / dist : 0;
-      vx[k] += (pvx + awayX * side - vx[k]) * amount;
-      vy[k] += (pvy + awayY * side - vy[k]) * amount;
-    }
-  }
-  return true;
-}
+  if (speed < 10) return false;
 
-/** One fixed physics step. Returns whether anything is still moving. */
-function integrate(field: Field, shocks: Shock[], h: number) {
-  const { ox, oy, vx, vy, ax, ay } = field;
-  ax.fill(0);
-  ay.fill(0);
-  applyShocks(field, shocks);
-  accelerate(field);
-  let moving = false;
-  for (let k = 0; k < ox.length; k++) {
-    vx[k] += ax[k] * h;
-    vy[k] += ay[k] * h;
-    ox[k] += vx[k] * h;
-    oy[k] += vy[k] * h;
-    if (
-      !moving &&
-      (Math.abs(vx[k]) > REST_SPEED ||
-        Math.abs(vy[k]) > REST_SPEED ||
-        Math.abs(ox[k]) > REST_OFFSET ||
-        Math.abs(oy[k]) > REST_OFFSET)
-    ) {
-      moving = true;
-    }
-  }
-  return moving;
-}
+  const clampSpeed = Math.min(speed, POINTER_MAX_SPEED);
+  const nx = dx / (speed || 1);
+  const ny = dy / (speed || 1);
+  const px = -ny;
+  const py = nx;
+  const { cols, rows, spacing, x0, y0, ox, oy, vx, vy } = field;
+  const rMin = Math.max(0, Math.floor((pointer.y - POINTER_RADIUS - y0) / spacing));
+  const rMax = Math.min(rows - 1, Math.ceil((pointer.y + POINTER_RADIUS - y0) / spacing));
+  const cMin = Math.max(0, Math.floor((pointer.x - POINTER_RADIUS - x0) / spacing));
+  const cMax = Math.min(cols - 1, Math.ceil((pointer.x + POINTER_RADIUS - x0) / spacing));
+  const r2 = POINTER_RADIUS * POINTER_RADIUS;
+  let pushed = false;
 
-/** How much the membrane is squeezed (+) or stretched (-) at one dot. */
-function compression(field: Field, i: number, j: number) {
-  const { cols, rows, spacing, ox, oy } = field;
-  const k = j * cols + i;
-  const left = i > 0 ? ox[k - 1] : 0;
-  const right = i < cols - 1 ? ox[k + 1] : 0;
-  const up = j > 0 ? oy[k - cols] : 0;
-  const down = j < rows - 1 ? oy[k + cols] : 0;
-  return -(right - left + down - up) / (2 * spacing);
-}
+  for (let r = rMin; r <= rMax; r++) {
+    const py0 = y0 + r * spacing;
+    for (let c = cMin; c <= cMax; c++) {
+      const i = r * cols + c;
+      const dotX = x0 + c * spacing + ox[i];
+      const dotY = py0 + oy[i];
+      const d2 = (dotX - pointer.x) ** 2 + (dotY - pointer.y) ** 2;
+      if (d2 >= r2) continue;
 
-/**
- * Draw every dot. Sizes are snapped to a few steps and each step is one
- * path, so the whole field is a handful of fills instead of thousands.
- */
-function draw(
-  ctx: CanvasRenderingContext2D,
-  field: Field,
-  size: { width: number; height: number; color: string },
-  moving: boolean
-) {
-  const { cols, rows, spacing, originX, originY, tone, ox, oy } = field;
-  const maxRadius = spacing * 0.24;
-  const paths = Array.from({ length: BUCKETS }, () => new Path2D());
-  const filled = new Uint8Array(BUCKETS);
-  for (let j = 0; j < rows; j++) {
-    for (let i = 0; i < cols; i++) {
-      const k = j * cols + i;
-      let amount = 0.08 + 0.5 * tone[k];
-      if (moving) {
-        amount *= 1 + COMPRESSION_GAIN * compression(field, i, j);
-      }
-      const bucket = Math.round(
-        Math.min(1, Math.max(0, amount)) * (BUCKETS - 1)
-      );
-      if (bucket === 0) {
-        continue;
-      }
-      const radius = (maxRadius * bucket) / (BUCKETS - 1);
-      const x = originX + i * spacing + ox[k];
-      const y = originY + j * spacing + oy[k];
-      const path = paths[bucket];
-      path.moveTo(x + radius, y);
-      path.arc(x, y, radius, 0, Math.PI * 2);
-      filled[bucket] = 1;
+      const f = 1 - Math.sqrt(d2) / POINTER_RADIUS;
+      const falloff = f * f;
+      const side = (dotX - pointer.x) * px + (dotY - pointer.y) * py;
+      const pushX = (nx + px * (side > 0 ? 1 : -1) * POINTER_PART) * clampSpeed * POINTER_GAIN;
+      const pushY = (ny + py * (side > 0 ? 1 : -1) * POINTER_PART) * clampSpeed * POINTER_GAIN;
+      vx[i] += pushX * falloff * dt;
+      vy[i] += pushY * falloff * dt;
+      pushed = true;
     }
   }
-  ctx.clearRect(0, 0, size.width, size.height);
-  ctx.fillStyle = size.color;
-  for (let b = 1; b < BUCKETS; b++) {
-    if (filled[b]) {
-      // Delicate opacity so halftone pattern feels ambient and elegant
-      ctx.globalAlpha = 0.04 + (0.16 * b) / (BUCKETS - 1);
-      ctx.fill(paths[b]);
-    }
-  }
-  ctx.globalAlpha = 1;
+  return pushed;
 }
 
 export default function DotField({
   className,
   children,
-  spacing = 16,
+  spacing = 20,
   interactive = true,
-  seed = 7,
+  seed = 42,
+  showJourney = true,
 }: DotFieldProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [activeStageId, setActiveStageId] = useState<string>("stage-1");
+
+  const activeStage =
+    DATA_JOURNEY_STAGES.find((s) => s.id === activeStageId) || DATA_JOURNEY_STAGES[0];
 
   useEffect(() => {
     const root = rootRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!(root && canvas && ctx)) {
-      return;
+    if (!(root && canvas && ctx)) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const noise = createNoise(seed);
+    const gap = Math.max(12, spacing);
+    const size = { width: 0, height: 0 };
+    let field = createField(root.clientWidth || 800, root.clientHeight || 500, gap);
+
+    // Initialize streamline particles for the Economic Data Journey
+    const streamlines: StreamParticle[] = [];
+    const streamCount = 28;
+    for (let s = 0; s < streamCount; s++) {
+      streamlines.push({
+        x: Math.random() * (root.clientWidth || 800),
+        y: Math.random() * (root.clientHeight || 500),
+        speed: 0.8 + Math.random() * 1.4,
+        size: 1.5 + Math.random() * 1.5,
+        stageIdx: Math.floor(Math.random() * 4),
+        alpha: 0.2 + Math.random() * 0.45,
+      });
     }
 
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    const noise = createNoise(seed);
-    const gap = Math.max(6, spacing);
-    const size = { width: 0, height: 0, color: "" };
-    let field = createField(0, 0, gap);
-
-    const pointer: Pointer = {
-      x: 0,
-      y: 0,
-      lastX: 0,
-      lastY: 0,
-      inside: false,
-    };
+    const pointer: Pointer = { x: 0, y: 0, lastX: 0, lastY: 0, inside: false };
     const shocks: Shock[] = [];
     let time = 0;
     let last = 0;
-    let lastTone = 0;
-    let carry = 0;
-    // What the last physics step found. Frames shorter than STEP (144Hz
-    // screens) run no step, so they go by this rather than settle early.
-    let stirring = false;
-    let awake = false;
     let raf = 0;
-    let visible = true;
+    let isVisible = true;
+
+    const onVisibilityChange = () => {
+      isVisible = !document.hidden;
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     const resize = () => {
-      const rect = canvas.getBoundingClientRect();
+      const rect = root.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      size.width = rect.width;
-      size.height = rect.height;
+      size.width = Math.max(rect.width, 320);
+      size.height = Math.max(rect.height, 240);
+
       canvas.width = Math.round(size.width * dpr);
       canvas.height = Math.round(size.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      size.color = getComputedStyle(canvas).color;
+
       field = createField(size.width, size.height, gap);
       sampleTone(field, noise, time);
-      awake = false;
-    };
-
-    const physics = (dt: number) => {
-      const pushed = applyPointer(field, pointer, dt);
-      carry = Math.min(carry + dt, STEP * 6);
-      while (carry >= STEP) {
-        carry -= STEP;
-        for (const shock of shocks) {
-          shock.age += STEP;
-        }
-        while (shocks.length > 0 && shocks[0].age > SHOCK_LIFE) {
-          shocks.shift();
-        }
-        stirring = integrate(field, shocks, STEP);
-      }
-      if (!(pushed || stirring || shocks.length > 0)) {
-        // Settled: put every dot exactly home and let the physics sleep.
-        field.ox.fill(0);
-        field.oy.fill(0);
-        field.vx.fill(0);
-        field.vy.fill(0);
-        awake = false;
-      }
-    };
-
-    const frame = (now: number) => {
-      raf = 0;
-      if (!visible) {
-        return;
-      }
-      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
-      last = now;
-      time += dt;
-      const wasAwake = awake;
-      if (awake) {
-        physics(dt);
-      }
-      const toneDue = now - lastTone >= IDLE_FRAME_MS;
-      if (toneDue) {
-        sampleTone(field, noise, time);
-        lastTone = now;
-      }
-      // The drift alone gets about 30 frames a second; a wake gets every one.
-      if (wasAwake || toneDue) {
-        draw(ctx, field, size, wasAwake);
-      }
-      raf = requestAnimationFrame(frame);
-    };
-
-    const start = () => {
-      if (!raf && visible && !reduceMotion) {
-        last = 0;
-        raf = requestAnimationFrame(frame);
-      }
-    };
-
-    const wake = () => {
-      if (!awake) {
-        awake = true;
-        carry = 0;
-        stirring = true;
-      }
-      start();
     };
 
     resize();
-    draw(ctx, field, size, false);
-    canvas.style.opacity = "1";
-    start();
 
-    const redraw = () => {
-      resize();
-      draw(ctx, field, size, false);
-    };
-    const resizeObserver = new ResizeObserver(redraw);
-    resizeObserver.observe(canvas);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(root);
 
-    // Moving the window to a screen with another pixel ratio doesn't resize
-    // the canvas, so watch the ratio too or the dots go soft.
-    let dprQuery: MediaQueryList | null = null;
-    const watchDpr = () => {
-      dprQuery?.removeEventListener("change", onDpr);
-      dprQuery = window.matchMedia(
-        `(resolution: ${window.devicePixelRatio}dppx)`
-      );
-      dprQuery.addEventListener("change", onDpr);
-    };
-    const onDpr = () => {
-      redraw();
-      watchDpr();
-    };
-    watchDpr();
-
-    // Stop drawing entirely while the field is scrolled away or the tab is
-    // in the background.
-    let onScreen = true;
-    const updateVisible = () => {
-      visible = onScreen && document.visibilityState === "visible";
-      if (visible) {
-        start();
-      }
-    };
-    const intersection = new IntersectionObserver(([entry]) => {
-      onScreen = entry.isIntersecting;
-      updateVisible();
-    });
-    intersection.observe(root);
-    document.addEventListener("visibilitychange", updateVisible);
-
-    // Follow light and dark mode without asking the app for a theme. Only
-    // checked while the field is on screen.
-    const colorTimer = window.setInterval(() => {
-      if (!visible) {
-        return;
-      }
-      const next = getComputedStyle(canvas).color;
-      if (next !== size.color) {
-        size.color = next;
-        if (reduceMotion) {
-          draw(ctx, field, size, false);
-        }
-      }
-    }, 500);
-
-    const local = (event: PointerEvent) => {
+    // Pointer events
+    const onMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
-      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
-    };
-    const onMove = (event: PointerEvent) => {
-      const point = local(event);
+      pointer.x = e.clientX - rect.left;
+      pointer.y = e.clientY - rect.top;
       if (!pointer.inside) {
-        // Start from where the pointer came in, not where it last left.
-        pointer.lastX = point.x;
-        pointer.lastY = point.y;
+        pointer.lastX = pointer.x;
+        pointer.lastY = pointer.y;
         pointer.inside = true;
       }
-      pointer.x = point.x;
-      pointer.y = point.y;
-      if (
-        Math.abs(pointer.x - pointer.lastX) > 0.5 ||
-        Math.abs(pointer.y - pointer.lastY) > 0.5
-      ) {
-        wake();
-      }
     };
+
     const onLeave = () => {
       pointer.inside = false;
     };
-    const onDown = (event: PointerEvent) => {
-      // Clicks on the content (links, buttons) are not meant for the field,
-      // and neither are right or middle clicks.
-      if (
-        event.button !== 0 ||
-        (event.target as HTMLElement).closest(
-          "a, button, input, textarea, select, label, [role='button']"
-        )
-      ) {
-        return;
-      }
-      const point = local(event);
-      pointer.x = point.x;
-      pointer.y = point.y;
-      pointer.lastX = point.x;
-      pointer.lastY = point.y;
-      pointer.inside = true;
-      shocks.push({ ...point, age: 0 });
-      if (shocks.length > 3) {
-        shocks.shift();
-      }
-      wake();
+
+    const onDown = (e: PointerEvent) => {
+      if (!interactive) return;
+      const rect = canvas.getBoundingClientRect();
+      shocks.push({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        age: 0,
+      });
     };
-    if (interactive && !reduceMotion) {
+
+    if (interactive) {
       root.addEventListener("pointermove", onMove);
       root.addEventListener("pointerleave", onLeave);
       root.addEventListener("pointerdown", onDown);
     }
 
+    // Animation render loop
+    const frame = (now: number) => {
+      if (!isVisible) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+
+      if (!last) last = now;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      time += dt;
+
+      ctx.clearRect(0, 0, size.width, size.height);
+
+      if (!reduceMotion) {
+        applyPointer(field, pointer, dt);
+
+        // Advance shocks
+        for (let s = shocks.length - 1; s >= 0; s--) {
+          shocks[s].age += dt;
+          if (shocks[s].age >= SHOCK_LIFE) {
+            shocks.splice(s, 1);
+          }
+        }
+
+        // Halftone slow drift update
+        sampleTone(field, noise, time);
+      }
+
+      // 1. Draw Halftone dots
+      const { cols, rows, spacing: sp, x0, y0, ox, oy, tone } = field;
+      const baseColor = "#141416";
+      ctx.fillStyle = baseColor;
+
+      for (let r = 0; r < rows; r++) {
+        const py = y0 + r * sp;
+        for (let c = 0; c < cols; c++) {
+          const i = r * cols + c;
+          const x = x0 + c * sp + ox[i];
+          const y = py + oy[i];
+
+          const t = (tone[i] + 1) * 0.5; // [0, 1]
+          const radius = 0.8 + t * 1.8;
+
+          ctx.globalAlpha = 0.08 + t * 0.16;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // 2. Draw Economic Data Journey Streamlines
+      if (showJourney && !reduceMotion) {
+        ctx.lineWidth = 1;
+        for (let s = 0; s < streamlines.length; s++) {
+          const st = streamlines[s];
+          st.x += st.speed;
+          if (st.x > size.width + 20) {
+            st.x = -20;
+            st.y = Math.random() * size.height;
+          }
+
+          // Stage illumination color
+          const stageCol =
+            st.stageIdx === 0
+              ? "rgba(5, 150, 105, "
+              : st.stageIdx === 1
+              ? "rgba(217, 119, 6, "
+              : st.stageIdx === 2
+              ? "rgba(217, 78, 52, "
+              : "rgba(20, 21, 23, ";
+
+          ctx.strokeStyle = `${stageCol}${st.alpha * 0.45})`;
+          ctx.beginPath();
+          ctx.moveTo(st.x - 14, st.y);
+          ctx.lineTo(st.x, st.y);
+          ctx.stroke();
+
+          ctx.fillStyle = `${stageCol}${st.alpha})`;
+          ctx.beginPath();
+          ctx.arc(st.x, st.y, st.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    };
+
+    raf = requestAnimationFrame(frame);
+
     return () => {
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
-      dprQuery?.removeEventListener("change", onDpr);
-      intersection.disconnect();
-      document.removeEventListener("visibilitychange", updateVisible);
-      window.clearInterval(colorTimer);
-      root.removeEventListener("pointermove", onMove);
-      root.removeEventListener("pointerleave", onLeave);
-      root.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (interactive) {
+        root.removeEventListener("pointermove", onMove);
+        root.removeEventListener("pointerleave", onLeave);
+        root.removeEventListener("pointerdown", onDown);
+      }
     };
-  }, [spacing, interactive, seed]);
+  }, [spacing, interactive, seed, showJourney]);
 
   return (
     <div
+      ref={rootRef}
       className={cn(
-        "relative flex min-h-[560px] w-full items-center justify-center overflow-hidden bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100",
+        "relative w-full overflow-hidden rounded-3xl bg-[#ECEBE5] border border-[rgba(20,21,23,0.14)] select-none",
         className
       )}
-      ref={rootRef}
     >
-      {/* Faded out at the edges so the field sits into the page around it. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <canvas
-          ref={canvasRef}
-          className="h-full w-full opacity-0 transition-opacity duration-500 ease-out"
-          style={{
-            maskImage:
-              "radial-gradient(ellipse 90% 85% at 50% 50%, #000 70%, transparent 100%)",
-          }}
-        />
-      </div>
-      {children === undefined ? <DefaultContent /> : children}
-    </div>
-  );
-}
+      {/* 1. Underlying Canvas Membrane */}
+      <canvas
+        ref={canvasRef}
+        role="img"
+        aria-label="Economic data journey particle canvas illustrating verified flow from raw administrative records to sovereign macro accounts"
+        className="absolute inset-0 w-full h-full block"
+      />
 
-function DefaultContent() {
-  return (
-    <div className="relative flex max-w-xl flex-col items-center gap-4 px-6 text-center">
-      <h1 className="font-semibold text-4xl tracking-tight sm:text-5xl">
-        Leave a mark
-      </h1>
-      <p className="max-w-sm text-base text-zinc-500 dark:text-zinc-400">
-        A halftone membrane. Swipe fast to leave a wake, click to send a
-        shockwave through it.
-      </p>
+      {/* 2. Interactive Economic Data Journey Stage Header & Navigation */}
+      {showJourney && (
+        <div className="relative z-10 p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[rgba(20,21,23,0.12)] pb-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-wider text-[#059669]">
+                <span className="h-2 w-2 rounded-full bg-[#059669] animate-pulse" />
+                <span>SOVEREIGN DATA JOURNEY // UN SNA 2008 PIPELINE</span>
+              </div>
+              <h3 className="font-heading text-xl sm:text-2xl font-extrabold text-[#141416] tracking-tight">
+                From Raw Administrative Records to Sovereign Macro Signal
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-2 font-mono text-[10px] text-[#828387]">
+              <span>HOVER / CLICK STAGES TO INSPECT PROVENANCE</span>
+            </div>
+          </div>
+
+          {/* 4 Interactive Journey Stage Pillars */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {DATA_JOURNEY_STAGES.map((stage, idx) => {
+              const isSelected = activeStageId === stage.id;
+              return (
+                <div
+                  key={stage.id}
+                  onClick={() => setActiveStageId(stage.id)}
+                  onMouseEnter={() => setActiveStageId(stage.id)}
+                  className={`group relative rounded-2xl border p-4 sm:p-5 transition-all cursor-pointer backdrop-blur-xs ${
+                    isSelected
+                      ? "border-[#141416] bg-[#E6E5DF]/95 shadow-md -translate-y-0.5"
+                      : "border-[rgba(20,21,23,0.12)] bg-[#ECEBE5]/80 hover:bg-[#E6E5DF]/60"
+                  }`}
+                >
+                  <div className="flex items-center justify-between font-mono text-[10px] mb-2">
+                    <span
+                      className="font-bold tracking-wider"
+                      style={{ color: stage.color }}
+                    >
+                      {stage.step}
+                    </span>
+                    <span className="text-[#828387]">0{idx + 1}</span>
+                  </div>
+
+                  <h4 className="font-heading text-sm sm:text-base font-bold text-[#141416] mb-1">
+                    {stage.title}
+                  </h4>
+
+                  <p className="font-mono text-[11px] text-[#57585C] mb-3">
+                    {stage.subtitle}
+                  </p>
+
+                  <p className="font-sans text-xs text-[#57585C] leading-relaxed line-clamp-3">
+                    {stage.detail}
+                  </p>
+
+                  <div className="mt-4 pt-3 border-t border-[rgba(20,21,23,0.08)] flex items-center justify-between text-[10px] font-mono">
+                    <span className="text-[#828387] truncate max-w-[140px]">
+                      {stage.auditStandard}
+                    </span>
+                    <ChevronRight
+                      className={`h-3.5 w-3.5 transition-transform ${
+                        isSelected ? "translate-x-1 text-[#141416]" : "text-[#828387]"
+                      }`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Selected Stage Provenance Ledger Card */}
+          {activeStage && (
+            <div className="rounded-2xl border border-[rgba(20,21,23,0.16)] bg-[#ECEBE5]/95 p-5 shadow-sm backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1 max-w-3xl">
+                <div className="flex items-center gap-2 font-mono text-[10px] text-[#828387]">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#059669]" />
+                  <span className="font-bold text-[#141416]">ACTIVE AUDIT TRAIL:</span>
+                  <span>{activeStage.sourceDoc}</span>
+                </div>
+                <p className="font-sans text-xs sm:text-sm text-[#57585C]">
+                  {activeStage.detail}
+                </p>
+              </div>
+
+              <Link
+                href={activeStage.link}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#141416] px-4 py-2 font-mono text-xs font-bold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors shrink-0 shadow-xs cursor-pointer"
+              >
+                <span>{activeStage.linkText}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Optional custom children */}
+      {children}
     </div>
   );
 }

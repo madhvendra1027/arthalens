@@ -26,7 +26,9 @@ import {
   BarChart3,
   BookOpen,
   Mail,
+  Radio,
 } from "lucide-react";
+import { NotificationCenter } from "@/components/intelligence/NotificationCenter";
 
 interface NavOption {
   title: string;
@@ -76,6 +78,13 @@ const NAVIGATION_SECTIONS: NavSection[] = [
   {
     category: "Sovereign Intelligence",
     items: [
+      {
+        title: "Global Market & Macro Intelligence",
+        description: "Worldwide stock markets, economic news, country-focused briefings, and personalized alerts.",
+        href: "/intelligence",
+        icon: Radio,
+        badge: "Live Feed",
+      },
       {
         title: "Sovereign Credit Ratings",
         description: "Historical credit trajectories from Fitch, Moody's, and S&P alongside fiscal metrics.",
@@ -208,6 +217,18 @@ export function NavBar() {
               How It Works
             </Link>
 
+            <Link
+              href="/intelligence"
+              className={`hidden md:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-sans font-medium transition-colors ${
+                pathname === "/intelligence"
+                  ? "bg-[#141416] text-[#ECEBE5]"
+                  : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
+              }`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
+              <span>Intelligence</span>
+            </Link>
+
             {/* Live Telemetry Dynamic Text Ticker (Desktop) */}
             <div className="hidden lg:flex items-center rounded-full border border-[rgba(20,21,23,0.1)] bg-[#ECEBE5]/60 px-3 py-1">
               <DynamicText
@@ -244,6 +265,8 @@ export function NavBar() {
 
           {/* Right Action Group */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <NotificationCenter />
+
             <ShinyButton
               onClick={() => setGovModalOpen(true)}
               className="!py-1.5 !px-3 sm:!px-3.5 !text-xs !font-sans !font-medium"

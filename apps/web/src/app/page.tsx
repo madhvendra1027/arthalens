@@ -186,12 +186,13 @@ export default function HomePage() {
           ========================================================================= */}
       <section className="relative py-16 sm:py-24 border-b border-[rgba(20,21,23,0.14)] overflow-hidden">
         {/* Subtle interactive DotField membrane in background */}
-        <div className="absolute inset-0 pointer-events-auto opacity-15">
+        <div className="absolute inset-0 pointer-events-none opacity-20">
           <DotField
-            className="w-full h-full min-h-full bg-transparent text-[#141416]"
-            spacing={24}
-            interactive={true}
+            className="w-full h-full min-h-full bg-transparent border-0"
+            spacing={28}
+            interactive={false}
             seed={42}
+            showJourney={false}
           >
             {null}
           </DotField>
@@ -398,6 +399,17 @@ export default function HomePage() {
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
+              </div>
+
+              {/* --- CHAPTER 02.2: THE VERIFIED ECONOMIC DATA JOURNEY --- */}
+              <div className="pt-2">
+                <DotField
+                  className="w-full shadow-xs"
+                  spacing={22}
+                  interactive={true}
+                  seed={42}
+                  showJourney={true}
+                />
               </div>
             </div>
           )}

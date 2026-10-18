@@ -142,7 +142,7 @@ export function RubberSegment({
             {isSelected && (
               <motion.div
                 layoutId={`rubber-thumb-${preset}`}
-                className="absolute inset-0 z-0 shadow-xs"
+                className="absolute inset-0 z-0 shadow-xs pointer-events-none"
                 style={{
                   backgroundColor: thumbColor,
                   borderRadius: radius === 9999 ? "9999px" : `${Math.max(4, radius - inset)}px`,

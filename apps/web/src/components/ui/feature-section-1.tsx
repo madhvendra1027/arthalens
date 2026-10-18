@@ -34,6 +34,7 @@ const DEFAULT_MENU_ITEMS: MenuItem[] = [
     title: "Analytical Engines",
     links: [
       { text: "Macro Accounts Workspace", url: "/gdp", badge: "Flagship" },
+      { text: "Global Market & Macro Intelligence", url: "/intelligence", badge: "New" },
       { text: "Deflator & Inflation Simulator", url: "/deflator", badge: "Live" },
       { text: "GDP Growth & Expenditure Drivers", url: "/gdp/why" },
       { text: "Sovereign AI Copilot", url: "/ai", badge: "Grounded" },
