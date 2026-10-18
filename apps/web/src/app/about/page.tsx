@@ -1,8 +1,27 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About ArthaLens - Sources & Governance",
-  description: "Official data policies, source provenance, and series isolation guidelines for ArthaLens macroeconomic platform.",
+  title: "About ArthaLens Observatory | Institutional Governance & Provenance",
+  description:
+    "Official data policies, source provenance, zero-synthetic-data pledge, and series isolation guidelines for the ArthaLens macroeconomic platform.",
+  alternates: {
+    canonical: "https://arthalens-production.up.railway.app/about",
+  },
+  openGraph: {
+    title: "About ArthaLens Observatory | Institutional Governance & Provenance",
+    description:
+      "Official data policies, source provenance, and series isolation guidelines for the ArthaLens macroeconomic platform.",
+    url: "https://arthalens-production.up.railway.app/about",
+    type: "website",
+    images: [
+      {
+        url: "https://arthalens-production.up.railway.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "About ArthaLens Observatory",
+      },
+    ],
+  },
 };
 
 export default function AboutPage() {

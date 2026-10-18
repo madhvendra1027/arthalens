@@ -10,43 +10,21 @@ export function middleware(request: NextRequest) {
 
   const sessionToken = request.cookies.get("arthalens_session")?.value;
 
-  // Unprotected / Public Explorer Paths
-  const isPublicPath =
-    pathname === "/" ||
-    pathname.startsWith("/gdp") ||
-    pathname.startsWith("/global") ||
-    pathname.startsWith("/methodology") ||
-    pathname.startsWith("/deflator") ||
-    pathname.startsWith("/revisions") ||
-    pathname.startsWith("/consistency") ||
-    pathname.startsWith("/ratings") ||
-    pathname.startsWith("/about") ||
-    pathname.startsWith("/sources") ||
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/static") ||
-    pathname === "/favicon.ico" ||
-    pathname === "/robots.txt" ||
-    pathname === "/sitemap.xml";
+  // Protected routes requiring active session
+  const isProtectedPath = pathname.startsWith("/analytics");
 
-  // If user is trying to access protected routes without a session cookie
-  if (!isPublicPath && !sessionToken) {
+  if (isProtectedPath && !sessionToken) {
     const loginUrl = new URL("/login", request.url);
-    if (pathname !== "/") {
-      loginUrl.searchParams.set("from", pathname);
-    }
+    loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Allow visiting /login so users can authenticate or switch accounts
-  return NextResponse.next();
-
+  // Allow visiting public and authenticated routes
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!_next/static|_next/image|favicon.ico|favicon.svg|icon.png|apple-touch-icon.png|og-image.png|site.webmanifest|sitemap.xml|robots.txt).*)",
   ],
 };

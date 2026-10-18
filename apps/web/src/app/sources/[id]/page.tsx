@@ -1,10 +1,42 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
-export const metadata: Metadata = {
-  title: "Statistical Source Provenance Detail | ArthaLens",
-  description: "Cryptographic provenance, publication metadata, and canonical verification links for official macroeconomic data sources.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const source = SOURCES_MAP[id];
+  const name = source ? source.name : id.toUpperCase();
+  const title = `${name} | Official Data Source Provenance — ArthaLens`;
+  const description = source
+    ? `Cryptographic SHA-256 provenance, publication cadence, and tracked series for ${source.fullName}.`
+    : `Cryptographic provenance, publication metadata, and canonical verification links for official macroeconomic data source ${id}.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `https://arthalens-production.up.railway.app/sources/${id}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://arthalens-production.up.railway.app/sources/${id}`,
+      type: "website",
+      images: [
+        {
+          url: "https://arthalens-production.up.railway.app/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${name} Provenance Record`,
+        },
+      ],
+    },
+  };
+}
 
 interface SourceDetail {
   id: string;
@@ -97,6 +129,13 @@ export default async function SourcePage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
+      <Breadcrumbs
+        items={[
+          { label: "Data Sources", href: "/sources" },
+          { label: source.name, href: `/sources/${source.id}` },
+        ]}
+        className="mb-4 !text-slate-500"
+      />
       {/* Top Breadcrumb and Actions */}
       <div className="mb-4 flex items-center justify-between">
         <Link

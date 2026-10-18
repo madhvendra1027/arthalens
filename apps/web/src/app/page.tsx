@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { clsx } from "clsx";
+import { trackEvent } from "@/lib/analytics";
 import { useDashboard } from "@/hooks/useApi";
 import { ErrorState, LoadingGrid } from "@/components/ui/StateComponents";
 import { HeroConstellation } from "@/components/antimetal/HeroConstellation";
@@ -102,7 +102,9 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/gdp"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#141416] px-6 py-3 font-mono text-xs font-semibold tracking-wide text-[#ECEBE5] shadow-xs hover:bg-[#D94E34] transition-colors cursor-pointer"
+                  onClick={() => trackEvent("cta_click", { label: "hero_macro_workspace", destination: "/gdp" })}
+                  aria-label="Explore Macro Accounts Workspace"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#141416] px-6 py-3 font-mono text-xs font-semibold tracking-wide text-[#ECEBE5] shadow-xs hover:bg-[#D94E34] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#D94E34] focus-visible:ring-offset-2 focus:outline-hidden"
                 >
                   <BarChart3 className="h-3.5 w-3.5" />
                   <span>Explore Macro Accounts Workspace</span>
@@ -110,14 +112,17 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href="/deflator"
-                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.2)] bg-[#ECEBE5] px-5 py-3 font-mono text-xs font-semibold tracking-wide text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer"
+                  onClick={() => trackEvent("cta_click", { label: "hero_deflator_simulator", destination: "/deflator" })}
+                  aria-label="Launch Inflation and Deflator Simulator"
+                  className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.2)] bg-[#ECEBE5] px-5 py-3 font-mono text-xs font-semibold tracking-wide text-[#141416] hover:bg-[#DFDED8] transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#141416] focus-visible:ring-offset-2 focus:outline-hidden"
                 >
                   <SlidersHorizontal className="h-3.5 w-3.5 text-[#D94E34]" />
                   <span>Deflator Simulator</span>
                 </Link>
                 <Link
                   href="/methodology"
-                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 font-mono text-xs font-semibold text-[#57585C] hover:text-[#141416] transition-colors"
+                  aria-label="Read UN SNA 2008 National Accounts Methodology"
+                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-3 font-mono text-xs font-semibold text-[#57585C] hover:text-[#141416] transition-colors focus-visible:ring-2 focus-visible:ring-[#141416] focus:outline-hidden"
                 >
                   <Compass className="h-3.5 w-3.5 text-[#059669]" />
                   <span>Methodology</span>

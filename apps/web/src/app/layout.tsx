@@ -4,6 +4,9 @@ import "./globals.css";
 import { NavBar } from "@/components/layout/NavBar";
 import { Providers } from "@/components/Providers";
 import { AntimetalFooter } from "@/components/antimetal/AntimetalFooter";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
+import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -72,6 +75,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://arthalens-production.up.railway.app",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -80,12 +94,22 @@ export const metadata: Metadata = {
     title: "India GDP & Macroeconomic Indicators 2024 | Official MoSPI & RBI Data",
     description:
       "Authoritative economic portal for India's National Accounts Statistics. Real GDP (+8.2%), Nominal GDP, Sectoral GVA, Deflator, and Sovereign Credit Ratings.",
+    images: [
+      {
+        url: "https://arthalens-production.up.railway.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ArthaLens — India Macroeconomic Intelligence Platform",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "India GDP & Macroeconomic Intelligence | ArthaLens",
     description:
       "Official macroeconomic data repository published by MoSPI and RBI. Real GDP (+8.2%), Nominal GDP, and Sectoral GVA.",
+    images: ["https://arthalens-production.up.railway.app/og-image.png"],
   },
   robots: {
     index: true,
@@ -115,6 +139,20 @@ export default function RootLayout({
         "name": "ArthaLens Macroeconomic Intelligence",
         "description": "Official India National Accounts Statistics, GDP growth rates, and economic indicators portal.",
         "inLanguage": "en-IN",
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://arthalens-production.up.railway.app/#organization",
+        "name": "ArthaLens Macro Intelligence",
+        "url": "https://arthalens-production.up.railway.app",
+        "logo": "https://arthalens-production.up.railway.app/icon.png",
+        "description": "Independent macroeconomic data observatory synthesizing sovereign National Accounts Statistics, Implicit Price Deflators, and sub-national accounts for India.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "Institutional Inquiries & Research",
+          "url": "https://arthalens-production.up.railway.app/contact",
+          "email": "research@arthalens.internal"
+        }
       },
       {
         "@type": "Dataset",
@@ -230,11 +268,16 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#E6E5DF] text-[#141416]">
-        <Providers>
-          <NavBar />
-          <main className="min-h-screen">{children}</main>
-          <AntimetalFooter />
-        </Providers>
+        <AnalyticsProvider>
+          <Providers>
+            <ToastProvider>
+              <NavBar />
+              <main className="min-h-screen">{children}</main>
+              <AntimetalFooter />
+              <CookieConsentBanner />
+            </ToastProvider>
+          </Providers>
+        </AnalyticsProvider>
       </body>
     </html>
   );

@@ -1,8 +1,9 @@
 "use client";
 
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { ArthaLensLogo } from "@/components/ui/ArthaLensLogo";
-import { ShieldCheck, ExternalLink } from "lucide-react";
+import { ShieldCheck, ExternalLink, Mail } from "lucide-react";
 
 export interface MenuItem {
   title: string;
@@ -23,78 +24,84 @@ export interface FooterSectionProps {
   aboutText?: string;
   status?: StatusItem[];
   menuItems?: MenuItem[];
-  copyright?: string;
   bottomLinks?: { text: string; url: string }[];
   showSystemStatus?: boolean;
   className?: string;
 }
 
+const DEFAULT_MENU_ITEMS: MenuItem[] = [
+  {
+    title: "Analytical Engines",
+    links: [
+      { text: "Macro Accounts Workspace", url: "/gdp", badge: "Flagship" },
+      { text: "Deflator & Inflation Simulator", url: "/deflator", badge: "Live" },
+      { text: "GDP Growth & Expenditure Drivers", url: "/gdp/why" },
+      { text: "Sovereign AI Copilot", url: "/ai", badge: "Grounded" },
+      { text: "Global Macroeconomic Nexus", url: "/global", badge: "World Bank" },
+    ],
+  },
+  {
+    title: "Institutions & Feeds",
+    links: [
+      { text: "Official Sources & Registry", url: "/sources", badge: "SHA-256" },
+      { text: "Sovereign Credit Ratings", url: "/ratings" },
+      { text: "MoSPI NAS Releases", url: "/sources" },
+      { text: "RBI DBIE Data Feeds", url: "/sources" },
+      { text: "State DES Surveys", url: "/sources" },
+    ],
+  },
+  {
+    title: "Methodology & Audit",
+    links: [
+      { text: "How It Works & Architecture", url: "/how-it-works", badge: "Guide" },
+      { text: "UN SNA 2008 Double Deflation", url: "/methodology" },
+      { text: "Multi-Source Consistency Audit", url: "/consistency" },
+      { text: "MoSPI Revision Calendar", url: "/revisions" },
+      { text: "Base Year Harmonization", url: "/methodology" },
+    ],
+  },
+  {
+    title: "Legal & Governance",
+    links: [
+      { text: "Privacy Policy", url: "/privacy", badge: "Updated" },
+      { text: "Terms & Conditions", url: "/terms" },
+      { text: "Institutional Inquiries", url: "/contact", badge: "Direct" },
+      { text: "Governance & About", url: "/about" },
+      { text: "Institutional Login", url: "/login" },
+    ],
+  },
+];
+
+const DEFAULT_BOTTOM_LINKS = [
+  { text: "Privacy Policy", url: "/privacy" },
+  { text: "Terms & Conditions", url: "/terms" },
+  { text: "Institutional Contact", url: "/contact" },
+  { text: "UN SNA 2008 Methodology", url: "/how-it-works" },
+  { text: "Official Data Sources", url: "/sources" },
+  { text: "Governance & About", url: "/about" },
+];
+
 export default function FooterSection({
   aboutTitle = "About ArthaLens Observatory",
-  aboutText = "ArthaLens provides institutional-grade transparency for Indian National Accounts. We synthesize real-time GDP decomposition, UN SNA 2008 double deflation, and sub-national GSDP across 31 state economies with cryptographic provenance from official MoSPI and RBI releases.",
+  aboutText = "ArthaLens is India's sovereign macroeconomic intelligence observatory. We synthesize official National Accounts, model double-deflation under UN SNA 2008 standards, and audit state economic accounts with cryptographic SHA-256 provenance.",
   status = [
     { text: "1.4B+", subtext: "Demographic Coverage" },
     { text: "31", subtext: "States & UTs Modelled" },
     { text: "2022-23", subtext: "Active Benchmark" },
     { text: "SHA-256", subtext: "Cryptographic Seal" },
   ],
-  menuItems = [
-    {
-      title: "Analytical Engines",
-      links: [
-        { text: "GDP Explorer & Accounts", url: "/gdp", badge: "Live" },
-        { text: "Deflator & Inflation Simulator", url: "/deflator" },
-        { text: "Macro Accounts Workspace", url: "/gdp", badge: "Flagship" },
-        { text: "Sovereign AI Copilot", url: "/ai", badge: "MoSPI Grounded" },
-      ],
-    },
-    {
-      title: "Institutions & Feeds",
-      links: [
-        { text: "MoSPI NAS Provisional Press Notes", url: "/sources" },
-        { text: "RBI Database on Indian Economy (DBIE)", url: "/sources" },
-        { text: "Sovereign Ratings Matrix (Fitch, Moody's, S&P)", url: "/ratings" },
-        { text: "World Bank WDI Global Nexus", url: "/global" },
-        { text: "State DES Economic Surveys", url: "/sources" },
-      ],
-    },
-    {
-      title: "Methodology & Audit",
-      links: [
-        { text: "System Architecture & Flow", url: "/how-it-works" },
-        { text: "UN SNA 2008 Double Deflation", url: "/how-it-works" },
-        { text: "Base Year Harmonization Standards", url: "/methodology" },
-        { text: "Multi-Source Consistency Audit", url: "/consistency" },
-        { text: "Revision Calendar & Backcast Tables", url: "/revisions" },
-      ],
-    },
-    {
-      title: "Governance & Access",
-      links: [
-        { text: "Open Data Framework (OGD India)", url: "/about" },
-        { text: "Data Provenance Manifesto", url: "/about" },
-        { text: "Zero Synthetic Data Guarantee", url: "/about" },
-        { text: "REST API Documentation", url: "/how-it-works" },
-        { text: "Institutional Portal Login", url: "/login" },
-      ],
-    },
-  ],
-  copyright = "© 2026 ArthaLens Macroeconomic Intelligence. Official MoSPI, RBI, and UN SNA 2008 statistics verified with cryptographic provenance. Open Government Data Platform India (OGD).",
-  bottomLinks = [
-    { text: "Terms of Research", url: "/about" },
-    { text: "Data Provenance", url: "/about" },
-    { text: "Security Architecture", url: "/about" },
-    { text: "UN SNA 2008 Chapter 15", url: "/how-it-works" },
-    { text: "MoSPI NAS 2024", url: "/sources" },
-  ],
+  menuItems = DEFAULT_MENU_ITEMS,
+  bottomLinks = DEFAULT_BOTTOM_LINKS,
   showSystemStatus = true,
   className = "",
 }: FooterSectionProps) {
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+
   return (
     <footer
       className={`relative mt-16 sm:mt-24 border-t border-[rgba(20,21,23,0.14)] bg-[#E6E5DF] text-[#141416] select-none ${className}`}
       role="contentinfo"
-      aria-label="Site Footer"
+      aria-label="ArthaLens Site Footer"
     >
       {/* Precision Top Editorial Crosshairs */}
       <div className="absolute top-0 left-6 sm:left-10 font-mono text-xs text-[#828387] -translate-y-1/2 pointer-events-none select-none">
@@ -109,7 +116,11 @@ export default function FooterSection({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-10 border-b border-[rgba(20,21,23,0.12)]">
           {/* Identity & About Column (4 cols) */}
           <div className="lg:col-span-4 space-y-5">
-            <Link href="/" className="inline-flex items-center gap-3 group focus:outline-hidden">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3 group focus-visible:ring-2 focus-visible:ring-[#D94E34] focus:outline-hidden rounded-lg p-1"
+              aria-label="ArthaLens National Accounts Observatory Home"
+            >
               <ArthaLensLogo size="md" />
               <div>
                 <span className="font-heading font-bold text-lg tracking-tight text-[#141416] block group-hover:text-[#D94E34] transition-colors">
@@ -130,11 +141,11 @@ export default function FooterSection({
               </p>
             </div>
 
-            {/* Telemetry Status Pills */}
+            {/* Observatory Telemetry Status Pills */}
             {status && status.length > 0 && (
               <div className="space-y-2 pt-2">
                 <span className="font-mono text-[10px] uppercase font-bold tracking-wider text-[#828387] block">
-                  Observatory Telemetry & Scope
+                  Observatory Telemetry &amp; Scope
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {status.map((item, idx) => (
@@ -153,9 +164,15 @@ export default function FooterSection({
                 </div>
               </div>
             )}
+
+            {/* Contact / Inquiries Box */}
+            <div className="pt-2 text-xs font-mono text-[#57585C] flex items-center gap-2">
+              <Mail className="h-3.5 w-3.5 text-[#D94E34]" />
+              <span>Inquiries: <a href="mailto:governance@arthalens.org" className="underline hover:text-[#141416]">governance@arthalens.org</a></span>
+            </div>
           </div>
 
-          {/* Navigation Links (8 cols: 4 sub-columns) */}
+          {/* Navigation Columns (8 cols: 4 sub-columns) */}
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
             {menuItems.map((section, sectionIdx) => (
               <div key={sectionIdx} className="space-y-3.5">
@@ -167,7 +184,7 @@ export default function FooterSection({
                     <li key={linkIdx}>
                       <Link
                         href={link.url}
-                        className="group flex items-center justify-between text-[#57585C] hover:text-[#141416] transition-colors py-0.5 leading-snug"
+                        className="group flex items-center justify-between text-[#57585C] hover:text-[#141416] transition-colors py-0.5 leading-snug focus-visible:ring-2 focus-visible:ring-[#D94E34] focus:outline-hidden rounded-sm"
                       >
                         <span className="group-hover:translate-x-0.5 transition-transform">
                           {link.text}
@@ -213,17 +230,17 @@ export default function FooterSection({
           </div>
         )}
 
-        {/* --- Bottom Row: Legal, Attribution, & Deep Links --- */}
+        {/* --- Bottom Row: Dynamic Copyright, Attribution, & Legal Links --- */}
         <div className="pt-6 flex flex-col lg:flex-row justify-between items-start lg:items-center text-[11px] font-mono text-[#828387] gap-4">
           <p className="max-w-xl leading-relaxed">
-            {copyright}
+            &copy; {currentYear} ArthaLens Macroeconomic Intelligence. Official MoSPI, RBI, and UN SNA 2008 statistics verified with cryptographic provenance. Published under the Open Government Data Platform India (OGD) Framework.
           </p>
           <ul className="flex flex-wrap items-center gap-4 sm:gap-5 font-sans text-xs">
             {bottomLinks.map((link, linkIdx) => (
               <li key={linkIdx}>
                 <Link
                   href={link.url}
-                  className="text-[#57585C] hover:text-[#D94E34] transition-colors underline underline-offset-4"
+                  className="text-[#57585C] hover:text-[#D94E34] transition-colors underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-[#D94E34] focus:outline-hidden rounded-xs"
                 >
                   {link.text}
                 </Link>

@@ -20,11 +20,19 @@ export const metadata: Metadata = {
     canonical: "https://arthalens-production.up.railway.app/gdp",
   },
   openGraph: {
-    title: "India GDP Explorer | Time Series & Sectoral Growth",
+    title: "India GDP Explorer & Sectoral Decomposition | ArthaLens",
     description: "Official MoSPI National Accounts Statistics: Real GDP, Nominal GDP, and Sectoral GVA Decomposition.",
     url: "https://arthalens-production.up.railway.app/gdp",
     siteName: "ArthaLens",
     type: "website",
+    images: [
+      {
+        url: "https://arthalens-production.up.railway.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ArthaLens GDP Explorer",
+      },
+    ],
   },
 };
 

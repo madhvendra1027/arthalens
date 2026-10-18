@@ -25,6 +25,7 @@ import {
   Database,
   BarChart3,
   BookOpen,
+  Mail,
 } from "lucide-react";
 
 interface NavOption {
@@ -131,6 +132,12 @@ const NAVIGATION_SECTIONS: NavSection[] = [
         description: "Cryptographic SHA-256 verification and official statistical gazette archives.",
         href: "/sources",
         icon: Database,
+      },
+      {
+        title: "Contact & Institutional Desk",
+        description: "Direct communications channel for data licensing, research collaborations, and SLA feeds.",
+        href: "/contact",
+        icon: Mail,
       },
     ],
   },

@@ -13,6 +13,7 @@ import {
   Scale,
   Compass,
 } from "lucide-react";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 interface MethodologyArticle {
   id: string;
@@ -132,7 +133,8 @@ export default function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-[#E6E5DF] text-[#141416] py-10 px-6">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl space-y-4">
+        <Breadcrumbs items={[{ label: "Methodology & Architecture", href: "/how-it-works" }]} className="!text-[#57585C]" />
         {/* Header Breadcrumb & Title */}
         <div className="mb-10 rounded-2xl border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] p-8 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-3">

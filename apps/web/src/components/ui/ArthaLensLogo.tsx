@@ -29,6 +29,8 @@ export function ArthaLensLogo({ size = "md", className = "", showText = false }:
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="w-full h-full p-1.5"
+          role="img"
+          aria-label="ArthaLens Logo — Magnifying Glass with Indian Rupee Lens"
         >
           {/* Subtle Precision Optics Crosshairs */}
           <line x1="21" y1="9" x2="21" y2="33" stroke="#60a5fa" strokeWidth="0.7" strokeDasharray="2 2" opacity="0.4" />

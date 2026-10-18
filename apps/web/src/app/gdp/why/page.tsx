@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 interface SectorContribution {
   sector: string;
@@ -21,6 +22,7 @@ const SECTOR_CONTRIBUTIONS: SectorContribution[] = [
 export default function GDPWhyPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
+      <Breadcrumbs items={[{ label: "GDP Explorer", href: "/gdp" }, { label: "Growth Accounting", href: "/gdp/why" }]} className="mb-4 !text-slate-500" />
       {/* Official Header */}
       <div className="mb-6 rounded-md border border-slate-200 bg-white p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div>

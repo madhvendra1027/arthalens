@@ -21,6 +21,14 @@ export const metadata: Metadata = {
     url: "https://arthalens-production.up.railway.app/revisions",
     siteName: "ArthaLens",
     type: "website",
+    images: [
+      {
+        url: "https://arthalens-production.up.railway.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ArthaLens GDP Revisions Monitor",
+      },
+    ],
   },
 };
 
