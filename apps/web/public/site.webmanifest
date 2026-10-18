@@ -1,11 +1,11 @@
 {
-  "name": "ArthaLens — India Macroeconomic Intelligence",
+  "name": "ArthaLens — Global Macroeconomic Intelligence",
   "short_name": "ArthaLens",
-  "description": "Official repository and analytical observatory for India's National Accounts Statistics with cryptographic provenance.",
+  "description": "Global macroeconomic intelligence and economic analysis platform with cryptographic provenance.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#E6E5DF",
-  "theme_color": "#141416",
+  "background_color": "#070B12",
+  "theme_color": "#070B12",
   "icons": [
     {
       "src": "/favicon.ico",

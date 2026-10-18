@@ -1,139 +1,168 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-interface LogoProps {
-  size?: "sm" | "md" | "lg" | "xl";
+export type LogoVariant = "auto" | "horizontal" | "full" | "symbol";
+export type LogoSize = "xs" | "sm" | "md" | "lg" | "xl";
+
+interface ArthaLensLogoProps {
+  variant?: LogoVariant;
+  size?: LogoSize;
   className?: string;
+  asLink?: boolean;
+  href?: string;
+  priority?: boolean;
+  alt?: string;
+  /** Backward compatibility flag */
   showText?: boolean;
-
 }
 
-export function ArthaLensLogo({ size = "md", className = "", showText = false }: LogoProps) {
-  const dimensions = {
-    sm: { box: 28, text: "text-base", sub: "text-[9px]" },
-    md: { box: 40, text: "text-lg", sub: "text-[10px]" },
-    lg: { box: 52, text: "text-2xl", sub: "text-xs" },
-    xl: { box: 64, text: "text-3xl", sub: "text-sm" },
-  }[size];
+const SIZE_CONFIGS = {
+  symbol: {
+    xs: { dim: 24, className: "w-6 h-6" },
+    sm: { dim: 32, className: "w-8 h-8" },
+    md: { dim: 40, className: "w-10 h-10" },
+    lg: { dim: 56, className: "w-14 h-14" },
+    xl: { dim: 72, className: "w-[72px] h-[72px]" },
+  },
+  horizontal: {
+    xs: { height: 24, width: 77, className: "h-6 w-auto" },
+    sm: { height: 32, width: 103, className: "h-8 w-auto" },
+    md: { height: 40, width: 128, className: "h-10 w-auto" },
+    lg: { height: 56, width: 180, className: "h-14 w-auto" },
+    xl: { height: 72, width: 231, className: "h-[72px] w-auto" },
+  },
+  full: {
+    xs: { height: 48, width: 40, className: "h-12 w-auto" },
+    sm: { height: 72, width: 61, className: "h-[72px] w-auto" },
+    md: { height: 110, width: 93, className: "h-[110px] w-auto" },
+    lg: { height: 160, width: 135, className: "h-[160px] w-auto" },
+    xl: { height: 240, width: 202, className: "h-[240px] w-auto" },
+  },
+};
 
-  return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Precision Magnifying Glass with Magnified Rupee (₹) Lens */}
-      <div
-        className="relative flex items-center justify-center rounded-lg bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 shadow-sm border border-slate-700/80 overflow-hidden group hover:border-blue-500 transition-all duration-200"
-        style={{ width: dimensions.box, height: dimensions.box }}
-      >
-        <svg
-          viewBox="0 0 48 48"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full p-1.5"
-          role="img"
-          aria-label="ArthaLens Logo — Magnifying Glass with Indian Rupee Lens"
-        >
-          {/* Subtle Precision Optics Crosshairs */}
-          <line x1="21" y1="9" x2="21" y2="33" stroke="#60a5fa" strokeWidth="0.7" strokeDasharray="2 2" opacity="0.4" />
-          <line x1="9" y1="21" x2="33" y2="21" stroke="#60a5fa" strokeWidth="0.7" strokeDasharray="2 2" opacity="0.4" />
+export function ArthaLensLogo({
+  variant = "horizontal",
+  size = "md",
+  className = "",
+  asLink = false,
+  href = "/",
+  priority = true,
+  alt = "ArthaLens — Macroeconomic Intelligence",
+  showText,
+}: ArthaLensLogoProps) {
+  // If showText was explicitly passed and variant is symbol, upgrade to horizontal
+  const activeVariant = showText === true && variant === "symbol" ? "horizontal" : variant;
 
-          {/* Optical Magnifying Glass Lens Body */}
-          <circle
-            cx="21"
-            cy="21"
-            r="12.5"
-            fill="url(#lensGlassGrad)"
-            stroke="url(#lensRimGrad)"
-            strokeWidth="2.5"
-          />
+  const renderContent = () => {
+    if (activeVariant === "auto") {
+      // Responsive: compact symbol on mobile, horizontal lockup on desktop
+      const symConf = SIZE_CONFIGS.symbol[size];
+      const horizConf = SIZE_CONFIGS.horizontal[size];
 
-          {/* Optical Glare Arc */}
-          <path
-            d="M12 16 A 10.5 10.5 0 0 1 25 10.5"
-            stroke="#bae6fd"
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.8"
-          />
-
-          {/* Magnified Indian Rupee Symbol (₹) Centered Under Lens */}
-          <g
-            stroke="url(#rupeeGrad)"
-            strokeWidth="2.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            {/* Top horizontal bar */}
-            <path d="M15 15.5 h11" />
-            {/* Middle horizontal bar */}
-            <path d="M15 19.5 h8.5" />
-            {/* Stem and upper curved bowl */}
-            <path d="M15 15.5 v9.5 c2.2 0 4.8 -.3 6 -2 1.3 -1.6 1.1 -4.8 -.2 -6.2" />
-            {/* Diagonal downward leg */}
-            <path d="M18.5 25 l6 7" />
-          </g>
-
-          {/* Magnifying Glass Bracket Connection */}
-          <path
-            d="M30 30 L32.5 32.5"
-            stroke="#93c5fd"
-            strokeWidth="3.2"
-            strokeLinecap="round"
-          />
-
-          {/* Magnifying Glass Handle */}
-          <path
-            d="M32.5 32.5 L41.5 41.5"
-            stroke="url(#handleGrad)"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          {/* Handle Brass End-Cap */}
-          <circle cx="41.5" cy="41.5" r="1.5" fill="#f59e0b" />
-
-          {/* Gradients */}
-          <defs>
-            <radialGradient id="lensGlassGrad" cx="38%" cy="38%" r="62%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.25" />
-              <stop offset="60%" stopColor="#1e3a8a" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#0f172a" stopOpacity="0.7" />
-            </radialGradient>
-
-            <linearGradient id="lensRimGrad" x1="9" y1="9" x2="33" y2="33" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#93c5fd" />
-              <stop offset="50%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#1d4ed8" />
-            </linearGradient>
-
-            <linearGradient id="rupeeGrad" x1="15" y1="14" x2="26" y2="32" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#fef08a" />
-              <stop offset="40%" stopColor="#fbbf24" />
-              <stop offset="100%" stopColor="#f59e0b" />
-            </linearGradient>
-
-            <linearGradient id="handleGrad" x1="32" y1="32" x2="41" y2="41" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="40%" stopColor="#334155" />
-              <stop offset="100%" stopColor="#0f172a" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {showText && (
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className={`font-extrabold tracking-tight text-slate-900 leading-none ${dimensions.text}`}>
-              Artha<span className="text-blue-700">Lens</span>
-            </span>
-            <span className="rounded bg-blue-50 text-blue-900 border border-blue-200 px-1.5 py-0.5 text-[10px] font-bold uppercase font-mono tracking-wider">
-              NSO • MoSPI
-            </span>
+      return (
+        <div className={`relative inline-flex items-center ${className}`}>
+          {/* Mobile Symbol */}
+          <div className="block sm:hidden shrink-0">
+            <div className="relative rounded-lg overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-xs">
+              <Image
+                src="/brand/arthalens-symbol.png"
+                alt={alt}
+                width={symConf.dim}
+                height={symConf.dim}
+                priority={priority}
+                className="object-contain"
+              />
+            </div>
           </div>
-          <span className={`font-medium text-slate-500 tracking-normal mt-0.5 ${dimensions.sub}`}>
-            National Accounts Statistics Portal
-          </span>
+
+          {/* Desktop Horizontal Lockup */}
+          <div className="hidden sm:block shrink-0">
+            <div className="relative rounded-lg overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-xs px-1.5 py-0.5">
+              <Image
+                src="/brand/arthalens-logo-horizontal.png"
+                alt={alt}
+                width={horizConf.width}
+                height={horizConf.height}
+                priority={priority}
+                className="object-contain"
+              />
+            </div>
+          </div>
         </div>
-      )}
-    </div>
-  );
+      );
+    }
+
+    if (activeVariant === "symbol") {
+      const conf = SIZE_CONFIGS.symbol[size];
+      return (
+        <div
+          className={`relative shrink-0 rounded-lg overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-xs ${className}`}
+          style={{ width: conf.dim, height: conf.dim }}
+        >
+          <Image
+            src="/brand/arthalens-symbol.png"
+            alt={alt}
+            width={conf.dim}
+            height={conf.dim}
+            priority={priority}
+            className="w-full h-full object-contain"
+          />
+        </div>
+      );
+    }
+
+    if (activeVariant === "full") {
+      const conf = SIZE_CONFIGS.full[size];
+      return (
+        <div
+          className={`relative inline-block rounded-xl overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-md p-2 ${className}`}
+        >
+          <Image
+            src="/brand/arthalens-logo.png"
+            alt={alt}
+            width={conf.width}
+            height={conf.height}
+            priority={priority}
+            className="object-contain mx-auto"
+          />
+        </div>
+      );
+    }
+
+    // Default: horizontal lockup
+    const conf = SIZE_CONFIGS.horizontal[size];
+    return (
+      <div
+        className={`relative inline-flex items-center rounded-lg overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-xs px-2 py-1 ${className}`}
+      >
+        <Image
+          src="/brand/arthalens-logo-horizontal.png"
+          alt={alt}
+          width={conf.width}
+          height={conf.height}
+          priority={priority}
+          className="object-contain"
+        />
+      </div>
+    );
+  };
+
+  if (asLink) {
+    return (
+      <Link
+        href={href}
+        className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E34] rounded-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        aria-label={alt}
+      >
+        {renderContent()}
+      </Link>
+    );
+  }
+
+  return renderContent();
 }
+
+export default ArthaLensLogo;

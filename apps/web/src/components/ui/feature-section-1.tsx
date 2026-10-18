@@ -119,18 +119,10 @@ export default function FooterSection({
           <div className="lg:col-span-4 space-y-5">
             <Link
               href="/"
-              className="inline-flex items-center gap-3 group focus-visible:ring-2 focus-visible:ring-[#D94E34] focus:outline-hidden rounded-lg p-1"
-              aria-label="ArthaLens National Accounts Observatory Home"
+              className="inline-flex items-center group focus-visible:ring-2 focus-visible:ring-[#D94E34] focus:outline-hidden rounded-lg transition-transform hover:scale-[1.01]"
+              aria-label="ArthaLens — Macroeconomic Intelligence Home"
             >
-              <ArthaLensLogo size="md" />
-              <div>
-                <span className="font-heading font-bold text-lg tracking-tight text-[#141416] block group-hover:text-[#D94E34] transition-colors">
-                  ArthaLens
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[#828387]">
-                  National Accounts Observatory
-                </span>
-              </div>
+              <ArthaLensLogo variant="horizontal" size="md" />
             </Link>
 
             <div className="space-y-2">

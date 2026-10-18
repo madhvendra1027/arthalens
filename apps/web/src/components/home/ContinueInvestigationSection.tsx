@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   TrendingUp,
   SlidersHorizontal,
@@ -147,28 +148,42 @@ export function ContinueInvestigationSection() {
           })}
         </div>
 
-        {/* Sovereign Open Data Guarantee Banner */}
-        <div className="mt-10 sm:mt-14 p-4 sm:p-6 lg:p-8 rounded-3xl bg-[#DFDED8]/80 border border-[rgba(20,21,23,0.14)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 text-xs font-mono text-[#57585C]">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <ShieldCheck className="h-6 w-6 text-[#059669] shrink-0" />
-            <div className="space-y-0.5">
-              <span className="font-bold text-sm text-[#141416] block">
-                ARTHALENS OPEN DATA & PROVENANCE GUARANTEE
-              </span>
-              <span>All series derived directly from official gazettes with zero synthetic interpolation.</span>
+        {/* Sovereign Open Data Guarantee & Official Brand Charter */}
+        <div className="mt-10 sm:mt-14 p-6 sm:p-8 rounded-3xl bg-[#070B12] border border-[rgba(255,255,255,0.12)] text-[#ECEBE5] shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+          <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 text-center sm:text-left">
+            <div className="shrink-0 p-1.5 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
+              <Image
+                src="/brand/arthalens-logo.png"
+                alt="ArthaLens — Macroeconomics. Clearer."
+                width={118}
+                height={140}
+                className="rounded-xl object-contain"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2 font-mono text-[11px] font-bold text-[#D94E34] uppercase tracking-wider">
+                <span className="h-2 w-2 rounded-full bg-[#D94E34]" />
+                <span>OFFICIAL BRAND CHARTER & PROVENANCE GUARANTEE</span>
+              </div>
+              <h3 className="font-heading text-lg sm:text-xl font-bold text-white tracking-tight">
+                Macroeconomics. Clearer.
+              </h3>
+              <p className="font-sans text-xs sm:text-sm text-[#94A3B8] max-w-xl leading-relaxed">
+                ArthaLens is India&apos;s sovereign macroeconomic intelligence observatory. All series are synthesized directly from official MoSPI and RBI gazettes with cryptographic SHA-256 provenance.
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-4 shrink-0 font-mono text-xs">
             <Link
               href="/sources"
-              className="text-[#141416] hover:text-[#D94E34] underline underline-offset-4 font-semibold"
+              className="text-[#ECEBE5] hover:text-[#D94E34] underline underline-offset-4 font-semibold transition-colors"
             >
-              Sources & Methods
+              Sources &amp; Methods
             </Link>
-            <span>•</span>
+            <span className="text-white/30">•</span>
             <Link
               href="/about"
-              className="text-[#141416] hover:text-[#D94E34] underline underline-offset-4 font-semibold"
+              className="text-[#ECEBE5] hover:text-[#D94E34] underline underline-offset-4 font-semibold transition-colors"
             >
               Open Data Policy
             </Link>

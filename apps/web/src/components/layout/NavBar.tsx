@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { GovernmentTerminalModal } from "@/components/antimetal/GovernmentTerminalModal";
@@ -194,21 +195,57 @@ export function NavBar() {
         }`}
       >
         <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
-          {/* Left: Aligned Hamburger Menu Button & Telemetry Ticker */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Left: Brand Identity & Navigation Controls */}
+          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
+            {/* Official Logo Link (navigates to homepage) */}
+            <Link
+              href="/"
+              className="inline-flex items-center shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D94E34] rounded-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              aria-label="ArthaLens — Macroeconomic Intelligence Home"
+            >
+              {/* Mobile Viewport: Compact Emblem (globe & sculpted A) */}
+              <div className="block sm:hidden shrink-0">
+                <div className="relative h-8 w-8 rounded-lg overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-xs">
+                  <Image
+                    src="/brand/arthalens-symbol.png"
+                    alt="ArthaLens — Macroeconomic Intelligence"
+                    width={32}
+                    height={32}
+                    priority
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Desktop Viewport: Official Horizontal Brand Lockup */}
+              <div className="hidden sm:block shrink-0">
+                <div className="relative rounded-lg overflow-hidden border border-[rgba(20,21,23,0.18)] bg-[#070B12] shadow-xs px-2 py-1">
+                  <Image
+                    src="/brand/arthalens-logo-horizontal.png"
+                    alt="ArthaLens — Macroeconomic Intelligence"
+                    width={116}
+                    height={36}
+                    priority
+                    className="h-7 w-auto object-contain"
+                  />
+                </div>
+              </div>
+            </Link>
+
+            {/* Hamburger Menu Trigger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-3.5 py-1.5 text-[13px] font-sans font-medium text-[#141416] hover:bg-black/5 hover:border-[rgba(20,21,23,0.35)] transition-all shadow-2xs cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-2.5 sm:px-3.5 py-1.5 text-[12px] sm:text-[13px] font-sans font-medium text-[#141416] hover:bg-black/5 hover:border-[rgba(20,21,23,0.35)] transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
               aria-label="Toggle navigation menu"
               aria-expanded={menuOpen}
             >
               <Menu className="h-3.5 w-3.5 text-[#141416]" />
-              <span className="leading-none">Menu</span>
+              <span className="leading-none hidden xs:inline">Menu</span>
             </button>
 
             <Link
               href="/how-it-works"
-              className={`hidden sm:inline-flex items-center rounded-full px-3 py-1.5 text-[13px] font-sans font-medium transition-colors ${
+              className={`hidden md:inline-flex items-center rounded-full px-3 py-1.5 text-[13px] font-sans font-medium transition-colors shrink-0 ${
                 pathname === "/how-it-works"
                   ? "bg-[#141416] text-[#ECEBE5]"
                   : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
@@ -219,7 +256,7 @@ export function NavBar() {
 
             <Link
               href="/intelligence"
-              className={`hidden md:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-sans font-medium transition-colors ${
+              className={`hidden lg:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-sans font-medium transition-colors shrink-0 ${
                 pathname === "/intelligence"
                   ? "bg-[#141416] text-[#ECEBE5]"
                   : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
@@ -228,40 +265,26 @@ export function NavBar() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
               <span>Intelligence</span>
             </Link>
-
-            {/* Live Telemetry Dynamic Text Ticker (Desktop) */}
-            <div className="hidden lg:flex items-center rounded-full border border-[rgba(20,21,23,0.1)] bg-[#ECEBE5]/60 px-3 py-1">
-              <DynamicText
-                words={[
-                  { text: "MoSPI National Accounts • FY24" },
-                  { text: "Double Deflation Matrix Active" },
-                  { text: "Real GDP: ₹173.8L Cr (Base 2011-12)" },
-                  { text: "State GVA • 28 States & 3 UTs" },
-                  { text: "RBI High-Frequency Indicators" },
-                ]}
-                interval={2600}
-                loop={true}
-                className="!min-h-0"
-                containerClassName="!h-4 !min-w-[210px]"
-                textClassName="!text-[11px] !font-mono !text-[#57585C]"
-                dotClassName="!h-1.5 !w-1.5 bg-[#059669]"
-              />
-            </div>
           </div>
 
-          {/* Center Brand Capsule Badge */}
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 rounded-full border border-[rgba(20,21,23,0.15)] bg-[#ECEBE5] px-4 py-1.5 shadow-2xs hover:border-[rgba(20,21,23,0.3)] transition-all"
-          >
-            <div className="flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-[#141416]" />
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D94E34]" />
-            </div>
-            <span className="font-heading text-lg font-bold tracking-tight text-[#141416]">
-              Artha<span className="font-sans font-light text-xs text-[#57585C] ml-1">LENS</span>
-            </span>
-          </Link>
+          {/* Center: Live Telemetry Dynamic Text Ticker (Desktop / Wide screens) */}
+          <div className="hidden xl:flex items-center rounded-full border border-[rgba(20,21,23,0.1)] bg-[#ECEBE5]/60 px-3 py-1">
+            <DynamicText
+              words={[
+                { text: "MoSPI National Accounts • FY24" },
+                { text: "Double Deflation Matrix Active" },
+                { text: "Real GDP: ₹173.8L Cr (Base 2011-12)" },
+                { text: "State GVA • 28 States & 3 UTs" },
+                { text: "RBI High-Frequency Indicators" },
+              ]}
+              interval={2600}
+              loop={true}
+              className="!min-h-0"
+              containerClassName="!h-4 !min-w-[210px]"
+              textClassName="!text-[11px] !font-mono !text-[#57585C]"
+              dotClassName="!h-1.5 !w-1.5 bg-[#059669]"
+            />
+          </div>
 
           {/* Right Action Group */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
@@ -333,12 +356,24 @@ export function NavBar() {
               {/* Header Bar */}
               <div className="flex items-center justify-between pb-6 border-b border-[rgba(20,21,23,0.12)]">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 rounded-full border border-[rgba(20,21,23,0.15)] bg-white/60 px-3 py-1">
-                    <span className="h-2 w-2 rounded-full bg-[#D94E34]" />
+                  <div className="flex items-center gap-2 rounded-xl border border-[rgba(20,21,23,0.15)] bg-[#070B12] p-1 shadow-xs">
+                    <Image
+                      src="/brand/arthalens-symbol.png"
+                      alt="ArthaLens Symbol"
+                      width={28}
+                      height={28}
+                      className="rounded-md"
+                    />
+                  </div>
+                  <div className="flex flex-col">
                     <span className="font-mono text-xs font-bold text-[#141416] uppercase tracking-wider">
                       ArthaLens Navigation Hub
                     </span>
+                    <span className="font-mono text-[10px] text-[#828387]">
+                      Macroeconomics. Clearer.
+                    </span>
                   </div>
+                </div>
 
                   <div className="hidden md:flex items-center">
                     <DynamicText
@@ -356,7 +391,6 @@ export function NavBar() {
                       dotClassName="!h-1.5 !w-1.5 bg-[#059669]"
                     />
                   </div>
-                </div>
 
                 <button
                   onClick={() => setMenuOpen(false)}
