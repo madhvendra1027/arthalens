@@ -164,22 +164,28 @@
   }
 
   select {
-    color-scheme: light !important;
-    background-color: #ECEBE5 !important;
-    color: #141416 !important;
-    border-color: rgba(20, 21, 23, 0.2) !important;
-  }
-  
-  select option {
-    background-color: #ECEBE5 !important;
-    color: #141416 !important;
-  }
-
-  input, textarea {
-    color-scheme: light !important;
+    color-scheme: light;
     background-color: #ECEBE5;
     color: #141416;
     border-color: rgba(20, 21, 23, 0.2);
+  }
+  
+  select option {
+    background-color: #ECEBE5;
+    color: #141416;
+  }
+
+  input, textarea {
+    color-scheme: light;
+    background-color: #ECEBE5;
+    color: #141416;
+    border-color: rgba(20, 21, 23, 0.2);
+  }
+
+  .dark select, select.dark-select,
+  .dark input, input.dark-input,
+  .dark textarea, textarea.dark-textarea {
+    color-scheme: dark;
   }
 }
 
