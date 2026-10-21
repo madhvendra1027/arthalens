@@ -146,27 +146,27 @@ export default function AIPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
+    <div className="mx-auto max-w-4xl px-3.5 sm:px-6 py-5 sm:py-10">
       {/* Header */}
-      <div className="mb-8 rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="mb-6 sm:mb-8 rounded-2xl border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-4 sm:p-6 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="rounded-full bg-[#141416] text-[#ECEBE5] px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider">
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <span className="rounded-full bg-[#141416] text-[#ECEBE5] px-2.5 py-0.5 text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider">
               GROUNDED COPILOT ENGINE
             </span>
-            <span className="font-mono text-xs text-[#828387]">• MoSPI & RBI Verified Corpus</span>
+            <span className="font-mono text-[11px] text-[#828387]">• MoSPI & RBI Corpus</span>
           </div>
-          <h1 className="font-serif text-3xl font-normal tracking-tight text-[#141416]">
+          <h1 className="font-serif text-2xl sm:text-3xl font-normal tracking-tight text-[#141416]">
             Sovereign Research Copilot
           </h1>
-          <p className="text-xs text-[#57585C] mt-1 max-w-xl">
+          <p className="text-xs text-[#57585C] mt-1 max-w-xl leading-relaxed">
             Query official macroeconomic accounts, methodology notes, sovereign debt bulletins, and inflation metrics with source citations.
           </p>
         </div>
         {messages.length > 0 && (
           <button
             onClick={clearConversation}
-            className="btn-realistic btn-outline-pill px-4 py-1.5 text-xs font-mono font-bold self-start sm:self-auto"
+            className="btn-realistic btn-outline-pill px-3.5 py-2 text-xs font-mono font-bold self-start sm:self-auto min-h-[40px] cursor-pointer"
           >
             Clear Session
           </button>
@@ -174,21 +174,22 @@ export default function AIPage() {
       </div>
 
       {/* Chat Container */}
-      <div className="rounded-lg border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-6 shadow-2xs min-h-[460px] flex flex-col justify-between">
+      <div className="rounded-2xl border border-[rgba(20,21,23,0.12)] bg-[#ECEBE5] p-3.5 sm:p-6 shadow-2xs min-h-[420px] sm:min-h-[460px] flex flex-col justify-between">
         <div className="space-y-4 mb-4">
           {messages.length === 0 && (
-            <div className="py-8 text-center">
-              <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#828387] mb-4">
+            <div className="py-6 sm:py-8 text-center">
+              <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#828387] mb-3 sm:mb-4">
                 Suggested Economic Research Inquiries
               </h2>
-              <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-2 max-w-2xl mx-auto">
                 {SUGGESTED_QUERIES.map((q) => (
                   <button
                     key={q}
                     onClick={() => sendQuery(q)}
-                    className="rounded-full border border-[rgba(20,21,23,0.15)] bg-[#E8E7E0] px-3.5 py-1.5 text-xs text-[#141416] hover:bg-[#141416] hover:text-[#ECEBE5] transition-colors text-left font-mono"
+                    className="rounded-full border border-[rgba(20,21,23,0.15)] bg-[#E8E7E0] px-3.5 py-2 text-xs text-[#141416] hover:bg-[#141416] hover:text-[#ECEBE5] transition-colors text-left font-mono min-h-[40px] flex items-center justify-between gap-2 cursor-pointer"
                   >
-                    {q} ➔
+                    <span className="truncate">{q}</span>
+                    <span className="shrink-0 font-bold">&rarr;</span>
                   </button>
                 ))}
               </div>
@@ -198,13 +199,13 @@ export default function AIPage() {
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`rounded-xl px-5 py-4 text-xs leading-relaxed max-w-[85%] ${
+                className={`rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-xs leading-relaxed max-w-[94%] sm:max-w-[85%] ${
                   msg.role === "user"
                     ? "bg-[#141416] text-[#ECEBE5] font-medium"
                     : "bg-[#E8E7E0] border border-[rgba(20,21,23,0.12)] text-[#141416]"
                 }`}
               >
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+                <p className="whitespace-pre-wrap break-words">{msg.content}</p>
 
                 {/* Citations Box */}
                 {msg.citations && msg.citations.length > 0 && (
@@ -212,19 +213,22 @@ export default function AIPage() {
                     <span className="font-mono font-bold text-[#141416] block mb-1">
                       Official Source Citations ({msg.citations.length}):
                     </span>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {msg.citations.map((c) => (
-                        <div key={c.citationId} className="rounded bg-white/70 border border-[rgba(20,21,23,0.1)] p-2 font-mono text-[10px]">
-                          <span className="font-bold text-[#141416]">{c.title}</span>
-                          <span className="text-[#57585C]"> — {c.publisher} ({c.publicationDate ?? "Official Release"})</span>
+                        <div key={c.citationId} className="rounded-lg bg-white/75 border border-[rgba(20,21,23,0.1)] p-2.5 font-mono text-[10px] space-y-1">
+                          <div className="font-bold text-[#141416] leading-tight">{c.title}</div>
+                          <div className="text-[#57585C]">
+                            {c.publisher} ({c.publicationDate ?? "Official Release"})
+                          </div>
                           {c.url && (
                             <a
                               href={c.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="ml-2 font-bold text-[#D94E34] hover:underline"
+                              className="inline-flex items-center gap-1 font-bold text-[#D94E34] hover:underline pt-0.5 min-h-[28px]"
                             >
-                              Document Link ↗
+                              <span>Official Gazette Document Link</span>
+                              <span>&nearr;</span>
                             </a>
                           )}
                         </div>
@@ -233,8 +237,8 @@ export default function AIPage() {
                   </div>
                 )}
 
-                <div className="mt-2 flex items-center justify-between text-[10px] text-[#828387] font-mono">
-                  <span>{msg.role === "assistant" ? "Verified Grounded Response" : "Query"}</span>
+                <div className="mt-2.5 flex items-center justify-between text-[10px] text-[#828387] font-mono">
+                  <span>{msg.role === "assistant" ? "Verified Grounded Response" : "Inquiry"}</span>
                   <span>{msg.timestamp.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>
                 </div>
               </div>
@@ -252,26 +256,26 @@ export default function AIPage() {
         </div>
 
         {/* Input Bar */}
-        <form onSubmit={handleSubmit} className="flex gap-2 pt-4 border-t border-[rgba(20,21,23,0.1)]" role="search">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 pt-3 sm:pt-4 border-t border-[rgba(20,21,23,0.1)]" role="search">
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your macroeconomic query (e.g. FY24 Real GDP, double deflation, CPI vs WPI)..."
+            placeholder="Type your macroeconomic query (e.g. FY24 Real GDP, CPI)..."
             disabled={loading}
-            className="flex-1 rounded-full border border-[rgba(20,21,23,0.2)] bg-white px-4 py-2.5 text-xs text-[#141416] focus:border-[#141416] focus:outline-hidden font-mono"
+            className="flex-1 rounded-full border border-[rgba(20,21,23,0.2)] bg-white px-4 py-2.5 text-xs text-[#141416] focus:border-[#141416] focus:outline-hidden font-mono min-h-[44px]"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="btn-realistic btn-solid-black px-6 py-2.5 text-xs font-semibold disabled:opacity-50"
+            className="btn-realistic btn-solid-black px-4 sm:px-6 py-2.5 text-xs font-semibold disabled:opacity-50 min-h-[44px] shrink-0 cursor-pointer"
           >
             Ask
           </button>
         </form>
       </div>
-      <p className="mt-3 text-center text-[10px] text-[#828387] font-mono">
+      <p className="mt-3 text-center text-[10px] text-[#828387] font-mono px-2">
         {DISCLAIMER}
       </p>
     </div>

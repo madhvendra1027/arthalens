@@ -1,6 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Manrope, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#E6E5DF",
+};
 import { NavBar } from "@/components/layout/NavBar";
 import { Providers } from "@/components/Providers";
 import { AntimetalFooter } from "@/components/antimetal/AntimetalFooter";

@@ -312,7 +312,7 @@ export function BklitGdpLineChart({
                 role="tab"
                 aria-selected={timeRange === range}
                 onClick={() => setTimeRange(range)}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all min-h-[36px] flex items-center ${
                   timeRange === range
                     ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
                     : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
@@ -327,7 +327,7 @@ export function BklitGdpLineChart({
           <div className="inline-flex rounded-lg border border-[rgba(20,21,23,0.15)] bg-white/70 p-0.5 shadow-2xs">
             <button
               onClick={() => setMetricMode("gdp")}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all min-h-[36px] flex items-center ${
                 metricMode === "gdp"
                   ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
                   : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
@@ -338,7 +338,7 @@ export function BklitGdpLineChart({
             {showGrowth && (
               <button
                 onClick={() => setMetricMode("growth")}
-                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all min-h-[36px] flex items-center ${
                   metricMode === "growth"
                     ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
                     : "text-[#57585C] hover:text-[#141416] hover:bg-black/5"
@@ -354,7 +354,7 @@ export function BklitGdpLineChart({
             <button
               onClick={() => setShowProjections(!showProjections)}
               aria-pressed={showProjections}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all min-h-[36px] flex items-center ${
                 showProjections
                   ? "border-[#D97706] bg-[#FFFBEB] text-[#B45309]"
                   : "border-[rgba(20,21,23,0.15)] bg-white/60 text-[#57585C] hover:bg-white"

@@ -135,32 +135,46 @@ export function ContextualInspectorPanel({
   };
 
   return (
-    <div
-      ref={panelRef}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`${sector.title} Sector Investigation Panel`}
-      className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#ECEBE5] border-l border-[rgba(20,21,23,0.18)] shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300"
-    >
-      {/* Top Header Bar */}
-      <div className="p-6 border-b border-[rgba(20,21,23,0.12)] space-y-3 sticky top-0 bg-[#ECEBE5]/95 backdrop-blur-md z-10">
-        <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-[#141416] bg-[#DFDED8] border border-[rgba(20,21,23,0.12)]">
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: sector.color.primary }}
-            />
-            <span>{sector.category}</span>
-          </div>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-stretch sm:items-end pointer-events-none">
+      {/* Clickable Backdrop */}
+      <div
+        className="fixed inset-0 bg-[#141416]/50 backdrop-blur-xs pointer-events-auto transition-opacity duration-200"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-          <button
-            onClick={onClose}
-            aria-label="Close analytical inspection drawer"
-            className="rounded-full p-2 text-[#57585C] hover:text-[#141416] hover:bg-[#DFDED8] transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#141416]"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      {/* Responsive Sheet / Drawer Container */}
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${sector.title} Sector Investigation Panel`}
+        className="relative z-10 w-full sm:max-w-lg md:max-w-xl bg-[#ECEBE5] border-t sm:border-t-0 sm:border-l border-[rgba(20,21,23,0.18)] shadow-2xl rounded-t-3xl sm:rounded-none flex flex-col justify-between overflow-y-auto max-h-[90vh] sm:max-h-full sm:h-full pointer-events-auto pb-safe animate-in slide-in-from-bottom sm:slide-in-from-right duration-300"
+      >
+        {/* Mobile Drag / Sheet Handle */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1" onClick={onClose}>
+          <div className="w-12 h-1.5 rounded-full bg-[#141416]/20" />
         </div>
+
+        {/* Top Header Bar */}
+        <div className="p-4 sm:p-6 border-b border-[rgba(20,21,23,0.12)] space-y-2.5 sm:space-y-3 sticky top-0 bg-[#ECEBE5]/95 backdrop-blur-md z-10">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-[#141416] bg-[#DFDED8] border border-[rgba(20,21,23,0.12)]">
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: sector.color.primary }}
+              />
+              <span>{sector.category}</span>
+            </div>
+
+            <button
+              onClick={onClose}
+              aria-label="Close analytical inspection drawer"
+              className="rounded-full p-2.5 text-[#57585C] hover:text-[#141416] hover:bg-[#DFDED8] transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#141416] min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
         <div>
           <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#141416] tracking-tight">
@@ -288,15 +302,16 @@ export function ContextualInspectorPanel({
           <span>{sector.primaryAnalyticsLabel}</span>
           <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
         </Link>
-        <div className="text-center">
+        <div className="text-center pt-1">
           <button
             onClick={onClose}
-            className="font-mono text-[11px] text-[#828387] hover:text-[#141416] transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center font-mono text-xs text-[#57585C] hover:text-[#141416] py-2 px-4 rounded-full hover:bg-black/5 transition-colors cursor-pointer min-h-[44px]"
           >
             &larr; Return to Isometric Landscape
           </button>
         </div>
       </div>
     </div>
+  </div>
   );
 }

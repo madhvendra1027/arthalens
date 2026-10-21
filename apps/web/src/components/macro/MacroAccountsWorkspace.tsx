@@ -254,11 +254,11 @@ export function MacroAccountsWorkspace({
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#828387] shrink-0">
                 Base Year:
               </span>
-              <div className="max-w-full overflow-x-auto [scrollbar-width:none]">
+              <div className="max-w-full overflow-x-auto touch-pan-x [scrollbar-width:none]">
                 <RubberSegment
-                  items={["2022-23 Active Benchmark", "2011-12 Historical Series"]}
-                  defaultValue={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
-                  value={baseYear === "2022-23" ? "2022-23 Active Benchmark" : "2011-12 Historical Series"}
+                  items={["2022-23 (Active)", "2011-12 (Series)"]}
+                  defaultValue={baseYear === "2022-23" ? "2022-23 (Active)" : "2011-12 (Series)"}
+                  value={baseYear === "2022-23" ? "2022-23 (Active)" : "2011-12 (Series)"}
                   onChange={(val) =>
                     updateParam({ base_year: val.startsWith("2022") ? "2022-23" : "2011-12" })
                   }
@@ -269,8 +269,8 @@ export function MacroAccountsWorkspace({
                   size="sm"
                   radius={9999}
                   inset={2}
-                  equalSlots
-                  stretch={60}
+                  equalSlots={false}
+                  stretch={50}
                   squash={3}
                   speed={1}
                   glide={75}
@@ -288,9 +288,9 @@ export function MacroAccountsWorkspace({
                 <button
                   type="button"
                   onClick={() => updateParam({ price_type: "constant" })}
-                  className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap min-h-[36px] flex items-center ${
                     priceType === "constant"
-                      ? "bg-[#141416] text-[#ECEBE5]"
+                      ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
                       : "text-[#57585C] hover:text-[#141416]"
                   }`}
                 >
@@ -299,9 +299,9 @@ export function MacroAccountsWorkspace({
                 <button
                   type="button"
                   onClick={() => updateParam({ price_type: "current" })}
-                  className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-mono font-semibold transition-all cursor-pointer whitespace-nowrap min-h-[36px] flex items-center ${
                     priceType === "current"
-                      ? "bg-[#141416] text-[#ECEBE5]"
+                      ? "bg-[#141416] text-[#ECEBE5] shadow-xs"
                       : "text-[#57585C] hover:text-[#141416]"
                   }`}
                 >

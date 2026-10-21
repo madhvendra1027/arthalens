@@ -361,8 +361,13 @@ export function SovereignParticleGlobe({
 
     // 2. Scene and Camera
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0, 3.4);
+    const computeCameraZ = (aspectRatio: number) => {
+      // For narrow mobile portrait screens (aspect < 1), step back camera so globe and halo fit inside container
+      return aspectRatio < 1 ? 3.4 + (1 - aspectRatio) * 1.5 : 3.4;
+    };
+    const initialAspect = width / height;
+    const camera = new THREE.PerspectiveCamera(40, initialAspect, 0.1, 100);
+    camera.position.set(0, 0, computeCameraZ(initialAspect));
     cameraRef.current = camera;
 
     // 3. Globe Container Group
@@ -580,8 +585,14 @@ export function SovereignParticleGlobe({
 
     // 8. Animation & Render Loop
     let tick = 0;
+    let isVisible = true;
 
     const render = () => {
+      if (!isVisible) {
+        animFrameRef.current = null;
+        return;
+      }
+
       tick += 0.016;
 
       // Handle smooth targeting rotation if an anchor was selected
@@ -664,14 +675,41 @@ export function SovereignParticleGlobe({
     render();
     setIsReady(true);
 
-    // 10. ResizeObserver to handle container dimension changes reliably
+    // 10. Visibility and Intersection Observers to pause off-screen rendering
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        const wasVisible = isVisible;
+        isVisible = entry.isIntersecting;
+        if (isVisible && !wasVisible && !animFrameRef.current) {
+          animFrameRef.current = requestAnimationFrame(render);
+        }
+      },
+      { threshold: 0.05 }
+    );
+    visibilityObserver.observe(stage);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isVisible = false;
+      } else {
+        isVisible = true;
+        if (!animFrameRef.current) {
+          animFrameRef.current = requestAnimationFrame(render);
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // 11. ResizeObserver to handle container dimension changes reliably
     const handleResize = () => {
       if (!stage || !renderer || !camera) return;
       const newWidth = stage.clientWidth;
       const newHeight = stage.clientHeight;
       if (newWidth === 0 || newHeight === 0) return;
 
-      camera.aspect = newWidth / newHeight;
+      const newAspect = newWidth / newHeight;
+      camera.aspect = newAspect;
+      camera.position.z = computeCameraZ(newAspect);
       camera.updateProjectionMatrix();
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(newWidth, newHeight, false);
@@ -681,11 +719,13 @@ export function SovereignParticleGlobe({
     resizeObserver.observe(stage);
     resizeObserverRef.current = resizeObserver;
 
-    // 11. Cleanup
+    // 12. Cleanup
     return () => {
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
       }
+      visibilityObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       resizeObserver.disconnect();
       dotTexture.dispose();
       particlesGeometry.dispose();
@@ -697,19 +737,57 @@ export function SovereignParticleGlobe({
     };
   }, [checkWebGL, centerOnAnchor, isRotating]);
 
-  // Pointer drag event handlers for free 3D rotation
+  // Pointer drag event handlers for free 3D rotation with mobile scroll preservation
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+  const touchDirectionDeterminedRef = useRef<"horizontal" | "vertical" | null>(null);
+
   const handlePointerDown = (e: React.PointerEvent) => {
-    isDraggingRef.current = true;
     targetRotationRef.current = null;
     previousPointerPosRef.current = { x: e.clientX, y: e.clientY };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    touchStartPosRef.current = { x: e.clientX, y: e.clientY };
+    touchDirectionDeterminedRef.current = null;
+
+    if (e.pointerType !== "touch") {
+      isDraggingRef.current = true;
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current || !globeGroupRef.current) return;
+    if (!globeGroupRef.current) return;
+
+    // For touch devices, check gesture direction before capturing pointer
+    if (e.pointerType === "touch" && touchStartPosRef.current) {
+      if (!touchDirectionDeterminedRef.current) {
+        const dx = Math.abs(e.clientX - touchStartPosRef.current.x);
+        const dy = Math.abs(e.clientY - touchStartPosRef.current.y);
+
+        if (dy > 8 && dy > dx) {
+          // Vertical swipe: allow native page scroll!
+          touchDirectionDeterminedRef.current = "vertical";
+          isDraggingRef.current = false;
+          return;
+        } else if (dx > 6) {
+          // Horizontal drag: user intends to rotate globe!
+          touchDirectionDeterminedRef.current = "horizontal";
+          isDraggingRef.current = true;
+          try {
+            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+          } catch {
+            // Fallback
+          }
+        } else {
+          return;
+        }
+      } else if (touchDirectionDeterminedRef.current === "vertical") {
+        return;
+      }
+    }
+
+    if (!isDraggingRef.current) return;
+
     const deltaX = e.clientX - previousPointerPosRef.current.x;
     const deltaY = e.clientY - previousPointerPosRef.current.y;
-
     previousPointerPosRef.current = { x: e.clientX, y: e.clientY };
 
     const sensitivity = 0.005;
@@ -727,6 +805,8 @@ export function SovereignParticleGlobe({
 
   const handlePointerUp = (e: React.PointerEvent) => {
     isDraggingRef.current = false;
+    touchStartPosRef.current = null;
+    touchDirectionDeterminedRef.current = null;
     try {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {
@@ -807,19 +887,19 @@ export function SovereignParticleGlobe({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        className={`relative w-full select-none overflow-hidden touch-none cursor-grab active:cursor-grabbing ${
+        className={`relative w-full select-none overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing ${
           isStageExpanded ? "h-[calc(100vh-180px)]" : stageHeight
         }`}
       >
         {/* Architectural Grid & Crosshairs */}
-        <div className="pointer-events-none absolute inset-0 z-10 p-5 flex flex-col justify-between">
+        <div className="pointer-events-none absolute inset-0 z-10 p-3 sm:p-5 flex flex-col justify-between">
           <div className="flex justify-between font-mono text-[9px] text-[#828387] opacity-60">
             <span>+ ORBIT_LAT // 28.61° N</span>
             <span>+ SHA-256 PROVENANCE ACTIVE</span>
           </div>
           <div className="flex justify-between font-mono text-[9px] text-[#828387] opacity-60">
-            <span>+ DRAG TO ROTATE 3D SPHERE</span>
-            <span>+ CLICK ANCHOR PIN TO INSPECT</span>
+            <span>+ HORIZONTAL DRAG TO ROTATE</span>
+            <span className="hidden xs:inline">+ CLICK ANCHOR PIN TO INSPECT</span>
           </div>
         </div>
 
@@ -865,9 +945,9 @@ export function SovereignParticleGlobe({
                 <button
                   onClick={() => centerOnAnchor(marker.anchor)}
                   aria-label={`Inspect ${marker.anchor.name}`}
-                  className={`group relative flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[10px] font-bold shadow-md transition-all cursor-pointer ${
+                  className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-bold shadow-md transition-all cursor-pointer min-h-[32px] ${
                     isSelected
-                      ? "bg-[#141416] text-[#ECEBE5] ring-2 ring-[#059669] scale-110"
+                      ? "bg-[#141416] text-[#ECEBE5] ring-2 ring-[#059669] scale-105"
                       : "bg-[#ECEBE5]/90 text-[#141416] hover:bg-[#141416] hover:text-[#ECEBE5] border border-[rgba(20,21,23,0.2)]"
                   }`}
                 >
@@ -875,7 +955,7 @@ export function SovereignParticleGlobe({
                     className="h-1.5 w-1.5 rounded-full animate-pulse"
                     style={{ backgroundColor: marker.anchor.color }}
                   />
-                  <span className="truncate max-w-[95px] sm:max-w-[120px]">
+                  <span className="truncate max-w-[85px] sm:max-w-[120px]">
                     {marker.anchor.name.split("//")[0].trim()}
                   </span>
                   <span className="text-[9px] opacity-70">
@@ -888,10 +968,10 @@ export function SovereignParticleGlobe({
 
         {/* 4. ACTIVE ANCHOR TELEMETRY INSPECTION OVERLAY CARD */}
         {activeAnchor && (
-          <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:left-4 z-30 sm:max-w-md rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5]/96 p-4.5 sm:p-5 shadow-xl backdrop-blur-md transition-all">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#141416]/5 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-[#141416]">
+          <div className="absolute bottom-2 sm:bottom-4 left-2 right-2 sm:right-auto sm:left-4 z-30 sm:max-w-md rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5]/96 p-3.5 sm:p-5 shadow-xl backdrop-blur-md transition-all max-h-[60%] sm:max-h-none overflow-y-auto overscroll-contain">
+            <div className="flex items-start justify-between gap-2">
+              <div className="space-y-0.5">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#141416]/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-[#141416]">
                   <span
                     className="h-1.5 w-1.5 rounded-full"
                     style={{ backgroundColor: activeAnchor.color }}
@@ -900,7 +980,7 @@ export function SovereignParticleGlobe({
                   <span className="text-[#828387]">•</span>
                   <span>{activeAnchor.code}</span>
                 </div>
-                <h4 className="font-heading text-sm sm:text-base font-bold text-[#141416]">
+                <h4 className="font-heading text-xs sm:text-base font-bold text-[#141416]">
                   {activeAnchor.name}
                 </h4>
               </div>
@@ -908,41 +988,41 @@ export function SovereignParticleGlobe({
               <button
                 onClick={() => setActiveAnchor(null)}
                 aria-label="Close details"
-                className="rounded-full p-1 text-[#828387] hover:bg-black/5 hover:text-[#141416] transition-colors cursor-pointer"
+                className="rounded-full p-2 text-[#828387] hover:bg-black/5 hover:text-[#141416] transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center shrink-0"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Primary Value Callout */}
-            <div className="my-3 flex items-baseline justify-between border-y border-[rgba(20,21,23,0.1)] py-2">
+            <div className="my-2 sm:my-3 flex items-baseline justify-between border-y border-[rgba(20,21,23,0.1)] py-1.5 sm:py-2">
               <div>
-                <div className="font-mono text-[10px] uppercase text-[#828387]">
+                <div className="font-mono text-[9px] sm:text-[10px] uppercase text-[#828387]">
                   {activeAnchor.metricLabel}
                 </div>
-                <div className="font-heading text-2xl sm:text-3xl font-extrabold text-[#141416]">
+                <div className="font-heading text-xl sm:text-3xl font-extrabold text-[#141416]">
                   {activeAnchor.primaryMetric}
                 </div>
               </div>
-              <div className="text-right font-mono text-[10px] text-[#57585C]">
+              <div className="text-right font-mono text-[9px] sm:text-[10px] text-[#57585C]">
                 <div>{activeAnchor.period}</div>
                 <div className="text-[9px] text-[#059669] font-bold">SHA-256 GAZETTE VERIFIED</div>
               </div>
             </div>
 
             {/* Concise Summary */}
-            <p className="font-sans text-xs text-[#57585C] leading-relaxed mb-3">
+            <p className="font-sans text-[11px] sm:text-xs text-[#57585C] leading-relaxed mb-2.5">
               {activeAnchor.summary}
             </p>
 
             {/* Secondary Metric Micro-Grid */}
-            <div className="grid grid-cols-3 gap-2 py-2 border-t border-[rgba(20,21,23,0.08)] mb-3">
+            <div className="grid grid-cols-3 gap-2 py-1.5 sm:py-2 border-t border-[rgba(20,21,23,0.08)] mb-2.5">
               {activeAnchor.secondaryMetrics.map((sec, sIdx) => (
                 <div key={sIdx} className="space-y-0.5">
-                  <div className="font-mono text-[9px] uppercase text-[#828387] truncate">
+                  <div className="font-mono text-[8px] sm:text-[9px] uppercase text-[#828387] truncate">
                     {sec.label}
                   </div>
-                  <div className="font-mono text-xs font-bold text-[#141416] truncate">
+                  <div className="font-mono text-[11px] sm:text-xs font-bold text-[#141416] truncate">
                     {sec.value}
                   </div>
                 </div>
@@ -950,14 +1030,14 @@ export function SovereignParticleGlobe({
             </div>
 
             {/* Provenance & Direct Navigation */}
-            <div className="flex items-center justify-between gap-3 pt-2 border-t border-[rgba(20,21,23,0.12)]">
-              <div className="flex items-center gap-1.5 font-mono text-[10px] text-[#828387] truncate">
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2 pt-2 border-t border-[rgba(20,21,23,0.12)]">
+              <div className="flex items-center gap-1.5 font-mono text-[9px] sm:text-[10px] text-[#828387] truncate">
                 <ShieldCheck className="h-3.5 w-3.5 text-[#059669] shrink-0" />
                 <span className="truncate">{activeAnchor.provenance}</span>
               </div>
               <Link
                 href={activeAnchor.link}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#141416] px-3 py-1.5 font-mono text-[11px] font-bold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors shrink-0 shadow-xs cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#141416] px-3 py-1.5 font-mono text-[11px] font-bold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors shrink-0 shadow-xs cursor-pointer min-h-[36px]"
               >
                 <span>{activeAnchor.linkText}</span>
                 <ArrowRight className="h-3 w-3" />
@@ -968,14 +1048,14 @@ export function SovereignParticleGlobe({
       </div>
 
       {/* 5. ACCESSIBLE KEYBOARD & TOUCH HUB SELECTOR BAR (Bottom Navigation) */}
-      <div className="border-t border-[rgba(20,21,23,0.12)] bg-[#E6E5DF]/60 p-3 sm:p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-wider text-[#57585C]">
+      <div className="border-t border-[rgba(20,21,23,0.12)] bg-[#E6E5DF]/60 p-2.5 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-wider text-[#57585C] shrink-0">
             <Globe2 className="h-3.5 w-3.5 text-[#059669]" />
             <span>SELECT SOVEREIGN CORRIDOR:</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] touch-pan-x -mx-1 px-1 sm:mx-0 sm:px-0">
             {SOVEREIGN_ANCHORS.map((anchor) => {
               const isSelected = activeAnchor?.id === anchor.id;
               return (
@@ -983,7 +1063,7 @@ export function SovereignParticleGlobe({
                   key={anchor.id}
                   onClick={() => centerOnAnchor(anchor)}
                   aria-pressed={isSelected}
-                  className={`rounded-full px-2.5 py-1 font-mono text-[10px] transition-all cursor-pointer ${
+                  className={`rounded-full px-3 py-1.5 font-mono text-[10px] sm:text-[11px] transition-all cursor-pointer shrink-0 min-h-[36px] ${
                     isSelected
                       ? "bg-[#141416] text-[#ECEBE5] font-bold shadow-xs"
                       : "bg-[#ECEBE5] text-[#57585C] hover:text-[#141416] hover:bg-black/5 border border-[rgba(20,21,23,0.14)]"

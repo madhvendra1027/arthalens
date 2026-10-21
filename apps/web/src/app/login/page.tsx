@@ -141,7 +141,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl border border-[rgba(20,21,23,0.14)] bg-[#ECEBE5] p-8 shadow-xl">
+    <div className="w-full max-w-md rounded-2xl border border-[rgba(20,21,23,0.14)] bg-[#ECEBE5] p-5 sm:p-8 shadow-xl">
       {/* Official Header */}
       <div className="flex flex-col items-center text-center pb-6 border-b border-[rgba(20,21,23,0.1)]">
         <ArthaLensLogo size="lg" />
@@ -409,7 +409,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center px-4 py-16">
+    <div className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center px-3.5 sm:px-4 py-8 sm:py-16">
       <Suspense fallback={<div className="text-xs text-[#828387] font-mono">Loading authentication portal...</div>}>
         <LoginForm />
       </Suspense>

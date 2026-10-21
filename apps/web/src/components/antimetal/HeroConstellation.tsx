@@ -304,14 +304,15 @@ export function HeroConstellation() {
   const mousePosRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
   const animFrameRef = useRef<number | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const isVisibleRef = useRef<boolean>(true);
 
   // Initialize node layout with safe boundary dimensions
   const initNodes = useCallback((width: number, height: number): MacroNode[] => {
-    const safeW = Math.max(width, 400);
-    const safeH = Math.max(height, 350);
+    const safeW = Math.max(width, 320);
+    const safeH = Math.max(height, 320);
     const centerX = safeW * 0.5;
-    const centerY = safeH * 0.48;
-    const radiusVariation = Math.min(safeW, safeH) * 0.38;
+    const centerY = safeH * (safeW < 640 ? 0.44 : 0.48);
+    const radiusVariation = Math.min(safeW, safeH) * (safeW < 640 ? 0.32 : 0.38);
 
     return MACRO_NODES_DATA.map((n, i) => {
       const angle = (i / MACRO_NODES_DATA.length) * Math.PI * 2 + 0.15;
@@ -326,6 +327,30 @@ export function HeroConstellation() {
         vy: (Math.random() - 0.5) * 0.25,
       };
     });
+  }, []);
+
+  // IntersectionObserver to pause rendering when offscreen
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(container);
+
+    const handleVisibility = () => {
+      isVisibleRef.current = document.visibilityState === "visible";
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   // Main canvas animation and layout effect
@@ -389,6 +414,11 @@ export function HeroConstellation() {
     let tick = 0;
 
     const render = () => {
+      if (!isVisibleRef.current) {
+        animFrameRef.current = requestAnimationFrame(render);
+        return;
+      }
+
       tick += 0.012;
       ctx.clearRect(0, 0, width, height);
 
@@ -576,7 +606,7 @@ export function HeroConstellation() {
 
     for (const node of nodesRef.current) {
       const dist = Math.sqrt((node.x - x) ** 2 + (node.y - y) ** 2);
-      if (dist < node.baseRadius * 3 + 10) {
+      if (dist < Math.max(26, node.baseRadius * 3 + 12)) {
         setActiveSelectedNode(node);
         return;
       }
@@ -594,7 +624,8 @@ export function HeroConstellation() {
 
     for (const node of nodesRef.current) {
       const dist = Math.sqrt((node.x - x) ** 2 + (node.y - y) ** 2);
-      if (dist < node.baseRadius * 3 + 14) {
+      // Generous 36px touch radius for mobile fingers
+      if (dist < Math.max(34, node.baseRadius * 3.8 + 16)) {
         setActiveSelectedNode(node);
         setHoveredNode(node);
         hoveredNodeRef.current = node;
@@ -614,21 +645,49 @@ export function HeroConstellation() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[480px] sm:h-[540px] lg:h-[580px] select-none overflow-hidden rounded-3xl bg-[#ECEBE5] border border-[rgba(20,21,23,0.15)] shadow-xs"
+      className="relative w-full h-[520px] sm:h-[560px] lg:h-[600px] select-none overflow-hidden rounded-3xl bg-[#ECEBE5] border border-[rgba(20,21,23,0.15)] shadow-xs"
     >
       {/* Top Header Badge */}
-      <div className="absolute top-4 inset-x-4 z-20 flex items-center justify-between font-mono text-[10px] text-[#828387]">
-        <div className="flex items-center gap-2">
+      <div className="absolute top-3.5 inset-x-3.5 sm:inset-x-4 z-20 flex items-center justify-between font-mono text-[10px] text-[#828387] pointer-events-none">
+        <div className="flex items-center gap-2 pointer-events-auto">
           <span className="h-1.5 w-1.5 rounded-full bg-[#059669] animate-pulse" />
           <span className="font-bold text-[#141416]">MACRO CONSTELLATION GRAPH</span>
-          <span>• 15 SOVEREIGN NODES</span>
+          <span className="hidden xs:inline">• 15 SOVEREIGN NODES</span>
         </div>
-        <div className="hidden sm:inline-flex items-center gap-1.5 text-[9px]">
-          <span>TAP ANY NODE TO PIN</span>
+        <div className="inline-flex items-center gap-1.5 text-[9px] pointer-events-auto">
+          <span className="hidden sm:inline">TAP NODE TO PIN</span>
+          <span className="sm:hidden font-mono text-[9px] text-[#141416] font-bold">15 NODES</span>
         </div>
       </div>
 
-      {/* Main Canvas */}
+      {/* Quick Node Directory Chips (Mobile & Tablet Friendly) */}
+      <div className="absolute top-10 inset-x-3 z-20 flex items-center gap-1.5 overflow-x-auto touch-pan-x py-1 no-scrollbar pointer-events-auto">
+        {MACRO_NODES_DATA.map((node) => {
+          const isSelected = activeSelectedNode?.id === node.id;
+          return (
+            <button
+              key={node.id}
+              onClick={() => {
+                const full = nodesRef.current.find((n) => n.id === node.id);
+                if (full) setActiveSelectedNode(full);
+              }}
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-mono font-medium transition-all min-h-[30px] inline-flex items-center gap-1.5 border cursor-pointer ${
+                isSelected
+                  ? "bg-[#141416] text-[#ECEBE5] border-[#141416] shadow-xs"
+                  : "bg-[#ECEBE5]/85 hover:bg-[#ECEBE5] text-[#57585C] border-[rgba(20,21,23,0.12)] backdrop-blur-xs"
+              }`}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: node.highlightColor }}
+              />
+              <span className="truncate max-w-[110px]">{node.code.split("/")[1]?.trim() || node.code}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Canvas with touch-pan-y so page scrolling is preserved */}
       <canvas
         ref={canvasRef}
         onMouseMove={handleMouseMove}
@@ -637,44 +696,58 @@ export function HeroConstellation() {
         onTouchStart={handleTouchStart}
         role="img"
         aria-label="Interactive macro constellation diagram displaying connections between Indian macroeconomic variables"
-        className="w-full h-full cursor-crosshair touch-none"
+        className="w-full h-full cursor-crosshair touch-pan-y pt-12"
       />
 
-      {/* Persistent / Hovered Inspection Card (Bottom Overlay) */}
+      {/* Persistent / Hovered Inspection Card (Responsive Bottom Sheet / Overlay) */}
       {activeDisplayNode && (
-        <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:left-4 z-30 sm:max-w-md rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5]/95 p-4 sm:p-5 shadow-xl backdrop-blur-md transition-all">
+        <div className="absolute bottom-3 inset-x-3 sm:right-auto sm:left-4 z-30 sm:max-w-md max-h-[58%] overflow-y-auto rounded-2xl border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5]/95 p-3.5 sm:p-5 shadow-xl backdrop-blur-md transition-all">
           <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#141416]/5 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-[#141416]">
+            <div className="space-y-1 pr-2">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#141416]/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-[#141416]">
                 <span
-                  className="h-1.5 w-1.5 rounded-full"
+                  className="h-1.5 w-1.5 rounded-full shrink-0"
                   style={{ backgroundColor: activeDisplayNode.highlightColor }}
                 />
-                <span>{activeDisplayNode.code}</span>
+                <span className="truncate max-w-[120px]">{activeDisplayNode.code}</span>
                 <span className="text-[#828387]">•</span>
                 <span className="uppercase">{activeDisplayNode.category}</span>
               </div>
-              <h4 className="font-heading text-sm sm:text-base font-bold text-[#141416]">
+              <h4 className="font-heading text-sm sm:text-base font-bold text-[#141416] line-clamp-1">
                 {activeDisplayNode.label}
               </h4>
             </div>
 
-            <div className="text-right">
-              <div className="font-heading text-xl sm:text-2xl font-extrabold text-[#141416]">
-                {activeDisplayNode.value}
+            <div className="flex items-start gap-2 shrink-0">
+              <div className="text-right">
+                <div className="font-heading text-lg sm:text-2xl font-extrabold text-[#141416]">
+                  {activeDisplayNode.value}
+                </div>
+                <div className="font-mono text-[8px] sm:text-[9px] text-[#57585C]">
+                  {activeDisplayNode.period}
+                </div>
               </div>
-              <div className="font-mono text-[9px] text-[#57585C]">
-                {activeDisplayNode.period}
-              </div>
+              <button
+                onClick={() => {
+                  setActiveSelectedNode(null);
+                  setHoveredNode(null);
+                  hoveredNodeRef.current = null;
+                }}
+                className="p-1 rounded-full text-[#828387] hover:text-[#141416] hover:bg-black/5 min-w-[32px] min-h-[32px] flex items-center justify-center cursor-pointer"
+                title="Dismiss details"
+                aria-label="Dismiss details"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
-          <p className="font-sans text-xs text-[#57585C] leading-relaxed my-2.5">
+          <p className="font-sans text-xs text-[#57585C] leading-relaxed my-2 line-clamp-3 sm:line-clamp-none">
             {activeDisplayNode.description}
           </p>
 
           {/* Connected Economic Indicators */}
-          <div className="space-y-1.5 pt-2 border-t border-[rgba(20,21,23,0.1)]">
+          <div className="space-y-1 pt-1.5 border-t border-[rgba(20,21,23,0.1)]">
             <div className="font-mono text-[9px] font-bold uppercase text-[#828387]">
               ECONOMIC LINKAGES:
             </div>
@@ -689,7 +762,7 @@ export function HeroConstellation() {
                       const fullNode = nodesRef.current.find((n) => n.id === cId);
                       if (fullNode) setActiveSelectedNode(fullNode);
                     }}
-                    className="rounded-full bg-black/5 hover:bg-black/10 px-2 py-0.5 font-mono text-[9px] text-[#141416] transition-colors cursor-pointer"
+                    className="rounded-full bg-black/5 hover:bg-black/10 px-2 py-0.5 font-mono text-[9px] text-[#141416] transition-colors cursor-pointer min-h-[26px] flex items-center"
                   >
                     {targetNode.code.split("/")[1]?.trim() || targetNode.code}
                   </button>
@@ -699,14 +772,14 @@ export function HeroConstellation() {
           </div>
 
           {/* Provenance & Direct Navigation */}
-          <div className="flex items-center justify-between gap-3 pt-3 mt-2 border-t border-[rgba(20,21,23,0.1)]">
+          <div className="flex items-center justify-between gap-2 pt-2.5 mt-2 border-t border-[rgba(20,21,23,0.1)]">
             <div className="flex items-center gap-1.5 font-mono text-[9px] text-[#828387] truncate">
               <ShieldCheck className="h-3.5 w-3.5 text-[#059669] shrink-0" />
               <span className="truncate">{activeDisplayNode.source}</span>
             </div>
             <Link
               href={activeDisplayNode.link}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#141416] px-3 py-1 font-mono text-[10px] font-bold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors shrink-0 shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-full bg-[#141416] px-3 py-1 font-mono text-[10px] font-bold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors shrink-0 shadow-xs cursor-pointer min-h-[32px]"
             >
               <span>{activeDisplayNode.linkText}</span>
               <ArrowRight className="h-3 w-3" />

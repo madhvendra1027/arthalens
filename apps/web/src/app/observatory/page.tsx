@@ -37,24 +37,24 @@ function ObservatoryContent() {
 
   const viewLabels: Record<ObservatoryView, string> = {
     observatory: "Observatory",
-    constellation: "Macro Constellation",
-    globe: "Interactive 3D Globe",
-    "living-economy": "Isometric Living Economy",
+    constellation: "Constellation",
+    globe: "3D Globe",
+    "living-economy": "Living Economy",
   };
 
   const currentLabel = viewLabels[activeView] ?? "Observatory";
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+    <div className="mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 py-5 sm:py-12 space-y-6 sm:space-y-8">
       {/* Editorial Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[rgba(20,21,23,0.14)]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 pb-5 sm:pb-6 border-b border-[rgba(20,21,23,0.14)]">
         <div className="space-y-2 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-3.5 py-1 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#141416]">
-            <span className="h-2 w-2 rounded-full bg-[#059669] animate-pulse" />
-            <span>ARTHALENS VISUAL OBSERVATORY SUITE // 4 INTEGRATED EXPERIENCES</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] px-3 py-1 font-mono text-[9px] sm:text-[11px] font-bold uppercase tracking-wider text-[#141416]">
+            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#059669] animate-pulse" />
+            <span className="truncate">ARTHALENS VISUAL OBSERVATORY SUITE // 4 EXPERIENCES</span>
           </div>
 
-          <h1 className="font-heading text-3xl sm:text-5xl font-black text-[#141416] tracking-tight">
+          <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl font-black text-[#141416] tracking-tight">
             Sovereign Economic Observatories
           </h1>
 
@@ -63,17 +63,17 @@ function ObservatoryContent() {
           </p>
         </div>
 
-        {/* Back Link to Homepage */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Back Link to Homepage & Macro Workspace */}
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-1 sm:pt-0">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] font-mono text-xs font-semibold text-[#141416] hover:bg-[#DFDED8] transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 border border-[rgba(20,21,23,0.18)] bg-[#ECEBE5] font-mono text-xs font-semibold text-[#141416] hover:bg-[#DFDED8] transition-colors min-h-[40px]"
           >
             <span>&larr; Return to Home</span>
           </Link>
           <Link
             href="/gdp"
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 bg-[#141416] font-mono text-xs font-semibold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 bg-[#141416] font-mono text-xs font-semibold text-[#ECEBE5] hover:bg-[#D94E34] transition-colors min-h-[40px]"
           >
             <span>Macro Workspace</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -82,22 +82,22 @@ function ObservatoryContent() {
       </div>
 
       {/* Mode Switcher Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="max-w-full overflow-x-auto [scrollbar-width:none]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="w-full sm:max-w-full overflow-x-auto touch-pan-x [scrollbar-width:none] pb-1">
           <RubberSegment
             items={[
               "Observatory",
-              "Macro Constellation",
-              "Interactive 3D Globe",
-              "Isometric Living Economy",
+              "Constellation",
+              "3D Globe",
+              "Living Economy",
             ]}
             defaultValue="Observatory"
             value={currentLabel}
             onChange={(val) => {
-              if (val === "Observatory" || val === "3D Observatory") setView("observatory");
-              else if (val === "Macro Constellation") setView("constellation");
-              else if (val === "Interactive 3D Globe") setView("globe");
-              else if (val === "Isometric Living Economy") setView("living-economy");
+              if (val === "Observatory") setView("observatory");
+              else if (val === "Constellation") setView("constellation");
+              else if (val === "3D Globe") setView("globe");
+              else if (val === "Living Economy") setView("living-economy");
             }}
             trackColor="#ECEBE5"
             thumbColor="#141416"
@@ -115,9 +115,9 @@ function ObservatoryContent() {
           />
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-[11px] text-[#828387]">
-          <ShieldCheck className="h-4 w-4 text-emerald-700" />
-          <span>REAL-TIME MACRO DATA & INTERACTIVE VISUALIZATIONS</span>
+        <div className="flex items-center gap-2 font-mono text-[10px] sm:text-[11px] text-[#828387]">
+          <ShieldCheck className="h-4 w-4 text-emerald-700 shrink-0" />
+          <span className="truncate">REAL-TIME MACRO DATA & INTERACTIVE VISUALIZATIONS</span>
         </div>
       </div>
 

@@ -88,47 +88,49 @@ export function StateGvaSection({ baseYear }: Props) {
         </div>
 
         {/* Search & RubberSegment Sort Controls */}
-        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto pt-2 sm:pt-0">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#828387]" />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full sm:w-auto pt-2 sm:pt-0">
+          <div className="relative w-full sm:w-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#828387]" />
             <input
               type="text"
               placeholder="Search state..."
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              className="rounded-full border border-[rgba(20,21,23,0.18)] bg-white/90 pl-8 pr-3 py-1 text-xs font-sans text-[#141416] placeholder-[#828387] focus:outline-none focus:border-[#141416] shadow-2xs w-36 sm:w-44"
+              className="rounded-full border border-[rgba(20,21,23,0.18)] bg-white/90 pl-8.5 pr-3 py-1.5 text-xs font-sans text-[#141416] placeholder-[#828387] focus:outline-none focus:border-[#141416] shadow-2xs w-full sm:w-44 min-h-[38px]"
             />
           </div>
 
-          <RubberSegment
-            items={sortOptions}
-            defaultValue={currentSortLabel}
-            value={currentSortLabel}
-            onChange={(val) => {
-              if (val === "Growth YoY") setSortBy("growth");
-              else if (val === "National Share") setSortBy("share");
-              else setSortBy("gsdp");
-            }}
-            trackColor="#E3E2DC"
-            thumbColor="#141416"
-            textColor="#57585C"
-            activeTextColor="#ECEBE5"
-            size="sm"
-            radius={9999}
-            inset={2}
-            equalSlots
-            stretch={60}
-            squash={2}
-            preset="state-sorting"
-          />
+          <div className="max-w-full overflow-x-auto touch-pan-x [scrollbar-width:none] pb-0.5">
+            <RubberSegment
+              items={sortOptions}
+              defaultValue={currentSortLabel}
+              value={currentSortLabel}
+              onChange={(val) => {
+                if (val === "Growth YoY") setSortBy("growth");
+                else if (val === "National Share") setSortBy("share");
+                else setSortBy("gsdp");
+              }}
+              trackColor="#E3E2DC"
+              thumbColor="#141416"
+              textColor="#57585C"
+              activeTextColor="#ECEBE5"
+              size="sm"
+              radius={9999}
+              inset={2}
+              equalSlots={false}
+              stretch={50}
+              squash={2}
+              preset="state-sorting"
+            />
+          </div>
         </div>
       </div>
 
       {sortedStates.length === 0 ? (
         <EmptyState message="No state records matched your filter." />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[rgba(20,21,23,0.08)] bg-white/70">
-          <table className="w-full text-left text-xs border-collapse">
+        <div className="overflow-x-auto touch-pan-x rounded-xl border border-[rgba(20,21,23,0.08)] bg-white/70">
+          <table className="w-full min-w-[560px] text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-[rgba(20,21,23,0.1)] bg-[#ECEBE5]/60 text-[11px] font-mono font-bold text-[#57585C] uppercase tracking-wider">
                 <th className="py-2.5 px-3">#</th>
