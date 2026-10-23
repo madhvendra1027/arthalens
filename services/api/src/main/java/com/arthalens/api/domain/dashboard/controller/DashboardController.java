@@ -20,7 +20,11 @@ public class DashboardController {
     @GetMapping("/india")
     @Operation(summary = "India economic snapshot")
     public DashboardResponse getIndiaDashboard(
-            @RequestParam(defaultValue = "2022-23") String baseYear) {
+            @RequestParam(value = "base_year", required = false) String baseYearSnake,
+            @RequestParam(value = "baseYear", required = false) String baseYearCamel) {
+        String baseYear = (baseYearSnake != null && !baseYearSnake.isBlank())
+                ? baseYearSnake
+                : ((baseYearCamel != null && !baseYearCamel.isBlank()) ? baseYearCamel : "2022-23");
         return service.getSnapshot(baseYear);
     }
 }

@@ -87,7 +87,7 @@ public class DashboardService {
                 );
             }
 
-            // Nominal GDP & Absolute Size
+            // Nominal GDP Growth
             Optional<GdpObservation> nomGdpOpt = gdpRepo.findLatest(baseYearId, "current");
             if (nomGdpOpt.isPresent()) {
                 GdpObservation o = nomGdpOpt.get();
@@ -108,6 +108,13 @@ public class DashboardService {
                                 o.getStatus().name()
                         )
                 );
+            }
+
+            // Nominal GDP Absolute Size (Annual FY)
+            Optional<GdpObservation> annualNomGdpOpt = gdpRepo.findLatestAnnual(baseYearId, "current")
+                    .or(() -> nomGdpOpt);
+            if (annualNomGdpOpt.isPresent()) {
+                GdpObservation o = annualNomGdpOpt.get();
                 gdpAbsoluteCard = new MetricCardDto(
                         "Nominal GDP Size",
                         o.getValueCrore(),
@@ -126,6 +133,7 @@ public class DashboardService {
                         )
                 );
             }
+
 
             // Real GVA
             Optional<GvaObservation> gvaOpt = gvaRepo.findLatest(baseYearId, "constant");

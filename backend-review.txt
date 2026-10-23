@@ -1,0 +1,253 @@
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/deflator/controller/DeflatorController.java b/services/api/src/main/java/com/arthalens/api/domain/deflator/controller/DeflatorController.java
+index e3a5f57..5a8e1eb 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/deflator/controller/DeflatorController.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/deflator/controller/DeflatorController.java
+@@ -21,8 +21,12 @@ public class DeflatorController {
+     @GetMapping
+     @Operation(summary = "Get deflator observations for a base year")
+     public ResponseEntity<DeflatorsResponse> getDeflators(
+-        @RequestParam(required = false, defaultValue = "2022-23") String baseYear,
++        @RequestParam(value = "base_year", required = false) String baseYearSnake,
++        @RequestParam(value = "baseYear", required = false) String baseYearCamel,
+         @RequestParam(required = false) String type) {
++        String baseYear = (baseYearSnake != null && !baseYearSnake.isBlank())
++            ? baseYearSnake
++            : ((baseYearCamel != null && !baseYearCamel.isBlank()) ? baseYearCamel : "2022-23");
+         return ResponseEntity.ok(deflatorService.getDeflators(baseYear, type));
+     }
+ }
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/deflator/dto/DeflatorsResponse.java b/services/api/src/main/java/com/arthalens/api/domain/deflator/dto/DeflatorsResponse.java
+index 2d83e32..be42c46 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/deflator/dto/DeflatorsResponse.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/deflator/dto/DeflatorsResponse.java
+@@ -3,7 +3,25 @@ package com.arthalens.api.domain.deflator.dto;
+ import java.util.List;
+ 
+ public record DeflatorsResponse(
++    List<DeflatorPointDto> data,
+     List<DeflatorDto> deflators,
+     String baseYear,
++    String periodType,
+     String note
+-) {}
++) {
++    public DeflatorsResponse(List<DeflatorDto> deflators, String baseYear, String note) {
++        this(
++            deflators != null ? deflators.stream().map(d -> new DeflatorPointDto(
++                d.periodLabel(),
++                d.deflatorValue(),
++                null,
++                null
++            )).toList() : List.of(),
++            deflators,
++            baseYear,
++            "Q",
++            note
++        );
++    }
++}
++
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/gdp/controller/GdpController.java b/services/api/src/main/java/com/arthalens/api/domain/gdp/controller/GdpController.java
+index a1da131..d4ec9ea 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/gdp/controller/GdpController.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/gdp/controller/GdpController.java
+@@ -29,8 +29,13 @@ public class GdpController {
+     @GetMapping("/latest")
+     @Operation(summary = "Latest GDP observation")
+     public GdpObservationDto getLatest(
+-            @RequestParam(defaultValue = "2022-23") String baseYear,
+-            @RequestParam(defaultValue = "constant") String priceType) {
++            @RequestParam(value = "base_year", required = false) String baseYearSnake,
++            @RequestParam(value = "baseYear", required = false) String baseYearCamel,
++            @RequestParam(value = "price_type", required = false) String priceTypeSnake,
++            @RequestParam(value = "priceType", required = false) String priceTypeCamel) {
++        String baseYear = firstNonBlank(baseYearSnake, baseYearCamel, "2022-23");
++        String priceType = firstNonBlank(priceTypeSnake, priceTypeCamel, "constant");
++        validateBaseYear(baseYear);
+         UUID baseYearId = resolveBaseYearId(baseYear);
+         return service.getLatest(baseYearId, priceType);
+     }
+@@ -38,14 +43,35 @@ public class GdpController {
+     @GetMapping("/series")
+     @Operation(summary = "GDP time series")
+     public GdpSeriesResponse getSeries(
+-            @RequestParam(defaultValue = "2022-23") String baseYear,
+-            @RequestParam(defaultValue = "constant") String priceType,
+-            @RequestParam(required = false) String periodType,
+-            @RequestParam(defaultValue = "false") boolean allowMixedSeries,
++            @RequestParam(value = "base_year", required = false) String baseYearSnake,
++            @RequestParam(value = "baseYear", required = false) String baseYearCamel,
++            @RequestParam(value = "price_type", required = false) String priceTypeSnake,
++            @RequestParam(value = "priceType", required = false) String priceTypeCamel,
++            @RequestParam(value = "period_type", required = false) String periodTypeSnake,
++            @RequestParam(value = "periodType", required = false) String periodTypeCamel,
++            @RequestParam(value = "allow_mixed_series", required = false) Boolean allowMixedSnake,
++            @RequestParam(value = "allowMixedSeries", defaultValue = "false") boolean allowMixedCamel,
+             @RequestParam(defaultValue = "0") @Min(0) int page,
+             @RequestParam(defaultValue = "50") @Min(1) @Max(200) int size) {
++        String baseYear = firstNonBlank(baseYearSnake, baseYearCamel, "2022-23");
++        String priceType = firstNonBlank(priceTypeSnake, priceTypeCamel, "constant");
++        String periodType = firstNonBlank(periodTypeSnake, periodTypeCamel, null);
++        boolean allowMixed = allowMixedSnake != null ? allowMixedSnake : allowMixedCamel;
++        validateBaseYear(baseYear);
+         UUID baseYearId = resolveBaseYearId(baseYear);
+-        return service.getSeries(baseYearId, priceType, periodType, allowMixedSeries, page, size);
++        return service.getSeries(baseYearId, priceType, periodType, allowMixed, page, size);
++    }
++
++    private void validateBaseYear(String baseYear) {
++        if (!java.util.List.of("2011-12", "2022-23").contains(baseYear)) {
++            throw new IllegalArgumentException("Invalid base year: " + baseYear + ". Permitted values are: 2011-12, 2022-23");
++        }
++    }
++
++    private String firstNonBlank(String first, String second, String defaultValue) {
++        if (first != null && !first.isBlank()) return first;
++        if (second != null && !second.isBlank()) return second;
++        return defaultValue;
+     }
+ 
+     private UUID resolveBaseYearId(String baseYear) {
+@@ -55,3 +81,4 @@ public class GdpController {
+                 .orElseThrow(() -> new ResourceNotFoundException("BaseYear", "yearLabel", effective));
+     }
+ }
++
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/gdp/dto/SectorDataDto.java b/services/api/src/main/java/com/arthalens/api/domain/gdp/dto/SectorDataDto.java
+index c53af8a..4c6f7ff 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/gdp/dto/SectorDataDto.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/gdp/dto/SectorDataDto.java
+@@ -1,5 +1,7 @@
+ package com.arthalens.api.domain.gdp.dto;
+ 
++import com.fasterxml.jackson.annotation.JsonProperty;
++
+ public record SectorDataDto(
+     String sectorCode,
+     String sectorName,
+@@ -9,4 +11,10 @@ public record SectorDataDto(
+     Double growthRateYoy,
+     String sourceId,
+     String status
+-) {}
++) {
++    @JsonProperty("growthRate")
++    public Double growthRate() {
++        return growthRateYoy;
++    }
++}
++
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorDto.java b/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorDto.java
+index b0ab757..fd7676b 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorDto.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorDto.java
+@@ -1,5 +1,6 @@
+ package com.arthalens.api.domain.indicators.dto;
+ 
++import com.fasterxml.jackson.annotation.JsonProperty;
+ import java.math.BigDecimal;
+ import java.time.LocalDate;
+ import java.util.UUID;
+@@ -14,4 +15,20 @@ public record IndicatorDto(
+     BigDecimal yoyChangePct,
+     String status,
+     LocalDate publicationDate
+-) {}
++) {
++    @JsonProperty("indicatorCode")
++    public String indicatorCode() { return indexType; }
++
++    @JsonProperty("indicatorName")
++    public String indicatorName() { return seriesName; }
++
++    @JsonProperty("latestValue")
++    public BigDecimal latestValue() { return indexValue; }
++
++    @JsonProperty("period")
++    public String period() { return periodLabel; }
++
++    @JsonProperty("unit")
++    public String unit() { return "Index Point"; }
++}
++
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorsResponse.java b/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorsResponse.java
+index df842ea..0996b92 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorsResponse.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/indicators/dto/IndicatorsResponse.java
+@@ -3,7 +3,13 @@ package com.arthalens.api.domain.indicators.dto;
+ import java.util.List;
+ 
+ public record IndicatorsResponse(
++    List<IndicatorDto> data,
+     List<IndicatorDto> indicators,
+     String indexType,
+     int totalCount
+-) {}
++) {
++    public IndicatorsResponse(List<IndicatorDto> indicators, String indexType, int totalCount) {
++        this(indicators, indicators, indexType, totalCount);
++    }
++}
++
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/methodology/dto/SeriesComparisonResponse.java b/services/api/src/main/java/com/arthalens/api/domain/methodology/dto/SeriesComparisonResponse.java
+index 1566204..0aefad5 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/methodology/dto/SeriesComparisonResponse.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/methodology/dto/SeriesComparisonResponse.java
+@@ -3,7 +3,9 @@ package com.arthalens.api.domain.methodology.dto;
+ import java.util.List;
+ 
+ public record SeriesComparisonResponse(
++    List<BaseYearSeriesDto> series,
+     List<MethodologyVersionDto> series2011_12,
+     List<MethodologyVersionDto> series2022_23,
+     String note
+ ) {}
++
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/methodology/service/MethodologyService.java b/services/api/src/main/java/com/arthalens/api/domain/methodology/service/MethodologyService.java
+index 8db1ba2..ac7e5ea 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/methodology/service/MethodologyService.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/methodology/service/MethodologyService.java
+@@ -40,7 +40,24 @@ public class MethodologyService {
+             .map(m -> toDto(m, byYearLabel.getOrDefault(m.getBaseYearId(), "unknown")))
+             .toList();
+ 
++        var seriesList = all.stream()
++            .map(m -> {
++                String by = byYearLabel.getOrDefault(m.getBaseYearId(), "unknown");
++                return new com.arthalens.api.domain.methodology.dto.BaseYearSeriesDto(
++                    by,
++                    m.getVersionLabel(),
++                    m.getNotes() != null ? m.getNotes() : (by + " National Accounts Series"),
++                    m.getDeflationMethod(),
++                    m.getPrimaryDataSources(),
++                    m.getCoverageFrom(),
++                    m.getCoverageTo(),
++                    m.getKeyChanges()
++                );
++            })
++            .toList();
++
+         return new SeriesComparisonResponse(
++            seriesList,
+             all2011, all2022,
+             "Base year 2022-23 is the current official series (released 2024). " +
+             "The 2011-12 series is retained for historical comparison. " +
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/ratings/dto/RatingsResponse.java b/services/api/src/main/java/com/arthalens/api/domain/ratings/dto/RatingsResponse.java
+index 25b6bd6..abb767d 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/ratings/dto/RatingsResponse.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/ratings/dto/RatingsResponse.java
+@@ -3,7 +3,13 @@ package com.arthalens.api.domain.ratings.dto;
+ import java.util.List;
+ 
+ public record RatingsResponse(
++    List<RatingDto> data,
+     List<RatingDto> current,
+     List<RatingDto> history,
+     String note
+-) {}
++) {
++    public RatingsResponse(List<RatingDto> current, List<RatingDto> history, String note) {
++        this(current, current, history, note);
++    }
++}
++

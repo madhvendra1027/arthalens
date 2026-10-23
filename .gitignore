@@ -111,3 +111,5 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# Graphify generated architecture maps and caches — do not publish
+/graphify-out/

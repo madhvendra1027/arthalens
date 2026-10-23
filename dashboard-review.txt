@@ -1,0 +1,72 @@
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/dashboard/controller/DashboardController.java b/services/api/src/main/java/com/arthalens/api/domain/dashboard/controller/DashboardController.java
+index a03b72e..494d826 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/dashboard/controller/DashboardController.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/dashboard/controller/DashboardController.java
+@@ -20,7 +20,11 @@ public class DashboardController {
+     @GetMapping("/india")
+     @Operation(summary = "India economic snapshot")
+     public DashboardResponse getIndiaDashboard(
+-            @RequestParam(defaultValue = "2022-23") String baseYear) {
++            @RequestParam(value = "base_year", required = false) String baseYearSnake,
++            @RequestParam(value = "baseYear", required = false) String baseYearCamel) {
++        String baseYear = (baseYearSnake != null && !baseYearSnake.isBlank())
++                ? baseYearSnake
++                : ((baseYearCamel != null && !baseYearCamel.isBlank()) ? baseYearCamel : "2022-23");
+         return service.getSnapshot(baseYear);
+     }
+ }
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/dashboard/service/DashboardService.java b/services/api/src/main/java/com/arthalens/api/domain/dashboard/service/DashboardService.java
+index 7aab589..13601a3 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/dashboard/service/DashboardService.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/dashboard/service/DashboardService.java
+@@ -87,7 +87,7 @@ public class DashboardService {
+                 );
+             }
+ 
+-            // Nominal GDP & Absolute Size
++            // Nominal GDP Growth
+             Optional<GdpObservation> nomGdpOpt = gdpRepo.findLatest(baseYearId, "current");
+             if (nomGdpOpt.isPresent()) {
+                 GdpObservation o = nomGdpOpt.get();
+@@ -108,6 +108,13 @@ public class DashboardService {
+                                 o.getStatus().name()
+                         )
+                 );
++            }
++
++            // Nominal GDP Absolute Size (Annual FY)
++            Optional<GdpObservation> annualNomGdpOpt = gdpRepo.findLatestAnnual(baseYearId, "current")
++                    .or(() -> nomGdpOpt);
++            if (annualNomGdpOpt.isPresent()) {
++                GdpObservation o = annualNomGdpOpt.get();
+                 gdpAbsoluteCard = new MetricCardDto(
+                         "Nominal GDP Size",
+                         o.getValueCrore(),
+@@ -127,6 +134,7 @@ public class DashboardService {
+                 );
+             }
+ 
++
+             // Real GVA
+             Optional<GvaObservation> gvaOpt = gvaRepo.findLatest(baseYearId, "constant");
+             if (gvaOpt.isPresent()) {
+diff --git a/services/api/src/main/java/com/arthalens/api/domain/gdp/repository/GdpObservationRepository.java b/services/api/src/main/java/com/arthalens/api/domain/gdp/repository/GdpObservationRepository.java
+index 16bd970..62a3e2e 100644
+--- a/services/api/src/main/java/com/arthalens/api/domain/gdp/repository/GdpObservationRepository.java
++++ b/services/api/src/main/java/com/arthalens/api/domain/gdp/repository/GdpObservationRepository.java
+@@ -20,6 +20,15 @@ public interface GdpObservationRepository extends JpaRepository<GdpObservation,
+             @Param("baseYearId") UUID baseYearId,
+             @Param("priceType") String priceType);
+ 
++    @Query("SELECT g FROM GdpObservation g WHERE g.baseYearId = :baseYearId " +
++           "AND g.priceType = :priceType " +
++           "AND g.periodType = 'FY' " +
++           "ORDER BY g.periodLabel DESC LIMIT 1")
++    Optional<GdpObservation> findLatestAnnual(
++            @Param("baseYearId") UUID baseYearId,
++            @Param("priceType") String priceType);
++
++
+     @Query("SELECT g FROM GdpObservation g WHERE g.baseYearId = :baseYearId " +
+            "AND g.priceType = :priceType " +
+            "AND (:periodType IS NULL OR g.periodType = :periodType) " +

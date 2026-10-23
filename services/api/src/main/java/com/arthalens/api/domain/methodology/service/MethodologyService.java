@@ -40,7 +40,24 @@ public class MethodologyService {
             .map(m -> toDto(m, byYearLabel.getOrDefault(m.getBaseYearId(), "unknown")))
             .toList();
 
+        var seriesList = all.stream()
+            .map(m -> {
+                String by = byYearLabel.getOrDefault(m.getBaseYearId(), "unknown");
+                return new com.arthalens.api.domain.methodology.dto.BaseYearSeriesDto(
+                    by,
+                    m.getVersionLabel(),
+                    m.getNotes() != null ? m.getNotes() : (by + " National Accounts Series"),
+                    m.getDeflationMethod(),
+                    m.getPrimaryDataSources(),
+                    m.getCoverageFrom(),
+                    m.getCoverageTo(),
+                    m.getKeyChanges()
+                );
+            })
+            .toList();
+
         return new SeriesComparisonResponse(
+            seriesList,
             all2011, all2022,
             "Base year 2022-23 is the current official series (released 2024). " +
             "The 2011-12 series is retained for historical comparison. " +

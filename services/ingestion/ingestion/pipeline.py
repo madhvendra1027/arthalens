@@ -15,7 +15,7 @@ import structlog
 from ingestion.adapters.base import SourceAdapter
 from ingestion.core.quarantine import QuarantineManager
 from ingestion.core.run_manager import IngestionRun
-from ingestion.core.validator import ValidationResult, validate_observation
+from ingestion.core.validator import ValidationResult, validate_document, validate_observation
 
 logger = structlog.get_logger()
 
@@ -57,7 +57,11 @@ class IngestionPipeline:
             # 4. Normalize + 5. Validate + 6. Reconcile + 7. Upsert
             for row in rows:
                 normalized = self.adapter.normalize(row, provenance)
-                result: ValidationResult = validate_observation(normalized)
+                if getattr(self.adapter, "adapter_id", "") == "pib_releases" or row.get("_adapter") == "pib_releases":
+                    result: ValidationResult = validate_document(normalized)
+                else:
+                    result: ValidationResult = validate_observation(normalized)
+
 
                 if not result.is_valid:
                     run.rows_quarantined += 1

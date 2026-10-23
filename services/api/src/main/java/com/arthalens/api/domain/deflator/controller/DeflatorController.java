@@ -21,8 +21,12 @@ public class DeflatorController {
     @GetMapping
     @Operation(summary = "Get deflator observations for a base year")
     public ResponseEntity<DeflatorsResponse> getDeflators(
-        @RequestParam(required = false, defaultValue = "2022-23") String baseYear,
+        @RequestParam(value = "base_year", required = false) String baseYearSnake,
+        @RequestParam(value = "baseYear", required = false) String baseYearCamel,
         @RequestParam(required = false) String type) {
+        String baseYear = (baseYearSnake != null && !baseYearSnake.isBlank())
+            ? baseYearSnake
+            : ((baseYearCamel != null && !baseYearCamel.isBlank()) ? baseYearCamel : "2022-23");
         return ResponseEntity.ok(deflatorService.getDeflators(baseYear, type));
     }
 }

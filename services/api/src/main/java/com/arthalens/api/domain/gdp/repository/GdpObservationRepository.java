@@ -22,6 +22,15 @@ public interface GdpObservationRepository extends JpaRepository<GdpObservation, 
 
     @Query("SELECT g FROM GdpObservation g WHERE g.baseYearId = :baseYearId " +
            "AND g.priceType = :priceType " +
+           "AND g.periodType = 'FY' " +
+           "ORDER BY g.periodLabel DESC LIMIT 1")
+    Optional<GdpObservation> findLatestAnnual(
+            @Param("baseYearId") UUID baseYearId,
+            @Param("priceType") String priceType);
+
+
+    @Query("SELECT g FROM GdpObservation g WHERE g.baseYearId = :baseYearId " +
+           "AND g.priceType = :priceType " +
            "AND (:periodType IS NULL OR g.periodType = :periodType) " +
            "ORDER BY g.periodLabel ASC")
     Page<GdpObservation> findSeries(

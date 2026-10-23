@@ -41,6 +41,13 @@ export default function HomePage() {
   const nominalGdp = data?.nominalGdpGrowth?.value ?? 9.6;
   const gvaGrowth = data?.gvaGrowth?.value ?? 7.2;
   const deflator = data?.gdpDeflator?.value ?? 1.4;
+  const gdpAbsoluteVal = data?.gdpAbsolute?.value
+    ? `₹${(data.gdpAbsolute.value / 100000).toFixed(1)}L Cr`
+    : "₹295.4L Cr";
+  const nominalGrowthLabel = data?.nominalGdpGrowth?.value != null
+    ? `+${data.nominalGdpGrowth.value.toFixed(1)}% YoY`
+    : "+9.6% YoY";
+
 
   return (
     <div className="relative min-h-screen bg-[#E6E5DF] text-[#141416] overflow-x-hidden selection:bg-[#141416] selection:text-[#E6E5DF]">
@@ -207,10 +214,10 @@ export default function HomePage() {
             <div className="p-4 sm:p-5 rounded-2xl bg-[#ECEBE5] border border-[rgba(20,21,23,0.15)] shadow-xs space-y-1.5">
               <div className="flex items-center justify-between text-[11px] font-mono text-[#57585C]">
                 <span className="font-bold uppercase text-[#141416]">NOMINAL OUTPUT</span>
-                <span className="text-emerald-800 font-bold">+9.6% YoY</span>
+                <span className="text-emerald-800 font-bold">{nominalGrowthLabel}</span>
               </div>
               <div className="font-mono text-3xl sm:text-4xl font-black text-[#141416]">
-                ₹295.4L Cr
+                {gdpAbsoluteVal}
               </div>
               <div className="text-[11px] font-sans text-[#828387]">
                 Approx. $3.55T USD Market Prices

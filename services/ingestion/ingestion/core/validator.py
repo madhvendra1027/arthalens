@@ -76,3 +76,16 @@ def validate_observation(row: dict[str, Any], indicator_type: str = "gdp") -> Va
         errors.append(ValidationError("status", f"Status must be one of {VALID_STATUSES}", status))
 
     return ValidationResult(is_valid=len(errors) == 0, errors=errors)
+
+
+def validate_document(row: dict[str, Any]) -> ValidationResult:
+    """Validate an unstructured document or press release row."""
+    errors: list[ValidationError] = []
+    if not row.get("title"):
+        errors.append(ValidationError("title", "Document title must not be empty"))
+    if not row.get("url"):
+        errors.append(ValidationError("url", "Document URL must not be empty"))
+    if not row.get("source_id"):
+        errors.append(ValidationError("source_id", "Source ID is required"))
+    return ValidationResult(is_valid=len(errors) == 0, errors=errors)
+
